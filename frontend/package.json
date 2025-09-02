@@ -1,7 +1,7 @@
 {
   "name": "astro-frontend",
-  "private": true,
   "version": "0.0.1",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "astro dev",
@@ -9,6 +9,6 @@
     "preview": "astro preview --host 0.0.0.0"
   },
   "dependencies": {
-    "astro": "^4.12.0"
+    "astro": "^4.16.19"
   }
 }
