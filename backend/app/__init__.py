@@ -10,6 +10,9 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SECRET_KEY"] = "changeme"
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True}
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"   # par défaut OK
+    app.config["SESSION_COOKIE_SECURE"] = False     # en local (HTTP). Passe à True en prod HTTPS.
+
 
     db.init_app(app)
 
