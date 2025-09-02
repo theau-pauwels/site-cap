@@ -42,35 +42,21 @@ def users_collection():
         db.session.add(user); db.session.commit()
         return jsonify({"ok": True, "id": user.id})
 
-    # -------- GET: lister avec cartes (année -> code) --------
+    # GET: lister avec dictionnaire {annee: code}
     users = (
         User.query
-        .options(joinedload(User.memberships))  # si tu as une relation; sinon on reconstruit ci-dessous
+        .options(joinedload(User.memberships))
         .order_by(User.nom.asc(), User.prenom.asc())
         .all()
     )
-
-    # Si tu n’as pas défini de relation `User.memberships`, on peut récupérer à part :
-    # from .models import Membership
-    # all_members = Membership.query.all()
-    # map_by_user = {}
-    # for m in all_members:
-    #     map_by_user.setdefault(m.user_id, {})[str(m.annee)] = m.annee_code
-
     result = []
     for u in users:
-        # Construire le "dictionnaire { année: code }"
-        cartes = {}
-        # si pas de relation, remplace la boucle par l’accès map_by_user.get(u.id, {})
-        for m in getattr(u, "memberships", []):
-            cartes[str(m.annee)] = m.annee_code
-
+        cartes = {str(m.annee): m.annee_code for m in (u.memberships or [])}
         result.append({
             "id": u.id,
             "nom": u.nom,
             "prenom": u.prenom,
             "identifiant": (u.member_id or u.email),
-            "cartes": cartes  # <= dictionnaire (clé = année -> valeur = code)
+            "cartes": cartes
         })
-
     return jsonify(result)
