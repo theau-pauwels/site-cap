@@ -23,3 +23,25 @@ def create_user():
     )
     db.session.add(user); db.session.commit()
     return jsonify({"ok": True, "id": user.id})
+    
+@bp_admin.route("/api/admin/users", methods=["GET"])
+@login_required
+def list_users():
+    if not is_admin():
+        return jsonify({"error": "Forbidden"}), 403
+    users = User.query.order_by(User.nom.asc(), User.prenom.asc()).all()
+
+    def identifiant(u):
+        # si plus tard vous ajoutez un champ `member_id` (6 chiffres), renvoyez-le ici,
+        # sinon fallback sur l'email :
+        return getattr(u, "member_id", None) or u.email
+
+    return jsonify([
+        {
+            "id": u.id,                 # l'UUID interne (utile pour des actions)
+            "nom": u.nom,
+            "prenom": u.prenom,
+            "identifiant": identifiant(u)
+        }
+        for u in users
+    ])
