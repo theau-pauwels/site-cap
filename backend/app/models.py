@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime
 from enum import Enum
+from sqlalchemy.orm import relationship
 import uuid
 
 db = SQLAlchemy()
@@ -27,6 +28,8 @@ class User(UserMixin, db.Model):
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    memberships = relationship("Membership", backref="user", cascade="all, delete-orphan")
+    
     __table_args__ = (
         # Au moins l'un des deux doit être renseigné
         db.CheckConstraint("(member_id IS NOT NULL) OR (email IS NOT NULL)", name="user_id_or_email_required"),
