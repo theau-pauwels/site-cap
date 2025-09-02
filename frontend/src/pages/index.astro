@@ -1,11 +1,16 @@
 ---
-const res = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email:'test@example.com', password:'test' }) });
-// Ce fetch échouera si l'API n'est pas prête : c'est juste un placeholder de page.
+let apiStatus = 'unknown';
+try {
+  // Appel direct au service Docker du backend (pas via Nginx)
+  const r = await fetch('http://backend:8000/api/auth/logout', { method: 'POST' });
+  apiStatus = `HTTP ${r.status}`;
+} catch (e) {
+  apiStatus = `down`;
+}
 ---
 <html>
-  <head><meta charset="utf-8"><title>Astro OK</title></head>
   <body>
-    <h1>Frontend Astro opérationnel</h1>
-    <p>Si vous voyez cette page via http://localhost, Nginx et Astro tournent.</p>
+    <h1>Astro OK</h1>
+    <p>API backend : {apiStatus}</p>
   </body>
 </html>
