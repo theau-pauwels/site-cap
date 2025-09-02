@@ -1,6 +1,6 @@
 # Carte Fédé Test
 
-Application web de gestion de cartes de fédération pour membres et administrateurs.  
+Application web de gestion de cartes pour la fédération des étudiants de la F.P.Ms.  
 Elle combine **Astro** pour le frontend et **Flask** (Python) pour le backend, avec une base **PostgreSQL** et un déploiement via **Docker Compose**.
 
 ---
