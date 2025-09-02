@@ -25,6 +25,15 @@ def create_app():
     def health():
         return {"ok": True}
 
+    from flask_login import current_user
+
+    @app.get("/api/me")
+    def me():
+        if current_user.is_authenticated:
+            return {"authenticated": True, "email": current_user.email, "role": current_user.role.value}
+        return {"authenticated": False}, 401
+
+    
     # Enregistrer les blueprints
     app.register_blueprint(bp_auth)
     app.register_blueprint(bp_admin)
