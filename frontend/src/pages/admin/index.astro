@@ -1,30 +1,79 @@
 ---
-import { useState } from 'react';
 ---
-
-<html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Admin - Utilisateurs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem; }
+      form { max-width: 520px; display: grid; gap: .75rem; margin-top: 1rem; }
+      input, button { padding: .6rem .8rem; font-size: 1rem; }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+      .bar { display:flex; gap:.75rem; align-items:center; }
+      .ok { color: #0a7; }
+      .err { color: #b00020; }
+    </style>
+  </head>
   <body>
-    <h1>Admin – Créer un utilisateur</h1>
-    <form id="create-user-form">
-      <input type="text" name="prenom" placeholder="Prénom" required />
-      <input type="text" name="nom" placeholder="Nom" required />
-      <input type="email" name="email" placeholder="Email" required />
-      <input type="password" name="password" placeholder="Mot de passe" required />
+    <div class="bar">
+      <h1 style="margin:0;">Administration</h1>
+      <span id="who" class="ok"></span>
+      <button id="logout" type="button">Se déconnecter</button>
+    </div>
+
+    <h2>Créer un utilisateur</h2>
+    <form id="create">
+      <div class="row">
+        <label>Prénom<br/><input name="prenom" required></label>
+        <label>Nom<br/><input name="nom" required></label>
+      </div>
+      <label>Email<br/><input name="email" type="email" required></label>
+      <label>Mot de passe initial<br/><input name="password" type="password" required></label>
       <button type="submit">Créer</button>
+      <div id="msg"></div>
     </form>
+
     <script>
-      document.querySelector("#create-user-form").addEventListener("submit", async (e) => {
+      async function guard() {
+        const r = await fetch('/api/me', { credentials: 'include' });
+        if (!r.ok) { location.href = '/login?next=' + encodeURIComponent(location.pathname); return; }
+        const me = await r.json();
+        if (me.role !== 'admin') { location.href = '/'; return; }
+        document.getElementById('who').textContent = 'Connecté : ' + me.email + ' (' + me.role + ')';
+      }
+
+      document.getElementById('logout').onclick = async () => {
+        await fetch('/api/auth/logout', { method:'POST', credentials:'include' });
+        location.href = '/login';
+      };
+
+      document.getElementById('create').addEventListener('submit', async (e) => {
         e.preventDefault();
+        const msg = document.getElementById('msg');
+        msg.className = ''; msg.textContent = '';
         const data = Object.fromEntries(new FormData(e.target).entries());
-        const res = await fetch("/api/admin/users", {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
+
+        const res = await fetch('/api/admin/users', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
           body: JSON.stringify(data),
-          credentials: "include"
+          credentials: 'include'
         });
-        const json = await res.json();
-        alert(JSON.stringify(json));
+
+        if (res.ok) {
+          msg.className = 'ok';
+          const j = await res.json();
+          msg.textContent = 'Utilisateur créé (id=' + j.id + ').';
+          e.target.reset();
+        } else {
+          msg.className = 'err';
+          try { const j = await res.json(); msg.textContent = j.error || ('Erreur ' + res.status); }
+          catch { msg.textContent = 'Erreur ' + res.status; }
+        }
       });
+
+      guard(); // lance le garde au chargement
     </script>
   </body>
 </html>
