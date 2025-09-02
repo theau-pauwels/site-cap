@@ -20,6 +20,29 @@ import Layout from "../../layouts/Layout.astro";
 </Layout>
 
 <script>
+  const ALLOWED_PREFIXES = ["A","F","E","EA","MI","S"];
+
+  function currentAcademicStartYear() {
+    // si on est après juillet, année de début = année courante, sinon année-1
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = d.getMonth() + 1;
+    return (m >= 8) ? y : (y - 1);
+  }
+
+  function makeYearRanges(countBefore=2, countAfter=6) {
+    // génère ["2023-2024","2024-2025",...]
+    const start = currentAcademicStartYear();
+    const arr = [];
+    for (let k = -countBefore; k <= countAfter; k++) {
+      const y = start + k;
+      arr.push(`${y}-${y+1}`);
+    }
+    return arr;
+  }
+
+  function yearRangeLabelFromStart(startYear) { return `${startYear}-${startYear+1}`; }
+
   async function ensureAdmin() {
     const me = await fetch('/api/me', { credentials: 'include' });
     if (!me.ok) { location.href = '/login?next=' + encodeURIComponent(location.pathname); return false; }
@@ -40,8 +63,12 @@ import Layout from "../../layouts/Layout.astro";
       const entries = Object.entries(cartes || {});
       if (!entries.length) return '<span class="muted">—</span>';
       entries.sort((a,b)=>Number(b[0])-Number(a[0]));
-      return entries.map(([y,c]) => `${y} → ${c}`).join('<br/>');
+      return entries.map(([y,c]) => `${yearRangeLabelFromStart(Number(y))} → ${c}`).join('<br/>');
     };
+
+    const yearRanges = makeYearRanges(); // ex: ["2023-2024","2024-2025",...]
+    const optionsHtml = yearRanges.map(r => `<option value="${r}">${r}</option>`).join('');
+
     tb.innerHTML = users.map(u => `
       <tr>
         <td>${u.nom}</td>
@@ -50,9 +77,15 @@ import Layout from "../../layouts/Layout.astro";
         <td>${fmtCartes(u.cartes)}</td>
         <td>
           <form class="inline form-carte" data-user="${u.id}">
-            <input type="number" name="annee" placeholder="Année" required min="1900" max="2100"/>
-            <input type="text" name="annee_code" placeholder="Numéro" required />
+            <select name="annee" required>
+              ${optionsHtml}
+            </select>
+            <select name="prefix" required>
+              ${ALLOWED_PREFIXES.map(p => `<option value="${p}">${p}</option>`).join('')}
+            </select>
+            <input type="text" name="num" placeholder="Numéro (ex: 23)" required pattern="\\d+" inputmode="numeric" />
             <button type="submit">➕</button>
+            <small class="muted" style="display:block">Format: PREFIX-Num (ex: A-23). Les zéros en tête sont ignorés.</small>
           </form>
         </td>
       </tr>
@@ -62,22 +95,36 @@ import Layout from "../../layouts/Layout.astro";
       f.addEventListener('submit', async (e) => {
         e.preventDefault();
         const userId = f.dataset.user;
-        const data = Object.fromEntries(new FormData(f).entries());
-        data.annee = Number(data.annee);
+        const formData = new FormData(f);
+        const annee = String(formData.get('annee')||'').trim();        // "2025-2026"
+        const prefix = String(formData.get('prefix')||'').trim().toUpperCase();
+        let num = String(formData.get('num')||'').trim();
+
+        if (!/^\d+$/.test(num)) { alert("Le numéro doit être un entier"); return; }
+        // normaliser : retirer les zéros initiaux → "023" => "23"
+        num = String(parseInt(num, 10));
+        if (num === "NaN" || num === "0") { alert("Le numéro doit être ≥ 1"); return; }
+
+        if (!ALLOWED_PREFIXES.includes(prefix)) {
+          alert("Préfixe invalide"); return;
+        }
+
+        const annee_code = `${prefix}-${num}`;
 
         const r = await fetch(`/api/admin/users/${userId}/annees`, {
           method:'PUT',
           headers:{'Content-Type':'application/json'},
           credentials:'include',
-          body: JSON.stringify(data)
+          body: JSON.stringify({ annee, annee_code })
         });
+
         if (!r.ok) {
           let msg = 'Erreur '+r.status;
           try { const j=await r.json(); if (j.error) msg=j.error; } catch {}
           alert(msg);
           return;
         }
-        // Refresh table
+        // Refresh
         const users = await fetchUsers();
         render(users);
       });
@@ -86,10 +133,7 @@ import Layout from "../../layouts/Layout.astro";
 
   (async () => {
     if (!await ensureAdmin()) return;
-    try {
-      render(await fetchUsers());
-    } catch (e) {
-      alert('Chargement impossible: '+e.message);
-    }
+    try { render(await fetchUsers()); }
+    catch (e) { alert('Chargement impossible: '+e.message); }
   })();
 </script>
