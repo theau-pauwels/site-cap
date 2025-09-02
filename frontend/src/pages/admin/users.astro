@@ -23,33 +23,34 @@ import Layout from "../../layouts/Layout.astro";
   const ALLOWED_PREFIXES = ["A","F","E","EA","MI","S"];
 
   // ---------- Utilitaires année ----------
-  function currentAcademicStartYear() {
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = d.getMonth() + 1;
-    return (m >= 8) ? y : (y - 1);
-  }
+function academicStartYearNow() {
+  // Septembre = début d'année scolaire
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = d.getMonth() + 1;
+  return (m >= 9) ? y : (y - 1);
+}
 
-  function makeYearRanges(countBefore=2, countAfter=6) {
-    const start = currentAcademicStartYear();
-    const arr = [];
-    for (let k = -countBefore; k <= countAfter; k++) {
-      const y = start + k;
-      arr.push(`${y}-${y+1}`);
-    }
-    return arr;
+function makeYearRangesFrom2022(yearsAhead = 6) {
+  // Génère ["2022-2023", ..., "YYYY-YYYY+1"] jusqu'à l'année courante + yearsAhead
+  const start = 2022;
+  const end = academicStartYearNow() + yearsAhead;
+  const arr = [];
+  for (let y = start; y <= end; y++) {
+    arr.push(`${y}-${y + 1}`);
   }
+  return arr;
+}
 
-  function yearRangeLabelFromStart(startYear) { return `${startYear}-${startYear+1}`; }
+function yearRangeLabelFromStart(startYear) { return `${startYear}-${startYear+1}`; }
 
-  function startYearFromLabel(label) {
-    // "2025-2026" -> 2025  ;  "2025" -> 2025
-    const s = String(label||"").trim();
-    if (!s) return null;
-    const left = s.includes("-") ? s.split("-")[0] : s;
-    const n = parseInt(left, 10);
-    return Number.isFinite(n) ? n : null;
-  }
+function startYearFromLabel(label) {
+  const s = String(label||"").trim();
+  const left = s.includes("-") ? s.split("-")[0] : s;
+  const n = parseInt(left, 10);
+  return Number.isFinite(n) ? n : null;
+}
+
 
   // ---------- Index des numéros pris ----------
   // taken[yearStart][prefix] = Set(numbers)
@@ -110,8 +111,14 @@ import Layout from "../../layouts/Layout.astro";
       return entries.map(([y,c]) => `${yearRangeLabelFromStart(Number(y))} → ${c}`).join('<br/>');
     };
 
-    const yearRanges = makeYearRanges(); // ex: ["2023-2024","2024-2025",...]
-    const optionsHtml = yearRanges.map(r => `<option value="${r}">${r}</option>`).join('');
+    const currentStart = academicStartYearNow();
+    const yearRanges = makeYearRangesFrom2022(); // ["2022-2023", ..., courant+N]
+    const optionsHtml = yearRanges.map(r => {
+      const yStart = startYearFromLabel(r);
+      const sel = (yStart === currentStart) ? ' selected' : '';
+      return `<option value="${r}"${sel}>${r}</option>`;
+    }).join('');
+
 
     // Index global des numéros déjà utilisés (tous users)
     const taken = buildTakenIndex(users);
