@@ -36,7 +36,10 @@ class Membership(db.Model):
     __tablename__ = "membership"
     id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = db.Column(db.String, db.ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
-    annee = db.Column(db.Integer, nullable=False)       # clé du “dictionnaire”
-    annee_code = db.Column(db.String, nullable=False)   # valeur du “dictionnaire”
+    annee = db.Column(db.Integer, nullable=False)       # année de début (2025 => 2025-2026)
+    annee_code = db.Column(db.String, nullable=False)   # ex: EA-23
 
-    __table_args__ = (db.UniqueConstraint("user_id", "annee", name="uq_user_annee"),)
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "annee", name="uq_user_annee"),        # 1 carte max par user et par année
+        db.UniqueConstraint("annee", "annee_code", name="uq_annee_code_year") # code unique dans une même année
+    )
