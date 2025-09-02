@@ -6,7 +6,7 @@ const next = Astro.url.searchParams.get("next") || "/"; // redir après login
   <h1>Connexion</h1>
   <form id="loginForm" class="stack" novalidate>
     <label>
-      Identifiant
+      Identifiant (email ou matricule UMONS)
       <input id="ident" name="ident" type="text" placeholder="email OU ID 6 chiffres" autocomplete="username" required />
     </label>
     <label>
