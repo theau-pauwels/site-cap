@@ -1,63 +1,95 @@
 ---
+import Layout from "../../layouts/Layout.astro";
 ---
-<html lang="fr">
-  <head>
-    <meta charset="utf-8" />
-    <title>Admin — Utilisateurs</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
-      body { font-family: system-ui, sans-serif; margin: 2rem; }
-      .bar { display:flex; gap:1rem; align-items:center; margin-bottom:1rem; }
-      table { border-collapse: collapse; width: 100%; max-width: 900px; }
-      th, td { border: 1px solid #ddd; padding: .6rem .8rem; text-align: left; }
-      th { background: #f6f6f7; }
-      tr:hover { background: #fafafa; }
-      a.btn { display:inline-block; padding:.4rem .6rem; border:1px solid #ddd; border-radius:.5rem; text-decoration:none; }
-    </style>
-  </head>
-  <body>
-    <div class="bar">
-      <h1 style="margin:0">Utilisateurs</h1>
-      <a class="btn" href="/admin">← Admin</a>
-    </div>
+<Layout title="Gestion des utilisateurs">
+  <h1>Gestion des utilisateurs</h1>
+  <p><a href="/admin" class="btn">← Admin</a></p>
 
-<table id="tbl">
-  <thead>
-    <tr><th>Nom</th><th>Prénom</th><th>Identifiant</th><th>Cartes (année → n°)</th></tr>
-  </thead>
-  <tbody></tbody>
-</table>
+  <table id="tbl">
+    <thead>
+      <tr>
+        <th>Nom</th>
+        <th>Prénom</th>
+        <th>Identifiant</th>
+        <th>Cartes (année → n°)</th>
+        <th>Ajouter une carte</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</Layout>
 
 <script>
-  (async () => {
-    const me = await fetch('/api/me', { credentials:'include' });
-    if (!me.ok) return location.href = '/login?next=' + encodeURIComponent(location.pathname);
-    const meJson = await me.json();
-    if (meJson.role !== 'admin') return location.href = '/';
+  async function ensureAdmin() {
+    const me = await fetch('/api/me', { credentials: 'include' });
+    if (!me.ok) { location.href = '/login?next=' + encodeURIComponent(location.pathname); return false; }
+    const j = await me.json();
+    if (j.role !== 'admin') { location.href = '/'; return false; }
+    return true;
+  }
 
-    const res = await fetch('/api/admin/users', { credentials:'include' });
-    if (!res.ok) { alert('Chargement impossible: HTTP ' + res.status); return; }
+  async function fetchUsers() {
+    const res = await fetch('/api/admin/users', { credentials: 'include' });
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    return res.json();
+  }
 
-    const users = await res.json();
+  function render(users) {
     const tb = document.querySelector('#tbl tbody');
     const fmtCartes = (cartes) => {
-      const entries = Object.entries(cartes || {}); // [['2025','CARTE-2025-001'], ...]
+      const entries = Object.entries(cartes || {});
       if (!entries.length) return '<span class="muted">—</span>';
-      // trier par année décroissante
-      entries.sort((a, b) => Number(b[0]) - Number(a[0]));
-      return entries.map(([year, code]) => `${year} → ${code}`).join('<br/>');
+      entries.sort((a,b)=>Number(b[0])-Number(a[0]));
+      return entries.map(([y,c]) => `${y} → ${c}`).join('<br/>');
     };
-
-    tb.innerHTML = users.map(u =>
-      `<tr>
+    tb.innerHTML = users.map(u => `
+      <tr>
         <td>${u.nom}</td>
         <td>${u.prenom}</td>
         <td>${u.identifiant ?? ''}</td>
         <td>${fmtCartes(u.cartes)}</td>
-      </tr>`
-    ).join('');
+        <td>
+          <form class="inline form-carte" data-user="${u.id}">
+            <input type="number" name="annee" placeholder="Année" required min="1900" max="2100"/>
+            <input type="text" name="annee_code" placeholder="Numéro" required />
+            <button type="submit">➕</button>
+          </form>
+        </td>
+      </tr>
+    `).join('');
+
+    document.querySelectorAll('.form-carte').forEach(f => {
+      f.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const userId = f.dataset.user;
+        const data = Object.fromEntries(new FormData(f).entries());
+        data.annee = Number(data.annee);
+
+        const r = await fetch(`/api/admin/users/${userId}/annees`, {
+          method:'PUT',
+          headers:{'Content-Type':'application/json'},
+          credentials:'include',
+          body: JSON.stringify(data)
+        });
+        if (!r.ok) {
+          let msg = 'Erreur '+r.status;
+          try { const j=await r.json(); if (j.error) msg=j.error; } catch {}
+          alert(msg);
+          return;
+        }
+        // Refresh table
+        const users = await fetchUsers();
+        render(users);
+      });
+    });
+  }
+
+  (async () => {
+    if (!await ensureAdmin()) return;
+    try {
+      render(await fetchUsers());
+    } catch (e) {
+      alert('Chargement impossible: '+e.message);
+    }
   })();
 </script>
-
-  </body>
-</html>
