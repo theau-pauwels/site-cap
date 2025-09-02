@@ -1,16 +1,14 @@
 ---
-let apiStatus = 'unknown';
-try {
-  // Appel direct au service Docker du backend (pas via Nginx)
-  const r = await fetch('http://backend:8000/api/auth/logout', { method: 'POST' });
-  apiStatus = `HTTP ${r.status}`;
-} catch (e) {
-  apiStatus = `down`;
-}
 ---
-<html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Accueil</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>body{font-family:system-ui;margin:2rem}</style>
+  </head>
   <body>
-    <h1>Astro OK</h1>
-    <p>API backend : {apiStatus}</p>
+    <h1>Frontend Astro opérationnel</h1>
+    <p><a href="/login">Se connecter</a> · <a href="/admin">Admin</a> · <a href="/admin/users">Liste utilisateurs</a> · <a href="/app/password">Changer mot de passe</a> · <a href="/app/cartes">Mes cartes</a></p>
   </body>
 </html>
