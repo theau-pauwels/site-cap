@@ -20,7 +20,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      volumes:
+    volumes:
         - ./backend:/app
   frontend:
     build: ./frontend
