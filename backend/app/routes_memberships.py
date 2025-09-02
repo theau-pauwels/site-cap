@@ -7,22 +7,24 @@ bp_mem = Blueprint("memberships", __name__)
 @bp_mem.route("/api/memberships", methods=["GET"])
 @login_required
 def my_memberships():
-    rows = (Membership.query
-            .filter_by(user_id=current_user.id)
-            .order_by(Membership.annee.desc())
-            .all())
+    rows = (
+        Membership.query
+        .filter_by(user_id=current_user.id)
+        .order_by(Membership.annee.desc())
+        .all()
+    )
     return jsonify([{"annee": r.annee, "annee_code": r.annee_code} for r in rows])
 
-# --- helpers ---
+
+# -------- Helpers de validation/normalisation --------
 ALLOWED_PREFIXES = {"A", "F", "E", "EA", "MI", "S"}
 
-def normalize_card_code(raw: str):
+def normalize_card_code(raw: str) -> str:
     """
-    Normalise un code 'prefix-num' :
-      - espaces retirés, majuscules,
-      - préfixe ∈ ALLOWED_PREFIXES,
-      - partie numérique sans zéro de tête (>=1).
-    Retourne 'PREFIX-N' ou lève ValueError.
+    Normalise 'prefix-num' :
+      - uppercase, trim
+      - prefix ∈ ALLOWED_PREFIXES
+      - num entier >=1 (enlève les zéros de tête)
     """
     if not raw:
         raise ValueError("annee_code requis")
@@ -36,28 +38,27 @@ def normalize_card_code(raw: str):
         raise ValueError(f"Préfixe invalide. Autorisés: {', '.join(sorted(ALLOWED_PREFIXES))}")
     if not num.isdigit():
         raise ValueError("La partie numérique doit être un entier")
-    n = int(num)  # supprime les zéros initiaux et valide >= 0
+    n = int(num)
     if n < 1:
         raise ValueError("Le numéro doit être ≥ 1")
     return f"{prefix}-{n}"
 
-def parse_year_range_to_start(raw: str):
+def parse_year_range_to_start(raw) -> int:
     """
-    Accepte soit '2025' soit '2025-2026'. Retourne l'année de début (int).
+    Accepte '2025' ou '2025-2026' et retourne 2025.
     """
-    s = str(raw).strip()
-    if "-" in s:
-        left, _ = s.split("-", 1)
-        s = left.strip()
-    try:
-        y = int(s)
-    except:
+    s = str(raw or "").strip()
+    if not s:
         raise ValueError("Année invalide")
+    if "-" in s:
+        s = s.split("-", 1)[0].strip()
+    y = int(s)
     if y < 1900 or y > 2100:
         raise ValueError("Année hors plage")
     return y
 
-# Admin: upsert (année -> code) pour un user
+
+# -------- Admin: upsert/list des cartes d'un user --------
 @bp_mem.route("/api/admin/users/<user_id>/annees", methods=["PUT", "GET"])
 @login_required
 def upsert_or_list_year(user_id):
@@ -69,29 +70,35 @@ def upsert_or_list_year(user_id):
         return jsonify({"error": "Forbidden"}), 403
 
     if request.method == "GET":
-        rows = Membership.query.filter_by(user_id=user_id).order_by(Membership.annee.desc()).all()
-        return jsonify([{ "annee": r.annee, "annee_code": r.annee_code } for r in rows])
+        rows = (
+            Membership.query
+            .filter_by(user_id=user_id)
+            .order_by(Membership.annee.desc())
+            .all()
+        )
+        return jsonify([{"annee": r.annee, "annee_code": r.annee_code} for r in rows])
 
+    # PUT
     data = request.json or {}
     try:
-        # le front envoie annee sous forme "YYYY-YYYY+1" OU juste "YYYY"
         annee_start = parse_year_range_to_start(data.get("annee"))
         code = normalize_card_code(data.get("annee_code", ""))
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
+    # 1 carte max pour ce user et cette année
     row = Membership.query.filter_by(user_id=u.id, annee=annee_start).first()
 
-# Refuser si le même code est déjà pris sur **la même année** par un autre enregistrement
-existing_same_year = Membership.query.filter_by(annee=annee_start, annee_code=code).first()
-if existing_same_year and (not row or existing_same_year.id != row.id):
-    return jsonify({"error": "Ce numéro de carte est déjà utilisé pour cette année."}), 409
+    # code unique dans la même année (mais peut exister sur d'autres années)
+    existing_same_year = Membership.query.filter_by(annee=annee_start, annee_code=code).first()
+    if existing_same_year and (not row or existing_same_year.id != row.id):
+        return jsonify({"error": "Ce numéro de carte est déjà utilisé pour cette année."}), 409
 
-if row:
-    row.annee_code = code
-else:
-    row = Membership(user_id=u.id, annee=annee_start, annee_code=code)
-    db.session.add(row)
+    if row:
+        row.annee_code = code
+    else:
+        row = Membership(user_id=u.id, annee=annee_start, annee_code=code)
+        db.session.add(row)
 
-db.session.commit()
-return jsonify({"ok": True, "id": row.id})
+    db.session.commit()
+    return jsonify({"ok": True, "id": row.id})
