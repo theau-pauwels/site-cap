@@ -23,37 +23,33 @@ import Layout from "../../layouts/Layout.astro";
   const ALLOWED_PREFIXES = ["A","F","E","EA","MI","S"];
 
   // ---------- Utilitaires année ----------
-function academicStartYearNow() {
-  // Septembre = début d'année scolaire
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = d.getMonth() + 1;
-  return (m >= 9) ? y : (y - 1);
-}
-
-function makeYearRangesFrom2022(yearsAhead = 6) {
-  // Génère ["2022-2023", ..., "YYYY-YYYY+1"] jusqu'à l'année courante + yearsAhead
-  const start = 2022;
-  const end = academicStartYearNow() + yearsAhead;
-  const arr = [];
-  for (let y = start; y <= end; y++) {
-    arr.push(`${y}-${y + 1}`);
+  function currentAcademicStartYear() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = d.getMonth() + 1;
+    return (m >= 8) ? y : (y - 1);
   }
-  return arr;
-}
 
-function yearRangeLabelFromStart(startYear) { return `${startYear}-${startYear+1}`; }
+  function makeYearRanges(countBefore=2, countAfter=6) {
+    const start = currentAcademicStartYear();
+    const arr = [];
+    for (let k = -countBefore; k <= countAfter; k++) {
+      const y = start + k;
+      arr.push(`${y}-${y+1}`);
+    }
+    return arr;
+  }
 
-function startYearFromLabel(label) {
-  const s = String(label||"").trim();
-  const left = s.includes("-") ? s.split("-")[0] : s;
-  const n = parseInt(left, 10);
-  return Number.isFinite(n) ? n : null;
-}
+  function yearRangeLabelFromStart(startYear) { return `${startYear}-${startYear+1}`; }
 
+  function startYearFromLabel(label) {
+    const s = String(label||"").trim();
+    const left = s.includes("-") ? s.split("-")[0] : s;
+    const n = parseInt(left, 10);
+    return Number.isFinite(n) ? n : null;
+  }
 
   // ---------- Index des numéros pris ----------
-  // taken[yearStart][prefix] = Set(numbers)
   function buildTakenIndex(users) {
     const taken = {};
     for (const u of users) {
@@ -61,8 +57,7 @@ function startYearFromLabel(label) {
       for (const [yearStr, code] of Object.entries(cartes)) {
         const year = parseInt(yearStr, 10);
         if (!Number.isFinite(year)) continue;
-        if (typeof code !== "string") continue;
-        const [rawPrefix, rawNum] = code.toUpperCase().split("-");
+        const [rawPrefix, rawNum] = (code||"").toUpperCase().split("-");
         if (!rawPrefix || !rawNum || !/^\d+$/.test(rawNum)) continue;
         const prefix = rawPrefix.trim();
         const num = parseInt(rawNum, 10);
@@ -77,7 +72,6 @@ function startYearFromLabel(label) {
   }
 
   function nextFreeNumber(taken, yearStart, prefix) {
-    // renvoie le plus petit entier >=1 non utilisé pour (année,prefix)
     if (!yearStart || !prefix) return 1;
     const used = taken?.[yearStart]?.[prefix];
     if (!used) return 1;
@@ -104,23 +98,19 @@ function startYearFromLabel(label) {
   // ---------- Rendu ----------
   function render(users) {
     const tb = document.querySelector('#tbl tbody');
-    const fmtCartes = (cartes) => {
+
+    const fmtCartes = (cartes, userId) => {
       const entries = Object.entries(cartes || {});
       if (!entries.length) return '<span class="muted">—</span>';
       entries.sort((a,b)=>Number(b[0])-Number(a[0]));
-      return entries.map(([y,c]) => `${yearRangeLabelFromStart(Number(y))} → ${c}`).join('<br/>');
+      return entries.map(([y,c]) => `
+        ${yearRangeLabelFromStart(Number(y))} → ${c}
+        <button class="btn-del" data-user="${userId}" data-year="${y}" data-code="${c}" style="margin-left:6px">🗑</button>
+      `).join('<br/>');
     };
 
-    const currentStart = academicStartYearNow();
-    const yearRanges = makeYearRangesFrom2022(); // ["2022-2023", ..., courant+N]
-    const optionsHtml = yearRanges.map(r => {
-      const yStart = startYearFromLabel(r);
-      const sel = (yStart === currentStart) ? ' selected' : '';
-      return `<option value="${r}"${sel}>${r}</option>`;
-    }).join('');
-
-
-    // Index global des numéros déjà utilisés (tous users)
+    const yearRanges = makeYearRanges();
+    const optionsHtml = yearRanges.map(r => `<option value="${r}">${r}</option>`).join('');
     const taken = buildTakenIndex(users);
 
     tb.innerHTML = users.map(u => `
@@ -128,75 +118,51 @@ function startYearFromLabel(label) {
         <td>${u.nom}</td>
         <td>${u.prenom}</td>
         <td>${u.identifiant ?? ''}</td>
-        <td>${fmtCartes(u.cartes)}</td>
+        <td>${fmtCartes(u.cartes, u.id)}</td>
         <td>
           <form class="inline form-carte" data-user="${u.id}">
-            <select name="annee" required>
-              ${optionsHtml}
-            </select>
+            <select name="annee" required>${optionsHtml}</select>
             <select name="prefix" required>
               ${ALLOWED_PREFIXES.map(p => `<option value="${p}">${p}</option>`).join('')}
             </select>
             <input type="text" name="num" placeholder="Numéro" required pattern="\\d+" inputmode="numeric" />
             <button type="submit">➕</button>
-            <small class="muted" style="display:block">Format: PREFIX-Num (ex: A-23). Les zéros en tête sont ignorés.</small>
+            <small class="muted" style="display:block">Format: PREFIX-Num (ex: A-23)</small>
           </form>
         </td>
       </tr>
     `).join('');
 
-    // Pour chaque ligne, initialiser le "num" avec le premier libre et gérer les changements
+    // -------- Ajout de carte --------
     document.querySelectorAll('.form-carte').forEach(f => {
       const selYear = f.querySelector('select[name="annee"]');
       const selPrefix = f.querySelector('select[name="prefix"]');
       const inputNum = f.querySelector('input[name="num"]');
 
-      // ... à la place de ta version actuelle :
-
       function refreshDefaultNumber(force = false) {
         const yearStart = startYearFromLabel(selYear.value);
         const prefix = String(selPrefix.value||'').toUpperCase();
         const suggestion = nextFreeNumber(taken, yearStart, prefix);
-
-        // si force=true (changement de prefix/année) -> remplace toujours
-        // sinon, on ne remplace que si le champ est vide/invalide
         if (force || !/^\d+$/.test(inputNum.value)) {
           inputNum.value = String(suggestion);
         }
         inputNum.placeholder = String(suggestion);
       }
 
-      // écouteurs :
-      selYear.addEventListener('change', () => refreshDefaultNumber(true));   // 👈 force
-      selPrefix.addEventListener('change', () => refreshDefaultNumber(true)); // 👈 force
-
-      // init
+      selYear.addEventListener('change', () => refreshDefaultNumber(true));
+      selPrefix.addEventListener('change', () => refreshDefaultNumber(true));
       refreshDefaultNumber(true);
-
 
       f.addEventListener('submit', async (e) => {
         e.preventDefault();
         const userId = f.dataset.user;
-
         const yearStart = startYearFromLabel(selYear.value);
         const prefix = String(selPrefix.value||'').toUpperCase();
 
-        let numRaw = String(inputNum.value||'').trim();
-        if (!/^\d+$/.test(numRaw)) {
-          // fallback : si vide ou invalide, utiliser le premier libre
-          numRaw = String(nextFreeNumber(taken, yearStart, prefix));
-        }
-        const num = parseInt(numRaw, 10);
-        if (!Number.isFinite(num) || num < 1) {
-          alert("Le numéro doit être un entier ≥ 1");
-          return;
-        }
-        if (!ALLOWED_PREFIXES.includes(prefix)) {
-          alert("Préfixe invalide");
-          return;
-        }
+        let num = parseInt(inputNum.value, 10);
+        if (!Number.isFinite(num) || num < 1) num = nextFreeNumber(taken, yearStart, prefix);
 
-        const anneeLabel = selYear.value; // "YYYY-YYYY+1"
+        const anneeLabel = selYear.value;
         const annee_code = `${prefix}-${num}`;
 
         const r = await fetch(`/api/admin/users/${userId}/annees`, {
@@ -207,24 +173,35 @@ function startYearFromLabel(label) {
         });
 
         if (!r.ok) {
-          if (r.status === 409) {
-            alert("Ce numéro de carte est déjà utilisé pour cette année.");
-            return;
-          }
           let msg = 'Erreur ' + r.status;
           try { const j=await r.json(); if (j.error) msg=j.error; } catch {}
           alert(msg);
           return;
         }
+        render(await fetchUsers());
+      });
+    });
 
-        // Met à jour l'index local "taken" pour éviter un refetch complet
-        if (!taken[yearStart]) taken[yearStart] = {};
-        if (!taken[yearStart][prefix]) taken[yearStart][prefix] = new Set();
-        taken[yearStart][prefix].add(num);
+    // -------- Suppression de carte --------
+    document.querySelectorAll('.btn-del').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const userId = btn.dataset.user;
+        const year = btn.dataset.year;
+        const code = btn.dataset.code;
+        if (!confirm(`Supprimer la carte ${code} pour ${yearRangeLabelFromStart(Number(year))} ?`)) return;
 
-        // Rafraîchir la table côté UI (refetch pour refléter toutes les colonnes)
-        const users = await fetchUsers();
-        render(users);
+        const r = await fetch(`/api/admin/users/${userId}/annees/${year}`, {
+          method:'DELETE',
+          credentials:'include'
+        });
+
+        if (!r.ok) {
+          let msg = 'Erreur ' + r.status;
+          try { const j=await r.json(); if (j.error) msg=j.error; } catch {}
+          alert(msg);
+          return;
+        }
+        render(await fetchUsers());
       });
     });
   }
