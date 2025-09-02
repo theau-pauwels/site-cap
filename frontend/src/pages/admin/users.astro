@@ -21,29 +21,43 @@
       <a class="btn" href="/admin">← Admin</a>
     </div>
 
-    <table id="tbl">
-      <thead>
-        <tr><th>Nom</th><th>Prénom</th><th>Identifiant</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+<table id="tbl">
+  <thead>
+    <tr><th>Nom</th><th>Prénom</th><th>Identifiant</th><th>Cartes (année → n°)</th></tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
-    <script>
-      (async () => {
-        const me = await fetch('/api/me', { credentials:'include' });
-        if (!me.ok) return location.href = '/login?next=' + encodeURIComponent(location.pathname);
-        const meJson = await me.json();
-        if (meJson.role !== 'admin') return location.href = '/';
+<script>
+  (async () => {
+    const me = await fetch('/api/me', { credentials:'include' });
+    if (!me.ok) return location.href = '/login?next=' + encodeURIComponent(location.pathname);
+    const meJson = await me.json();
+    if (meJson.role !== 'admin') return location.href = '/';
 
-        const res = await fetch('/api/admin/users', { credentials:'include' });
-        if (!res.ok) { alert('Chargement impossible: HTTP ' + res.status); return; }
+    const res = await fetch('/api/admin/users', { credentials:'include' });
+    if (!res.ok) { alert('Chargement impossible: HTTP ' + res.status); return; }
 
-        const users = await res.json();
-        const tb = document.querySelector('#tbl tbody');
-        tb.innerHTML = users.map(u =>
-          `<tr><td>${u.nom}</td><td>${u.prenom}</td><td>${u.identifiant}</td></tr>`
-        ).join('');
-      })();
-    </script>
+    const users = await res.json();
+    const tb = document.querySelector('#tbl tbody');
+    const fmtCartes = (cartes) => {
+      const entries = Object.entries(cartes || {}); // [['2025','CARTE-2025-001'], ...]
+      if (!entries.length) return '<span class="muted">—</span>';
+      // trier par année décroissante
+      entries.sort((a, b) => Number(b[0]) - Number(a[0]));
+      return entries.map(([year, code]) => `${year} → ${code}`).join('<br/>');
+    };
+
+    tb.innerHTML = users.map(u =>
+      `<tr>
+        <td>${u.nom}</td>
+        <td>${u.prenom}</td>
+        <td>${u.identifiant ?? ''}</td>
+        <td>${fmtCartes(u.cartes)}</td>
+      </tr>`
+    ).join('');
+  })();
+</script>
+
   </body>
 </html>
