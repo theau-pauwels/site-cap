@@ -16,7 +16,7 @@ const redirectTo = Astro.url.searchParams.get('next') ?? '/admin';
   </head>
   <body>
     <h1>Connexion</h1>
-    <p class="hint">Identifiant = email. (admin@example.com / monpass)</p>
+    <p class="hint">admin@example.com / monpass</p>
     <form id="login">
       <label>Email<br/><input name="email" type="email" required autocomplete="username" /></label>
       <label>Mot de passe<br/><input name="password" type="password" required autocomplete="current-password" /></label>
@@ -38,7 +38,7 @@ const redirectTo = Astro.url.searchParams.get('next') ?? '/admin';
           method: 'POST',
           headers: {'Content-Type':'application/json'},
           body: JSON.stringify(data),
-          credentials: 'include' // <- indispensable pour recevoir le cookie de session
+          credentials: 'include' // indispensable pour le cookie
         });
 
         if (res.ok) {
