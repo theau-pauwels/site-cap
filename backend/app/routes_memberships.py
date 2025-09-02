@@ -81,10 +81,17 @@ def upsert_or_list_year(user_id):
         return jsonify({"error": str(e)}), 400
 
     row = Membership.query.filter_by(user_id=u.id, annee=annee_start).first()
-    if row:
-        row.annee_code = code
-    else:
-        row = Membership(user_id=u.id, annee=annee_start, annee_code=code)
-        db.session.add(row)
-    db.session.commit()
-    return jsonify({"ok": True, "id": row.id})
+
+# Refuser si le même code est déjà pris sur **la même année** par un autre enregistrement
+existing_same_year = Membership.query.filter_by(annee=annee_start, annee_code=code).first()
+if existing_same_year and (not row or existing_same_year.id != row.id):
+    return jsonify({"error": "Ce numéro de carte est déjà utilisé pour cette année."}), 409
+
+if row:
+    row.annee_code = code
+else:
+    row = Membership(user_id=u.id, annee=annee_start, annee_code=code)
+    db.session.add(row)
+
+db.session.commit()
+return jsonify({"ok": True, "id": row.id})
