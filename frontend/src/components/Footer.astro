@@ -1,0 +1,49 @@
+---
+import { onMount } from "solid-js"; // pour fetch côté client
+
+let links = [];
+
+onMount(async () => {
+  try {
+    const r = await fetch("/api/me", { credentials: "include" });
+    if (!r.ok) return;
+    const j = await r.json();
+
+    if (!j?.email && !j?.identifiant) {
+      // pas connecté
+      links = [
+        { href: "/login", label: "Connexion" },
+      ];
+    } else if (j.role === "admin") {
+      links = [
+        { href: "/", label: "Accueil" },
+        { href: "/cartes", label: "Mes cartes" },
+        { href: "/admin", label: "Admin" },
+        { href: "/admin/users", label: "Gestion des utilisateurs" },
+        { href: "/logout", label: "Déconnexion" },
+      ];
+    } else {
+      // utilisateur normal
+      links = [
+        { href: "/", label: "Accueil" },
+        { href: "/cartes", label: "Mes cartes" },
+        { href: "/logout", label: "Déconnexion" },
+      ];
+    }
+
+    // force re-render
+    document.querySelector("#footer-links").innerHTML =
+      links.map(l => `<a href="${l.href}">${l.label}</a>`).join(" | ");
+  } catch {
+    // si erreur => seulement "Connexion"
+    document.querySelector("#footer-links").innerHTML =
+      `<a href="/login">Connexion</a>`;
+  }
+});
+---
+
+<footer style="margin-top:2rem; padding:1rem; border-top:1px solid #ddd; text-align:center;">
+  <div id="footer-links">
+    <!-- Liens remplis côté client -->
+  </div>
+</footer>
