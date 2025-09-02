@@ -3,7 +3,7 @@ from flask_login import LoginManager, current_user
 from .models import db, User
 from .routes_auth import bp_auth
 from .routes_admin import bp_admin
-# from .routes_memberships import bp_mem  # si tu l’as ajouté
+from .routes_memberships import bp_mem  # si tu l’as ajouté
 
 def create_app():
     app = Flask(__name__)
@@ -33,5 +33,5 @@ def create_app():
 
     app.register_blueprint(bp_auth)
     app.register_blueprint(bp_admin)
-    # app.register_blueprint(bp_mem)
+    app.register_blueprint(bp_mem)
     return app
