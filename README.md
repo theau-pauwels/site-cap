@@ -65,9 +65,9 @@ Accès :
 - [ ] **Système d’email** : envoi automatique d’un mot de passe temporaire lors de la création du compte.
 - [ ] **Améliorer l’UI** (style, responsivité).
 - [ ] **Gestion des erreurs côté frontend** (messages plus clairs).
-- [ ] **Page Admin → création utilisateur** directement depuis l’UI (actuellement via script / API).
+- [ ] **Page Admin → création utilisateur** directement depuis l’UI (clarification de l'interface et des options).
 - [ ] **Page Admin → édition/suppression utilisateur**.
-- [ ] **Export CSV/PDF** des cartes pour une fédération donnée.
+- [ ] **QR Code temporaire** des cartes pour une soirée/occasion.
 - [ ] **Déploiement en prod** (config TLS, nom de domaine, CI/CD).
 - [ ] **Tests unitaires & end-to-end** pour sécuriser le projet.
 
@@ -88,11 +88,6 @@ carte-fede-test/
 ├── docker-compose.yml
 └── README.md
 ```
-
----
-
-## 👨‍💻 Auteurs
-- [@theau-pauwels](https://github.com/theau-pauwels) – conception et intégration.
 
 ---
 
