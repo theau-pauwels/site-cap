@@ -151,21 +151,28 @@ function startYearFromLabel(label) {
       const selPrefix = f.querySelector('select[name="prefix"]');
       const inputNum = f.querySelector('input[name="num"]');
 
-      function refreshDefaultNumber() {
+      // ... à la place de ta version actuelle :
+
+      function refreshDefaultNumber(force = false) {
         const yearStart = startYearFromLabel(selYear.value);
         const prefix = String(selPrefix.value||'').toUpperCase();
         const suggestion = nextFreeNumber(taken, yearStart, prefix);
-        // ne remplace pas si l’utilisateur a déjà tapé quelque chose de valide
-        if (!inputNum.value || !/^\d+$/.test(inputNum.value)) {
+
+        // si force=true (changement de prefix/année) -> remplace toujours
+        // sinon, on ne remplace que si le champ est vide/invalide
+        if (force || !/^\d+$/.test(inputNum.value)) {
           inputNum.value = String(suggestion);
         }
         inputNum.placeholder = String(suggestion);
       }
 
-      selYear.addEventListener('change', refreshDefaultNumber);
-      selPrefix.addEventListener('change', refreshDefaultNumber);
-      // init au montage
-      refreshDefaultNumber();
+      // écouteurs :
+      selYear.addEventListener('change', () => refreshDefaultNumber(true));   // 👈 force
+      selPrefix.addEventListener('change', () => refreshDefaultNumber(true)); // 👈 force
+
+      // init
+      refreshDefaultNumber(true);
+
 
       f.addEventListener('submit', async (e) => {
         e.preventDefault();
