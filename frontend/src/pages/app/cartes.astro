@@ -1,0 +1,33 @@
+---
+/* Côté SSR on ne charge pas (pas de cookie); on chargera côté client */
+---
+<html lang="fr">
+  <head>
+    <meta charset="utf-8"/><title>Mes cartes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <style>
+      body{font-family:system-ui;margin:2rem}
+      table{border-collapse:collapse} th,td{border:1px solid #ddd;padding:.5rem .7rem}
+      th{background:#f6f6f7}
+    </style>
+  </head>
+  <body>
+    <h1>Mes cartes</h1>
+    <table id="tbl">
+      <thead><tr><th>Année</th><th>Id de l'année</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <script>
+      (async () => {
+        const r = await fetch('/api/me', { credentials:'include' });
+        if (!r.ok) return location.href = '/login?next=' + encodeURIComponent(location.pathname);
+
+        const res = await fetch('/api/memberships', { credentials:'include' });
+        if (!res.ok) { alert('Erreur: ' + res.status); return; }
+        const data = await res.json();
+        const tb = document.querySelector('#tbl tbody');
+        tb.innerHTML = data.map(x => `<tr><td>${x.annee}</td><td>${x.annee_code ?? x.membership_code ?? ''}</td></tr>`).join('');
+      })();
+    </script>
+  </body>
+</html>
