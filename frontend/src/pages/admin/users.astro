@@ -22,8 +22,8 @@ import Layout from "../../layouts/Layout.astro";
 <script>
   const ALLOWED_PREFIXES = ["A","F","E","EA","MI","S"];
 
+  // ---------- Utilitaires année ----------
   function currentAcademicStartYear() {
-    // si on est après juillet, année de début = année courante, sinon année-1
     const d = new Date();
     const y = d.getFullYear();
     const m = d.getMonth() + 1;
@@ -31,7 +31,6 @@ import Layout from "../../layouts/Layout.astro";
   }
 
   function makeYearRanges(countBefore=2, countAfter=6) {
-    // génère ["2023-2024","2024-2025",...]
     const start = currentAcademicStartYear();
     const arr = [];
     for (let k = -countBefore; k <= countAfter; k++) {
@@ -43,6 +42,50 @@ import Layout from "../../layouts/Layout.astro";
 
   function yearRangeLabelFromStart(startYear) { return `${startYear}-${startYear+1}`; }
 
+  function startYearFromLabel(label) {
+    // "2025-2026" -> 2025  ;  "2025" -> 2025
+    const s = String(label||"").trim();
+    if (!s) return null;
+    const left = s.includes("-") ? s.split("-")[0] : s;
+    const n = parseInt(left, 10);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  // ---------- Index des numéros pris ----------
+  // taken[yearStart][prefix] = Set(numbers)
+  function buildTakenIndex(users) {
+    const taken = {};
+    for (const u of users) {
+      const cartes = u.cartes || {};
+      for (const [yearStr, code] of Object.entries(cartes)) {
+        const year = parseInt(yearStr, 10);
+        if (!Number.isFinite(year)) continue;
+        if (typeof code !== "string") continue;
+        const [rawPrefix, rawNum] = code.toUpperCase().split("-");
+        if (!rawPrefix || !rawNum || !/^\d+$/.test(rawNum)) continue;
+        const prefix = rawPrefix.trim();
+        const num = parseInt(rawNum, 10);
+        if (!ALLOWED_PREFIXES.includes(prefix) || num < 1) continue;
+
+        if (!taken[year]) taken[year] = {};
+        if (!taken[year][prefix]) taken[year][prefix] = new Set();
+        taken[year][prefix].add(num);
+      }
+    }
+    return taken;
+  }
+
+  function nextFreeNumber(taken, yearStart, prefix) {
+    // renvoie le plus petit entier >=1 non utilisé pour (année,prefix)
+    if (!yearStart || !prefix) return 1;
+    const used = taken?.[yearStart]?.[prefix];
+    if (!used) return 1;
+    let n = 1;
+    while (used.has(n)) n++;
+    return n;
+  }
+
+  // ---------- API ----------
   async function ensureAdmin() {
     const me = await fetch('/api/me', { credentials: 'include' });
     if (!me.ok) { location.href = '/login?next=' + encodeURIComponent(location.pathname); return false; }
@@ -57,6 +100,7 @@ import Layout from "../../layouts/Layout.astro";
     return res.json();
   }
 
+  // ---------- Rendu ----------
   function render(users) {
     const tb = document.querySelector('#tbl tbody');
     const fmtCartes = (cartes) => {
@@ -68,6 +112,9 @@ import Layout from "../../layouts/Layout.astro";
 
     const yearRanges = makeYearRanges(); // ex: ["2023-2024","2024-2025",...]
     const optionsHtml = yearRanges.map(r => `<option value="${r}">${r}</option>`).join('');
+
+    // Index global des numéros déjà utilisés (tous users)
+    const taken = buildTakenIndex(users);
 
     tb.innerHTML = users.map(u => `
       <tr>
@@ -83,7 +130,7 @@ import Layout from "../../layouts/Layout.astro";
             <select name="prefix" required>
               ${ALLOWED_PREFIXES.map(p => `<option value="${p}">${p}</option>`).join('')}
             </select>
-            <input type="text" name="num" placeholder="Numéro (ex: 23)" required pattern="\\d+" inputmode="numeric" />
+            <input type="text" name="num" placeholder="Numéro" required pattern="\\d+" inputmode="numeric" />
             <button type="submit">➕</button>
             <small class="muted" style="display:block">Format: PREFIX-Num (ex: A-23). Les zéros en tête sont ignorés.</small>
           </form>
@@ -91,40 +138,77 @@ import Layout from "../../layouts/Layout.astro";
       </tr>
     `).join('');
 
+    // Pour chaque ligne, initialiser le "num" avec le premier libre et gérer les changements
     document.querySelectorAll('.form-carte').forEach(f => {
+      const selYear = f.querySelector('select[name="annee"]');
+      const selPrefix = f.querySelector('select[name="prefix"]');
+      const inputNum = f.querySelector('input[name="num"]');
+
+      function refreshDefaultNumber() {
+        const yearStart = startYearFromLabel(selYear.value);
+        const prefix = String(selPrefix.value||'').toUpperCase();
+        const suggestion = nextFreeNumber(taken, yearStart, prefix);
+        // ne remplace pas si l’utilisateur a déjà tapé quelque chose de valide
+        if (!inputNum.value || !/^\d+$/.test(inputNum.value)) {
+          inputNum.value = String(suggestion);
+        }
+        inputNum.placeholder = String(suggestion);
+      }
+
+      selYear.addEventListener('change', refreshDefaultNumber);
+      selPrefix.addEventListener('change', refreshDefaultNumber);
+      // init au montage
+      refreshDefaultNumber();
+
       f.addEventListener('submit', async (e) => {
         e.preventDefault();
         const userId = f.dataset.user;
-        const formData = new FormData(f);
-        const annee = String(formData.get('annee')||'').trim();        // "2025-2026"
-        const prefix = String(formData.get('prefix')||'').trim().toUpperCase();
-        let num = String(formData.get('num')||'').trim();
 
-        if (!/^\d+$/.test(num)) { alert("Le numéro doit être un entier"); return; }
-        // normaliser : retirer les zéros initiaux → "023" => "23"
-        num = String(parseInt(num, 10));
-        if (num === "NaN" || num === "0") { alert("Le numéro doit être ≥ 1"); return; }
+        const yearStart = startYearFromLabel(selYear.value);
+        const prefix = String(selPrefix.value||'').toUpperCase();
 
+        let numRaw = String(inputNum.value||'').trim();
+        if (!/^\d+$/.test(numRaw)) {
+          // fallback : si vide ou invalide, utiliser le premier libre
+          numRaw = String(nextFreeNumber(taken, yearStart, prefix));
+        }
+        const num = parseInt(numRaw, 10);
+        if (!Number.isFinite(num) || num < 1) {
+          alert("Le numéro doit être un entier ≥ 1");
+          return;
+        }
         if (!ALLOWED_PREFIXES.includes(prefix)) {
-          alert("Préfixe invalide"); return;
+          alert("Préfixe invalide");
+          return;
         }
 
+        const anneeLabel = selYear.value; // "YYYY-YYYY+1"
         const annee_code = `${prefix}-${num}`;
 
         const r = await fetch(`/api/admin/users/${userId}/annees`, {
           method:'PUT',
           headers:{'Content-Type':'application/json'},
           credentials:'include',
-          body: JSON.stringify({ annee, annee_code })
+          body: JSON.stringify({ annee: anneeLabel, annee_code })
         });
 
         if (!r.ok) {
-          let msg = 'Erreur '+r.status;
+          if (r.status === 409) {
+            alert("Ce numéro de carte est déjà utilisé pour cette année.");
+            return;
+          }
+          let msg = 'Erreur ' + r.status;
           try { const j=await r.json(); if (j.error) msg=j.error; } catch {}
           alert(msg);
           return;
         }
-        // Refresh
+
+        // Met à jour l'index local "taken" pour éviter un refetch complet
+        if (!taken[yearStart]) taken[yearStart] = {};
+        if (!taken[yearStart][prefix]) taken[yearStart][prefix] = new Set();
+        taken[yearStart][prefix].add(num);
+
+        // Rafraîchir la table côté UI (refetch pour refléter toutes les colonnes)
         const users = await fetchUsers();
         render(users);
       });
