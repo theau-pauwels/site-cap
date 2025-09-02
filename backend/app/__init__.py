@@ -25,10 +25,6 @@ def create_app():
     def health():
         return {"ok": True}
 
-    # Créer les tables au premier lancement (temporaire)
-    with app.app_context():
-        db.create_all()
-
     # Enregistrer les blueprints
     app.register_blueprint(bp_auth)
     app.register_blueprint(bp_admin)
