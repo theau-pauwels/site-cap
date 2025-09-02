@@ -1,0 +1,29 @@
+from flask import Blueprint, request, jsonify
+from flask_login import login_required, current_user
+from werkzeug.security import generate_password_hash
+from .models import db, User, Role
+
+bp_admin = Blueprint("admin", __name__)
+
+def require_admin():
+    if not current_user.is_authenticated or current_user.role != Role.ADMIN:
+        return False
+    return True
+
+@bp_admin.route("/api/admin/users", methods=["POST"])
+@login_required
+def create_user():
+    if not require_admin():
+        return jsonify({"error": "Forbidden"}), 403
+    
+    data = request.json
+    new_user = User(
+        email=data["email"],
+        prenom=data["prenom"],
+        nom=data["nom"],
+        password_hash=generate_password_hash(data["password"]),
+        role=Role.MEMBER
+    )
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({"ok": True, "id": new_user.id})
