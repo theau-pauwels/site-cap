@@ -12,15 +12,30 @@ def is_admin():
 @login_required
 def create_user():
     if not is_admin():
-        return jsonify({"error": "Forbidden"}), 403
+        return jsonify({"error":"Forbidden"}), 403
     data = request.json or {}
-    user = User(
-        email=data["email"].lower(),
-        prenom=data["prenom"],
-        nom=data["nom"],
-        password_hash=generate_password_hash(data["password"]),
-        role=Role.MEMBER
-    )
+
+    # Champs requis
+    nom = (data.get("nom") or "").strip()
+    prenom = (data.get("prenom") or "").strip()
+    email = (data.get("email") or "").strip().lower() or None
+    member_id = (data.get("member_id") or "").strip() or None
+    password = (data.get("password") or "").strip()
+
+    if not nom or not prenom or not password:
+        return jsonify({"error":"Champs requis: nom, prenom, password + (member_id OU email)"}), 400
+    if not member_id and not email:
+        return jsonify({"error":"Fournir soit member_id (6 chiffres) soit email"}), 400
+    if member_id and (len(member_id)!=6 or not member_id.isdigit()):
+        return jsonify({"error":"member_id doit être 6 chiffres"}), 400
+
+    if member_id and User.query.filter_by(member_id=member_id).first():
+        return jsonify({"error":"member_id déjà utilisé"}), 409
+    if email and User.query.filter_by(email=email).first():
+        return jsonify({"error":"email déjà utilisé"}), 409
+
+    user = User(nom=nom, prenom=prenom, email=email, member_id=member_id,
+                password_hash=generate_password_hash(password), role=Role.MEMBER)
     db.session.add(user); db.session.commit()
     return jsonify({"ok": True, "id": user.id})
     
