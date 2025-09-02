@@ -1,0 +1,59 @@
+---
+---
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Admin — Utilisateurs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem; }
+      .bar { display:flex; gap:1rem; align-items:center; margin-bottom:1rem; }
+      table { border-collapse: collapse; width: 100%; max-width: 900px; }
+      th, td { border: 1px solid #ddd; padding: .6rem .8rem; text-align: left; }
+      th { background: #f6f6f7; }
+      tr:hover { background: #fafafa; }
+      .muted { color: #666; font-size: .9rem; }
+      a.btn { display:inline-block; padding:.5rem .75rem; border:1px solid #ddd; border-radius:.5rem; text-decoration:none; }
+    </style>
+  </head>
+  <body>
+    <div class="bar">
+      <h1 style="margin:0">Utilisateurs</h1>
+      <a class="btn" href="/admin">← Admin</a>
+    </div>
+
+    <p class="muted">Colonnes : Nom, Prénom, Identifiant (id 6 chiffres si présent, sinon email)</p>
+
+    <table id="tbl">
+      <thead>
+        <tr><th>Nom</th><th>Prénom</th><th>Identifiant</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <script>
+      (async () => {
+        // garde admin + chargement
+        const me = await fetch('/api/me', { credentials:'include' });
+        if (!me.ok) return location.href = '/login?next=' + encodeURIComponent(location.pathname);
+        const meJson = await me.json();
+        if (meJson.role !== 'admin') return location.href = '/';
+
+        const res = await fetch('/api/admin/users', { credentials:'include' });
+        if (!res.ok) {
+          alert('Chargement impossible: HTTP ' + res.status);
+          return;
+        }
+        const users = await res.json();
+        const tb = document.querySelector('#tbl tbody');
+        tb.innerHTML = users.map(u =>
+          `<tr>
+            <td>${u.nom}</td>
+            <td>${u.prenom}</td>
+            <td>${u.identifiant}</td>
+          </tr>`
+        ).join('');
+      })();
+    </script>
+  </body>
+</html>
