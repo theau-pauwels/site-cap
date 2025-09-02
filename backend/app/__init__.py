@@ -1,9 +1,9 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_login import LoginManager, current_user
 from .models import db, User
 from .routes_auth import bp_auth
 from .routes_admin import bp_admin
-from .routes_memberships import bp_mem  # si tu l’as ajouté
+from .routes_memberships import bp_mem
 
 def create_app():
     app = Flask(__name__)
@@ -28,7 +28,8 @@ def create_app():
     @app.get("/api/me")
     def me():
         if current_user.is_authenticated:
-            return {"authenticated": True, "email": current_user.email, "role": current_user.role.value}
+            role_val = getattr(current_user.role, "value", current_user.role)
+            return {"authenticated": True, "email": current_user.email, "role": role_val}
         return {"authenticated": False}, 401
 
     app.register_blueprint(bp_auth)
