@@ -1,0 +1,30 @@
+---
+import { useState } from 'react';
+---
+
+<html>
+  <body>
+    <h1>Admin – Créer un utilisateur</h1>
+    <form id="create-user-form">
+      <input type="text" name="prenom" placeholder="Prénom" required />
+      <input type="text" name="nom" placeholder="Nom" required />
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Mot de passe" required />
+      <button type="submit">Créer</button>
+    </form>
+    <script>
+      document.querySelector("#create-user-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(e.target).entries());
+        const res = await fetch("/api/admin/users", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(data),
+          credentials: "include"
+        });
+        const json = await res.json();
+        alert(JSON.stringify(json));
+      });
+    </script>
+  </body>
+</html>
