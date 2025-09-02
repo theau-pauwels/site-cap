@@ -8,20 +8,17 @@ db = SQLAlchemy()
 
 class Role(Enum):
     MEMBER = "member"
-    ADMIN = "admin"
+    ADMIN  = "admin"
 
 class User(UserMixin, db.Model):
+    __tablename__ = "user"
     id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
     email = db.Column(db.String, unique=True, nullable=False)
     prenom = db.Column(db.String, nullable=False)
     nom = db.Column(db.String, nullable=False)
     password_hash = db.Column(db.String, nullable=False)
-    role = db.Column(db.Enum(Role), default=Role.MEMBER, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-class Membership(db.Model):
-    id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id = db.Column(db.String, db.ForeignKey('user.id'), nullable=False)
-    annee = db.Column(db.Integer, nullable=False)
-    membership_code = db.Column(db.String, nullable=False)
-    valid_until = db.Column(db.DateTime, nullable=False)
+    # IMPORTANT : nommer le type pour Postgres
+    role = db.Column(db.Enum(Role, name="role_enum"), default=Role.MEMBER, nullable=False)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
