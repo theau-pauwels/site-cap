@@ -1,0 +1,11 @@
+---
+const res = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email:'test@example.com', password:'test' }) });
+// Ce fetch échouera si l'API n'est pas prête : c'est juste un placeholder de page.
+---
+<html>
+  <head><meta charset="utf-8"><title>Astro OK</title></head>
+  <body>
+    <h1>Frontend Astro opérationnel</h1>
+    <p>Si vous voyez cette page via http://localhost, Nginx et Astro tournent.</p>
+  </body>
+</html>
