@@ -28,7 +28,10 @@
         const data = await res.json();
         if (!data.length) { tb.innerHTML = `<tr><td colspan="2">Aucune carte pour le moment</td></tr>`; return; }
         data.sort((a,b)=>b.annee-a.annee);
-        tb.innerHTML = data.map(x => `<tr><td>${x.annee}</td><td>${x.annee_code ?? ''}</td></tr>`).join('');
+        tb.innerHTML = data.map(x => {
+          const label = `${x.annee}-${x.annee+1}`;  // transforme 2025 en "2025-2026"
+          return `<tr><td>${label}</td><td>${x.annee_code ?? ''}</td></tr>`;
+        }).join('');
       })();
     </script>
   </body>
