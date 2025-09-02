@@ -1,27 +1,15 @@
 ---
-const { title = "App" } = Astro.props;
+const { title } = Astro.props;
+import Footer from "../components/Footer.astro";
 ---
 <html lang="fr">
   <head>
     <meta charset="utf-8" />
     <title>{title}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
-      :root { --bd:#ddd; --muted:#666; }
-      body { font-family: system-ui, sans-serif; margin: 2rem; }
-      table { border-collapse: collapse; width: 100%; max-width: 1000px; }
-      th, td { border:1px solid var(--bd); padding:.6rem .8rem; text-align:left; vertical-align: top; }
-      th { background:#f6f6f7; }
-      tr:hover { background:#fafafa; }
-      .muted { color: var(--muted); }
-      .btn { display:inline-block; padding:.4rem .6rem; border:1px solid var(--bd); border-radius:.5rem; text-decoration:none; }
-      input, button { padding:.45rem .6rem; font-size: 1rem; }
-      form.inline { display:flex; gap:.4rem; align-items:center; }
-      form.inline input[type="number"]{ width:90px; }
-      form.inline input[type="text"]{ width:160px; }
-    </style>
   </head>
   <body>
     <slot />
+    <Footer />
   </body>
 </html>
