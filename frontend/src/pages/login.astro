@@ -3,17 +3,35 @@ import Layout from "../layouts/Layout.astro";
 const next = Astro.url.searchParams.get("next") || "/"; // redir après login
 ---
 <Layout title="Connexion">
-  <h1>Connexion</h1>
+  <main class="flex-1 flex flex-col gap-4 items-center p-4 justify-center">
+  <section class="w-full max-w-md">
+  <h1 class="font-semibold text-2xl text-blue-800 bg-white mb-1">Connexion</h1>
   <form id="loginForm" class="stack" novalidate>
     <label>
       Identifiant (email ou matricule UMONS)
-      <input id="ident" name="ident" type="text" placeholder="email OU ID 6 chiffres" autocomplete="username" required />
+      <input 
+      id="ident" 
+      name="ident" 
+      type="text" 
+      placeholder="email OU ID 6 chiffres" 
+      autocomplete="username" 
+      required 
+      class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+      />
     </label>
     <label>
       Mot de passe
-      <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
+      <input 
+      id="password" 
+      name="password" 
+      type="password" 
+      placeholder="••••••••" 
+      autocomplete="current-password" 
+      required 
+      class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
     </label>
-    <button type="submit">Se connecter</button>
+    <button type="submit" class="font-semibold text-2xl text-blue-800 bg-white mb-1">Se connecter</button>
     <p id="err" style="color:#b00;"></p>
   </form>
 
@@ -21,6 +39,8 @@ const next = Astro.url.searchParams.get("next") || "/"; // redir après login
     .stack { display:flex; flex-direction:column; gap:.8rem; max-width:380px }
     input, button { padding:.55rem .7rem; font-size:1rem }
   </style>
+  </section>
+  </main>
 </Layout>
 
 <script>

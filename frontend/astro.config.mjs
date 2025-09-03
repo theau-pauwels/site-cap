@@ -7,7 +7,6 @@ import robotsTxt from "astro-robots-txt";
 
 // https://astro.build/config
 export default defineConfig({
-<<<<<<< HEAD
   redirects: {
     "/cercles": "/cercles&commissions",
     "/houzeau": "/cite-houzeau",
@@ -45,7 +44,4 @@ export default defineConfig({
       },
     },
   },
-=======
-  site: 'https://carte-fede-test.magellan.fpms.ac.be', // ← important pour URLs absolues
->>>>>>> 11347e567bded2b649e61579e5c08fb50db60f12
 });
