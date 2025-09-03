@@ -1,7 +1,5 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  server: {
-    host: true
-  }
+  site: 'https://carte-fede-test.magellan.fpms.ac.be', // ← important pour URLs absolues
 });
