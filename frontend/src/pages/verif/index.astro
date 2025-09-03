@@ -1,0 +1,124 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+<Layout title="Vérification carte fédé">
+  <h1>Vérifier une carte</h1>
+  <p class="muted">Autorise l'accès à la caméra. Si ça ne marche pas, colle le token ci-dessous.</p>
+
+  <div id="scanZone" style="display:grid; gap:10px; grid-template-columns: 1fr; max-width:520px;">
+    <video id="preview" playsinline style="width:100%; max-width:520px; border:1px solid #ddd; border-radius:8px;"></video>
+    <button id="btnStart">Démarrer la caméra</button>
+    <button id="btnStop" disabled>Stop</button>
+  </div>
+
+  <h3>Ou vérifier manuellement</h3>
+  <form id="manual" class="row" onsubmit="return false;">
+    <input id="token" type="text" placeholder="token..." style="width:420px"/>
+    <button id="btnCheck">Vérifier</button>
+  </form>
+
+  <div id="result" style="margin-top:1rem;"></div>
+
+  <style>
+    .muted{color:#666} .ok{color: #0a7} .ko{color:#c00}
+    .row{display:flex; gap:8px; align-items:center}
+  </style>
+</Layout>
+
+<script type="module">
+  // Accès réservé (admin ou verifier)
+  const me = await fetch('/api/me', { credentials:'include' });
+  if (!me.ok) location.href = '/login?next=' + encodeURIComponent(location.pathname);
+  const meJson = await me.json();
+  if (!['admin','verifier'].includes(meJson.role)) location.href = '/';
+
+  const preview = document.getElementById('preview');
+  const btnStart = document.getElementById('btnStart');
+  const btnStop = document.getElementById('btnStop');
+  const result = document.getElementById('result');
+
+  let stream;
+  let codeReader;
+  let scanning = false;
+
+  async function ensureZXing() {
+    if (window.ZXingBrowser) return window.ZXingBrowser;
+    // charge lib depuis unpkg (léger et pratique pour POC)
+    await import('https://unpkg.com/@zxing/browser@latest');
+    return window.ZXingBrowser;
+  }
+
+  async function startScan() {
+    const ZX = await ensureZXing();
+    codeReader = new ZX.BrowserMultiFormatReader();
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio:false });
+    preview.srcObject = stream;
+    await preview.play();
+    scanning = true;
+    btnStart.disabled = true; btnStop.disabled = false;
+
+    codeReader.decodeFromVideoDevice(null, preview, async (res, err, controls) => {
+      if (!scanning) return;
+      if (res) {
+        controls.stop(); // pause une fois trouvé
+        await handlePayload(res.getText());
+        // pour relancer automatiquement, retire les 2 lignes ci-dessus et gère un “debounce”
+      }
+    });
+  }
+
+  async function stopScan() {
+    scanning = false;
+    btnStart.disabled = false; btnStop.disabled = true;
+    if (stream) {
+      stream.getTracks().forEach(t => t.stop());
+      stream = null;
+    }
+  }
+
+  async function handlePayload(text) {
+    // Le QR encode une URL /verify?token=... -> on extrait le token
+    let token = "";
+    try {
+      const u = new URL(text);
+      token = u.searchParams.get("token") || "";
+    } catch {
+      // si ce n'est pas une URL, l'utilisateur peut avoir encodé le token brut
+      token = text;
+    }
+    if (!token) { renderKO("QR invalide (pas de token)."); return; }
+
+    const r = await fetch(`/api/verify?token=${encodeURIComponent(token)}`);
+    const j = await r.json();
+    if (!j.valid) renderKO(j.reason || `Erreur ${r.status}`);
+    else renderOK(j);
+  }
+
+  function renderOK(j) {
+    result.innerHTML = `
+      <div class="ok">
+        <h3>✅ Carte valide</h3>
+        <p><strong>${j.user.prenom} ${j.user.nom}</strong><br/>
+        Période: ${j.periode}<br/>
+        Numéro: ${j.code}</p>
+      </div>`;
+  }
+
+  function renderKO(msg) {
+    result.innerHTML = `<div class="ko"><h3>❌ Invalide</h3><p>${msg}</p></div>`;
+  }
+
+  // Events
+  btnStart.addEventListener('click', startScan);
+  btnStop.addEventListener('click', stopScan);
+
+  // Manuel
+  document.getElementById('btnCheck').addEventListener('click', async () => {
+    const token = document.getElementById('token').value.trim();
+    if (!token) return;
+    const r = await fetch(`/api/verify?token=${encodeURIComponent(token)}`);
+    const j = await r.json();
+    if (!j.valid) renderKO(j.reason || `Erreur ${r.status}`);
+    else renderOK(j);
+  });
+</script>
