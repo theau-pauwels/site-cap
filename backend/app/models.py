@@ -10,6 +10,7 @@ db = SQLAlchemy()
 class Role(Enum):
     MEMBER = "member"
     ADMIN  = "admin"
+    VERIFIER = "verifier"
 
 class User(UserMixin, db.Model):
     __tablename__ = "user"
