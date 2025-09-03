@@ -1,49 +1,36 @@
 ---
-import { onMount } from "solid-js"; // pour fetch côté client
+---
+<footer style="margin-top:2rem; padding:1rem; border-top:1px solid #ddd; text-align:center;">
+  <nav id="footer-links">Chargement…</nav>
+</footer>
 
-let links = [];
-
-onMount(async () => {
+<script>
+(async () => {
+  const el = document.getElementById('footer-links');
   try {
-    const r = await fetch("/api/me", { credentials: "include" });
-    if (!r.ok) return;
+    const r = await fetch('/api/me', { credentials:'include' });
+    if (!r.ok) { el.innerHTML = `<a href="/login">Connexion</a>`; return; }
     const j = await r.json();
 
+    const links = [];
     if (!j?.email && !j?.identifiant) {
-      // pas connecté
-      links = [
-        { href: "/login", label: "Connexion" },
-      ];
-    } else if (j.role === "admin") {
-      links = [
-        { href: "/", label: "Accueil" },
-        { href: "/cartes", label: "Mes cartes" },
-        { href: "/admin", label: "Admin" },
-        { href: "/admin/users", label: "Gestion des utilisateurs" },
-        { href: "/logout", label: "Déconnexion" },
-      ];
+      links.push({href:'/login', label:'Connexion'});
     } else {
-      // utilisateur normal
-      links = [
-        { href: "/", label: "Accueil" },
-        { href: "/cartes", label: "Mes cartes" },
-        { href: "/logout", label: "Déconnexion" },
-      ];
+      links.push({href:'/', label:'Accueil'});
+      links.push({href:'/cartes', label:'Mes cartes'});
+      links.push({href:'/app/qr', label:'Mon QR'});
+      if (j.role === 'admin') {
+        links.push({href:'/admin', label:'Admin'});
+        links.push({href:'/admin/users', label:'Gestion utilisateurs'});
+        links.push({href:'/verif', label:'Vérification'});
+      } else if (j.role === 'verifier') {
+        links.push({href:'/verif', label:'Vérification'});
+      }
+      links.push({href:'/logout', label:'Déconnexion'});
     }
-
-    // force re-render
-    document.querySelector("#footer-links").innerHTML =
-      links.map(l => `<a href="${l.href}">${l.label}</a>`).join(" | ");
+    el.innerHTML = links.map(l => `<a href="${l.href}">${l.label}</a>`).join(' | ');
   } catch {
-    // si erreur => seulement "Connexion"
-    document.querySelector("#footer-links").innerHTML =
-      `<a href="/login">Connexion</a>`;
+    el.innerHTML = `<a href="/login">Connexion</a>`;
   }
-});
----
-
-<footer style="margin-top:2rem; padding:1rem; border-top:1px solid #ddd; text-align:center;">
-  <div id="footer-links">
-    <!-- Liens remplis côté client -->
-  </div>
-</footer>
+})();
+</script>
