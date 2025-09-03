@@ -13,6 +13,7 @@ import Layout from "../../layouts/Layout.astro";
         <th>Identifiant</th>
         <th>Cartes (année → n°)</th>
         <th>Ajouter une carte</th>
+        <th>Rôle</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -21,6 +22,7 @@ import Layout from "../../layouts/Layout.astro";
 
 <script>
   const ALLOWED_PREFIXES = ["A","F","E","EA","MI","S"];
+  const ROLE_OPTIONS = ["member","verifier","admin"]; // 👈 options affichées dans la colonne Rôle
 
   // ---------- Utilitaires année ----------
   function currentAcademicStartYear() {
@@ -130,10 +132,18 @@ import Layout from "../../layouts/Layout.astro";
             <small class="muted" style="display:block">Format: PREFIX-Num (ex: A-23)</small>
           </form>
         </td>
+        <td>
+          <div class="role-box" data-user="${u.id}">
+            <select name="role">
+              ${ROLE_OPTIONS.map(r => `<option value="${r}" ${u.role===r?'selected':''}>${r}</option>`).join('')}
+            </select>
+            <button class="btn-role-apply">Appliquer</button>
+          </div>
+        </td>
       </tr>
     `).join('');
 
-    // -------- Ajout de carte --------
+    // -------- Ajout / maj de carte --------
     document.querySelectorAll('.form-carte').forEach(f => {
       const selYear = f.querySelector('select[name="annee"]');
       const selPrefix = f.querySelector('select[name="prefix"]');
@@ -149,8 +159,8 @@ import Layout from "../../layouts/Layout.astro";
         inputNum.placeholder = String(suggestion);
       }
 
-      selYear.addEventListener('change', () => refreshDefaultNumber(true));
-      selPrefix.addEventListener('change', () => refreshDefaultNumber(true));
+      selYear.addEventListener('change', () => refreshDefaultNumber(true));   // force recalcul
+      selPrefix.addEventListener('change', () => refreshDefaultNumber(true)); // idem
       refreshDefaultNumber(true);
 
       f.addEventListener('submit', async (e) => {
@@ -195,6 +205,30 @@ import Layout from "../../layouts/Layout.astro";
           credentials:'include'
         });
 
+        if (!r.ok) {
+          let msg = 'Erreur ' + r.status;
+          try { const j=await r.json(); if (j.error) msg=j.error; } catch {}
+          alert(msg);
+          return;
+        }
+        render(await fetchUsers());
+      });
+    });
+
+    // -------- Changement de rôle --------
+    document.querySelectorAll('.role-box').forEach(box => {
+      const userId = box.dataset.user;
+      const sel = box.querySelector('select[name="role"]');
+      const btn = box.querySelector('.btn-role-apply');
+
+      btn.addEventListener('click', async () => {
+        const role = sel.value;
+        const r = await fetch(`/api/admin/users/${userId}/role`, {
+          method:'PUT',
+          headers:{'Content-Type':'application/json'},
+          credentials:'include',
+          body: JSON.stringify({ role })
+        });
         if (!r.ok) {
           let msg = 'Erreur ' + r.status;
           try { const j=await r.json(); if (j.error) msg=j.error; } catch {}
