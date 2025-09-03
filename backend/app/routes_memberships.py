@@ -129,3 +129,114 @@ def delete_year_card(user_id, annee):
     db.session.delete(row)
     db.session.commit()
     return jsonify({"ok": True})
+
+# --- QR code: génération & vérification ---
+from flask import current_app, send_file
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
+import io
+import qrcode
+
+def _qr_serializer():
+    # token signé avec la SECRET_KEY
+    return URLSafeTimedSerializer(
+        secret_key=current_app.config["SECRET_KEY"],
+        salt="qr-token-v1"
+    )
+
+def _abs_host():
+    # ex: http://localhost/
+    base = request.host_url  # ex: 'http://localhost/'
+    return base
+
+@bp_mem.route("/api/qr/<int:annee>.png", methods=["GET"])
+@login_required
+def qr_png_for_year(annee: int):
+    """Génère un QR PNG pour l'utilisateur connecté et l'année donnée.
+
+    Le QR encode une URL absolue /verify?token=...
+    """
+    # retrouver la carte de l'utilisateur pour cette année
+    row = Membership.query.filter_by(user_id=current_user.id, annee=annee).first()
+    if not row:
+        return jsonify({"error": "Aucune carte pour cette année"}), 404
+
+    s = _qr_serializer()
+    payload = {
+        "uid": current_user.id,
+        "annee": row.annee,
+        "annee_code": row.annee_code,
+    }
+    # token valable 400 jours (exemple)
+    token = s.dumps(payload)
+
+    verify_url = _abs_host().rstrip("/") + "/verify?token=" + token
+    # génère le QR PNG
+    img = qrcode.make(verify_url)
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    buf.seek(0)
+    return send_file(buf, mimetype="image/png")
+
+@bp_mem.route("/api/verify", methods=["GET"])
+def api_verify():
+    """API JSON: ?token=... -> {valid:bool, ...}"""
+    token = request.args.get("token", "").strip()
+    if not token:
+        return jsonify({"valid": False, "reason": "missing token"}), 400
+
+    s = _qr_serializer()
+    try:
+        data = s.loads(token, max_age=400*24*3600)  # même TTL que génération
+    except SignatureExpired:
+        return jsonify({"valid": False, "reason": "expired"}), 400
+    except BadSignature:
+        return jsonify({"valid": False, "reason": "bad-signature"}), 400
+
+    # RE-vérifier en DB que la carte est toujours valide et correspond
+    u = User.query.get(data.get("uid"))
+    if not u:
+        return jsonify({"valid": False, "reason": "user-not-found"}), 404
+
+    row = Membership.query.filter_by(user_id=u.id, annee=data.get("annee")).first()
+    if not row:
+        return jsonify({"valid": False, "reason": "card-not-found"}), 404
+
+    if row.annee_code != data.get("annee_code"):
+        return jsonify({"valid": False, "reason": "code-mismatch"}), 400
+
+    # OK
+    return jsonify({
+        "valid": True,
+        "user": {"nom": u.nom, "prenom": u.prenom},
+        "annee": row.annee,
+        "periode": f"{row.annee}-{row.annee+1}",
+        "code": row.annee_code
+    })
+
+@bp_mem.route("/verify", methods=["GET"])
+def human_verify_page():
+    """Page HTML simple si on ouvre directement l'URL du QR dans un navigateur."""
+    token = request.args.get("token", "")
+    # On réutilise l'API JSON côté serveur
+    with current_app.test_request_context(f"/api/verify?token={token}"):
+        resp = api_verify()
+        # resp est (jsonify, status) ou jsonify direct
+        if isinstance(resp, tuple):
+            data, status = resp
+        else:
+            data, status = resp, 200
+        j = data.get_json()
+    ok = j.get("valid")
+    if ok:
+        return f"""
+<!doctype html><meta charset="utf-8">
+<h1>Carte valide ✅</h1>
+<p><strong>{j['user']['prenom']} {j['user']['nom']}</strong></p>
+<p>Période : {j['periode']}<br>Code : {j['code']}</p>
+""", 200
+    else:
+        return f"""
+<!doctype html><meta charset="utf-8">
+<h1>Carte invalide ❌</h1>
+<p>Raison : {j.get('reason','unknown')}</p>
+""", 400
