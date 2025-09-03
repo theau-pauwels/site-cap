@@ -1,0 +1,165 @@
+---
+const navItems = [
+  { title: "Se connecter", href: "/login" },
+  { title: "S'inscrire", href: "/register" },
+  { title: "Mes cartes", href: "/cartes"},
+  { title : "Liste d'utilisateurs", href:"/admin/users"},
+  { title : "Changer de mot de passe", href:"/app/password"},
+];
+---
+
+<header class="sticky top-0 z-20 bg-white font-semibold text-blue-900">
+  <nav class="container mx-auto flex justify-between gap-4 p-4 lg:block">
+    <a
+      href="/"
+      class="inline-flex items-center gap-2 text-base duration-150 hover:opacity-80 xs:text-lg"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 1653 1846"
+        class="w-8 min-w-8 lg:w-10"
+      >
+        <title>Blason Polytech</title>
+        <path
+          class="fill-blue-900"
+          d="M168,80V1526a262,262,0,0,0,262,262H862a138,138,0,0,1,138,138,138,138,0,0,1,138-138h421a262,262,0,0,0,262-262V80Z"
+          transform="translate(-168 -80)"></path>
+        <path
+          class="fill-white"
+          d="M1107.17,1281.25a40,40,0,0,0,56.57,0l14.14-14.14a40,40,0,0,0,0-56.57l-102-102-70.71,70.71Z"
+          transform="translate(-168 -80)"></path>
+        <path
+          class="fill-white"
+          d="M734.6,590,620.78,476.22,442,655c17.71,17.63,27.71,43,25.77,71.9-2,29.42-15.93,56.8-36.78,77.09l44.83,44.83,99.46-99.46L722.13,896.21,763,795.69l-117-117Z"
+          transform="translate(-168 -80)"></path>
+        <path
+          class="fill-white"
+          d="M1124,897.8,811.24,1210.54a40,40,0,0,0,0,56.57l14.15,14.14a40,40,0,0,0,56.56,0L1175.7,987.5Z"
+          transform="translate(-168 -80)"></path>
+        <polygon
+          class="fill-white"
+          points="815.96 936.61 697.69 818.35 645.98 908.06 745.25 1007.32 815.96 936.61"
+        >
+        </polygon>
+        <path
+          class="fill-white"
+          d="M1101,526s-11-32-49-51a125,125,0,0,0-57-13,132.63,132.63,0,0,0-57,13c-36,17-49,51-49,51L471,1553,995,644l524,909Z"
+          transform="translate(-168 -80)"></path>
+        <path
+          class="fill-white"
+          d="M1559.14,898.22c-32.49-183.3-177.06-327.87-360.36-360.36l142.51,142.51L1226,795.69l40.91,100.52L1412,751.08Z"
+          transform="translate(-168 -80)"></path>
+      </svg>
+      <div>Fédération des Étudiants FPMs</div>
+    </a>
+    <ul
+      class="hidden flex-wrap justify-between gap-2 text-sm lg:flex xl:text-base"
+    >
+      {
+        navItems.map((navItem) => (
+          <li class="mx-auto flex items-center justify-center">
+            {navItem.title === "Devenir membre" ? (
+              <a
+                class="rounded-lg border-2 border-blue-900 bg-blue-900 px-4 py-2 text-white transition duration-150 hover:bg-blue-50 hover:text-blue-900"
+                href={navItem.href}
+              >
+                {navItem.title}
+              </a>
+            ) : (
+              <a
+                class="relative px-1 py-1 after:absolute after:bottom-0 after:left-0 after:z-50 after:h-[3px] after:w-0 after:rounded-full after:bg-blue-900 after:duration-500 hover:after:w-full"
+                href={navItem.href}
+              >
+                {navItem.title}
+              </a>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+    <button id="menu-toggle" class="focus:outline-none lg:hidden">
+      <svg
+        class="h-8 w-8"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="3"
+          d="M4 6h16M4 12h16m-7 6h7"></path>
+      </svg>
+    </button>
+  </nav>
+  <div
+    id="mobile-menu"
+    data-visible="false"
+    class="fixed bottom-0 right-0 top-0 hidden bg-white bg-opacity-95 shadow-box backdrop-blur-sm lg:hidden"
+  >
+    <div class="flex justify-end p-4">
+      <button id="menu-close" class="my-1">
+        <svg
+          class="h-8 w-8"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="3"
+            d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    <ul class="flex h-full flex-col gap-4 p-8">
+      {
+        navItems.map((navItem) => (
+          <li class="flex flex-col space-y-4">
+            <div class="inline-flex">
+              {navItem.title === "Devenir membre" ? (
+                <a
+                  class="rounded-lg border-2 border-blue-900 bg-blue-900 px-4 py-2 text-white transition duration-150 hover:bg-blue-50 hover:text-blue-900"
+                  href={navItem.href}
+                >
+                  {navItem.title}
+                </a>
+              ) : (
+                <a
+                  class="relative px-1 py-1 after:absolute after:bottom-0 after:left-0 after:z-50 after:h-[3px] after:w-0 after:rounded-full after:bg-blue-900 after:duration-500 hover:after:w-full"
+                  href={navItem.href}
+                >
+                  {navItem.title}
+                </a>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</header>
+
+<script>
+  document.addEventListener("click", function (event) {
+    const mobileMenu = document.getElementById("mobile-menu");
+    const menuToggle = document.getElementById("menu-toggle");
+    const menuClose = document.getElementById("menu-close");
+    if (event.target instanceof Node) {
+      if (menuToggle?.contains(event.target)) {
+        mobileMenu?.classList.remove("hidden");
+        mobileMenu?.setAttribute("data-visible", "true");
+      } else if (
+        menuClose?.contains(event.target) ||
+        (!mobileMenu?.contains(event.target) &&
+          mobileMenu?.getAttribute("data-visible") === "true")
+      ) {
+        mobileMenu?.classList.add("hidden");
+        mobileMenu?.setAttribute("data-visible", "false");
+      }
+    }
+  });
+</script>

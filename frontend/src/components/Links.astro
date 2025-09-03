@@ -1,0 +1,74 @@
+---
+import Facebook from "@icons/Facebook.astro";
+import Twitter from "@icons/Twitter.astro";
+import Instagram from "@icons/Instagram.astro";
+import Youtube from "@icons/Youtube.astro";
+import Mail from "@icons/Mail.astro";
+import Spotify from "@icons/Spotify.astro";
+import Website from "@icons/Website.astro";
+import Tiktok from "@icons/Tiktok.astro";
+import Linktree from "@icons/Linktree.astro";
+
+export enum LinkType {
+  FACEBOOK = "FACEBOOK",
+  TWITTER = "TWITTER",
+  INSTAGRAM = "INSTAGRAM",
+  YOUTUBE = "YOUTUBE",
+  EMAIL = "EMAIL",
+  SPOTIFY = "SPOTIFY",
+  WEBSITE = "WEBSITE",
+  TIKTOK = "TIKTOK",
+  LINKTREE = "LINKTREE",
+}
+
+interface Props {
+  links: {
+    name: string;
+    type: LinkType;
+    url: string;
+  }[];
+}
+
+const { links } = Astro.props;
+---
+
+<section class="space-y-2 font-medium">
+  <h2 class="text-2xl">Réseaux sociaux</h2>
+  <ul class="flex flex-wrap items-center gap-x-6 gap-y-2 text-blue-900">
+    {
+      links.map((link) => (
+        <>
+          {link.type === "WEBSITE" ? (
+            <li class="flex gap-2">
+              {link.name} :
+              <a
+                class="inline-flex gap-2 underline duration-150 hover:translate-x-2 hover:opacity-80"
+                href={link.url}
+              >
+                <Website />
+                {link.url}
+              </a>
+            </li>
+          ) : (
+            <li class="flex">
+              <a
+                class="inline-flex gap-2 underline duration-150 hover:translate-x-2 hover:opacity-80"
+                href={link.url}
+              >
+                {link.type === LinkType.FACEBOOK && <Facebook />}
+                {link.type === LinkType.TWITTER && <Twitter />}
+                {link.type === "INSTAGRAM" && <Instagram />}
+                {link.type === "YOUTUBE" && <Youtube />}
+                {link.type === "EMAIL" && <Mail />}
+                {link.type === "SPOTIFY" && <Spotify />}
+                {link.type === "TIKTOK" && <Tiktok />}
+                {link.type === "LINKTREE" && <Linktree />}
+                {link.name}
+              </a>
+            </li>
+          )}
+        </>
+      ))
+    }
+  </ul>
+</section>

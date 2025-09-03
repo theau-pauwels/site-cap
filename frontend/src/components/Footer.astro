@@ -1,36 +1,112 @@
 ---
+import Facebook from "@icons/Facebook.astro";
+import Instagram from "@icons/Instagram.astro";
+import Mail from "@icons/Mail.astro";
 ---
-<footer style="margin-top:2rem; padding:1rem; border-top:1px solid #ddd; text-align:center;">
-  <nav id="footer-links">Chargement…</nav>
+
+<footer
+  class="z-10 mt-6 bg-blue-900 text-sm text-white"
+  transition:animate="none"
+>
+  <div
+    class="container mx-auto flex flex-col gap-4 px-4 py-8 md:grid md:grid-cols-[repeat(3,_1fr)_auto]"
+  >
+    <div>
+      <h4 class="mb-4 mt-0 font-semibold">Réseaux sociaux</h4>
+      <ul class="flex flex-col gap-2">
+        <li>
+          <a
+            class="inline-flex items-center gap-2 underline duration-150 hover:translate-x-2 hover:opacity-80"
+            href="https://www.instagram.com/fede_fpms/"
+          >
+            <Instagram />
+            Instagram
+          </a>
+        </li>
+        <li>
+          <a
+            class="inline-flex items-center gap-2 underline duration-150 hover:translate-x-2 hover:opacity-80"
+            href="https://www.facebook.com/fede.fpms"
+          >
+            <Facebook />
+            Page Facebook
+          </a>
+        </li>
+        <li>
+          <a
+            class="inline-flex items-center gap-2 underline duration-150 hover:translate-x-2 hover:opacity-80"
+            href="https://www.facebook.com/groups/12209585370"
+          >
+            <Facebook />
+            Groupe Facebook
+          </a>
+        </li>
+        <li>
+          <a
+            class="inline-flex items-center gap-2 underline duration-150 hover:translate-x-2 hover:opacity-80"
+            href="mailto:fede.polytech@umons.ac.be"
+          >
+            <Mail />
+            fede.polytech@umons.ac.be
+          </a>
+        </li>
+      </ul>
+    </div>
+    <!-- <div class="h-[2px] rounded-full bg-white md:hidden"></div>
+    <div>
+      <h4 class="mb-4 mt-0 font-semibold">Commission Web 187</h4>
+      <ul class="flex flex-col gap-2">
+        <li>Florian Lefebvre</li>
+        <li>Guillaume Hinnekens</li>
+        <li>Lucas Lebrun</li>
+      </ul>
+    </div>
+    <div class="h-[2px] rounded-full bg-white md:hidden"></div> -->
+
+    <div>
+      <h4 class="mb-4 mt-0 font-semibold">© Site développé par</h4>
+      <ul class="flex flex-col gap-2">
+        <li>Florian Lefebvre</li>
+        <li>Théau Pauwels</li>
+      </ul>
+    </div>
+    <div class="h-[2px] rounded-full bg-white md:hidden"></div>
+
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 1653 1846"
+      class="w-32"
+    >
+      <title>Blason Polytech</title>
+      <path
+        class="fill-white"
+        d="M168,80V1526a262,262,0,0,0,262,262H862a138,138,0,0,1,138,138,138,138,0,0,1,138-138h421a262,262,0,0,0,262-262V80Z"
+        transform="translate(-168 -80)"></path>
+      <path
+        class="fill-blue-800"
+        d="M1107.17,1281.25a40,40,0,0,0,56.57,0l14.14-14.14a40,40,0,0,0,0-56.57l-102-102-70.71,70.71Z"
+        transform="translate(-168 -80)"></path>
+      <path
+        class="fill-blue-800"
+        d="M734.6,590,620.78,476.22,442,655c17.71,17.63,27.71,43,25.77,71.9-2,29.42-15.93,56.8-36.78,77.09l44.83,44.83,99.46-99.46L722.13,896.21,763,795.69l-117-117Z"
+        transform="translate(-168 -80)"></path>
+      <path
+        class="fill-blue-800"
+        d="M1124,897.8,811.24,1210.54a40,40,0,0,0,0,56.57l14.15,14.14a40,40,0,0,0,56.56,0L1175.7,987.5Z"
+        transform="translate(-168 -80)"></path>
+      <polygon
+        class="fill-blue-800"
+        points="815.96 936.61 697.69 818.35 645.98 908.06 745.25 1007.32 815.96 936.61"
+      >
+      </polygon>
+      <path
+        class="fill-blue-800"
+        d="M1101,526s-11-32-49-51a125,125,0,0,0-57-13,132.63,132.63,0,0,0-57,13c-36,17-49,51-49,51L471,1553,995,644l524,909Z"
+        transform="translate(-168 -80)"></path>
+      <path
+        class="fill-blue-800"
+        d="M1559.14,898.22c-32.49-183.3-177.06-327.87-360.36-360.36l142.51,142.51L1226,795.69l40.91,100.52L1412,751.08Z"
+        transform="translate(-168 -80)"></path>
+    </svg>
+  </div>
 </footer>
-
-<script>
-(async () => {
-  const el = document.getElementById('footer-links');
-  try {
-    const r = await fetch('/api/me', { credentials:'include' });
-    if (!r.ok) { el.innerHTML = `<a href="/login">Connexion</a>`; return; }
-    const j = await r.json();
-
-    const links = [];
-    if (!j?.email && !j?.identifiant) {
-      links.push({href:'/login', label:'Connexion'});
-    } else {
-      links.push({href:'/', label:'Accueil'});
-      links.push({href:'/cartes', label:'Mes cartes'});
-      links.push({href:'/app/qr', label:'Mon QR'});
-      if (j.role === 'admin') {
-        links.push({href:'/admin', label:'Admin'});
-        links.push({href:'/admin/users', label:'Gestion utilisateurs'});
-        links.push({href:'/verif', label:'Vérification'});
-      } else if (j.role === 'verifier') {
-        links.push({href:'/verif', label:'Vérification'});
-      }
-      links.push({href:'/logout', label:'Déconnexion'});
-    }
-    el.innerHTML = links.map(l => `<a href="${l.href}">${l.label}</a>`).join(' | ');
-  } catch {
-    el.innerHTML = `<a href="/login">Connexion</a>`;
-  }
-})();
-</script>
