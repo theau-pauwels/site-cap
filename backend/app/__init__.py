@@ -4,6 +4,7 @@ from .models import db, User
 from .routes_auth import bp_auth
 from .routes_admin import bp_admin
 from .routes_memberships import bp_mem
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 def create_app():
     app = Flask(__name__)
@@ -12,10 +13,13 @@ def create_app():
     app.config["SECRET_KEY"] = "changeme"
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True}
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-    app.config["SESSION_COOKIE_SECURE"] = False
+    app.config["SESSION_COOKIE_SECURE"] = True
+    app.config["SESSION_COOKIE_HTTPONLY"] = True
 
     db.init_app(app)
     login_manager = LoginManager(); login_manager.init_app(app)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
 
     @login_manager.user_loader
     def load_user(user_id):
