@@ -1,25 +1,13 @@
----
-const navItems = [
-  { title: "Se connecter", href: "/login" },
-  { title: "S'inscrire", href: "/register" },
-  { title: "Mes cartes", href: "/cartes"},
-  { title : "Liste d'utilisateurs", href:"/admin/users"},
-  { title : "Changer de mot de passe", href:"/app/password"},
-];
----
-
 <header class="sticky top-0 z-20 bg-white font-semibold text-blue-900">
+  <div id="user-info" class="absolute right-4 top-4 text-sm font-medium text-blue-900"></div>
   <nav class="container mx-auto flex justify-between gap-4 p-4 lg:block">
-    <a
-      href="/"
-      class="inline-flex items-center gap-2 text-base duration-150 hover:opacity-80 xs:text-lg"
-    >
+    <a href="/" class="inline-flex items-center gap-2 text-base duration-150 hover:opacity-80 xs:text-lg">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 1653 1846"
         class="w-8 min-w-8 lg:w-10"
       >
-        <title>Blason Polytech</title>
+      <title>Blason Polytech</title>
         <path
           class="fill-blue-900"
           d="M168,80V1526a262,262,0,0,0,262,262H862a138,138,0,0,1,138,138,138,138,0,0,1,138-138h421a262,262,0,0,0,262-262V80Z"
@@ -52,107 +40,71 @@ const navItems = [
       </svg>
       <div>Fédération des Étudiants FPMs</div>
     </a>
-    <ul
-      class="hidden flex-wrap justify-between gap-2 text-sm lg:flex xl:text-base"
-    >
-      {
-        navItems.map((navItem) => (
-          <li class="mx-auto flex items-center justify-center">
-            {(
-              <a
-                class="relative px-1 py-1 after:absolute after:bottom-0 after:left-0 after:z-50 after:h-[3px] after:w-0 after:rounded-full after:bg-blue-900 after:duration-500 hover:after:w-full"
-                href={navItem.href}
-              >
-                {navItem.title}
-              </a>
-            )}
-          </li>
-        ))
-      }
-    </ul>
-    <button id="menu-toggle" class="focus:outline-none lg:hidden">
-      <svg
-        class="h-8 w-8"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="3"
-          d="M4 6h16M4 12h16m-7 6h7"></path>
-      </svg>
-    </button>
+
+    <!-- Desktop Menu -->
+    <ul id="nav-list" class="hidden flex-wrap justify-between gap-2 text-sm lg:flex xl:text-base"></ul>
+
+    <!-- Mobile Toggle -->
+    <button id="menu-toggle" class="lg:hidden px-2 py-1 border rounded">Menu</button>
+
+    <!-- Mobile Menu -->
+    <ul id="mobile-nav" class="hidden absolute top-full left-0 w-full bg-white shadow-lg flex-col gap-2 p-4 lg:hidden"></ul>
+
   </nav>
-  <div
-    id="mobile-menu"
-    data-visible="false"
-    class="fixed bottom-0 right-0 top-0 hidden bg-white bg-opacity-95 shadow-box backdrop-blur-sm lg:hidden"
-  >
-    <div class="flex justify-end p-4">
-      <button id="menu-close" class="my-1">
-        <svg
-          class="h-8 w-8"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="3"
-            d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
-    </div>
-    <ul class="flex h-full flex-col gap-4 p-8">
-      {
-        navItems.map((navItem) => (
-          <li class="flex flex-col space-y-4">
-            <div class="inline-flex">
-              {navItem.title === "Devenir membre" ? (
-                <a
-                  class="rounded-lg border-2 border-blue-900 bg-blue-900 px-4 py-2 text-white transition duration-150 hover:bg-blue-50 hover:text-blue-900"
-                  href={navItem.href}
-                >
-                  {navItem.title}
-                </a>
-              ) : (
-                <a
-                  class="relative px-1 py-1 after:absolute after:bottom-0 after:left-0 after:z-50 after:h-[3px] after:w-0 after:rounded-full after:bg-blue-900 after:duration-500 hover:after:w-full"
-                  href={navItem.href}
-                >
-                  {navItem.title}
-                </a>
-              )}
-            </div>
-          </li>
-        ))
-      }
-    </ul>
-  </div>
 </header>
 
 <script>
-  document.addEventListener("click", function (event) {
-    const mobileMenu = document.getElementById("mobile-menu");
-    const menuToggle = document.getElementById("menu-toggle");
-    const menuClose = document.getElementById("menu-close");
-    if (event.target instanceof Node) {
-      if (menuToggle?.contains(event.target)) {
-        mobileMenu?.classList.remove("hidden");
-        mobileMenu?.setAttribute("data-visible", "true");
-      } else if (
-        menuClose?.contains(event.target) ||
-        (!mobileMenu?.contains(event.target) &&
-          mobileMenu?.getAttribute("data-visible") === "true")
-      ) {
-        mobileMenu?.classList.add("hidden");
-        mobileMenu?.setAttribute("data-visible", "false");
-      }
+async function guard() {
+  try {
+    const r = await fetch('/api/me', { credentials: 'include' });
+    if (!r.ok) { 
+      location.href = '/login?next=' + encodeURIComponent(location.pathname);
+      return;
     }
-  });
+    const me = await r.json();
+
+    // Affiche email et rôle
+    document.getElementById('user-info').textContent = `${me.email || me.identifiant || ''} (${me.role})`;
+
+    // Met à jour le menu
+    updateMenu(me);
+  } catch (err) {
+    console.error('Erreur guard:', err);
+  }
+}
+
+function updateMenu(user) {
+  const navItems = [
+    { title: "Se connecter", href: "/login" },
+    { title: "S'inscrire", href: "/register" },
+    { title: "Mes cartes", href: "/cartes" },
+    { title: "Changer de mot de passe", href:"/app/password" },
+    ...(user.role === 'admin' ? [
+      { title: "Liste d'utilisateurs", href:"/admin/users" },
+      { title: "Admin", href: "/admin" }
+    ] : [])
+  ];
+
+  const buildMenu = items => items.map(item => `
+    <li class="mx-auto flex items-center justify-center">
+      <a class="relative px-1 py-1 after:absolute after:bottom-0 after:left-0 after:z-50 after:h-[3px] after:w-0 after:rounded-full after:bg-blue-900 after:duration-500 hover:after:w-full"
+         href="${item.href}">${item.title}</a>
+    </li>
+  `).join('');
+
+  // Menu desktop et mobile
+  document.getElementById('nav-list').innerHTML = buildMenu(navItems);
+  document.getElementById('mobile-nav').innerHTML = buildMenu(navItems);
+}
+
+// Initialisation
+guard();
+
+// Gestion du menu mobile
+document.getElementById('menu-toggle').addEventListener('click', () => {
+  const mobileMenu = document.getElementById('mobile-nav');
+  const isHidden = mobileMenu.classList.contains('hidden');
+  mobileMenu.classList.toggle('hidden', !isHidden);
+});
+
 </script>

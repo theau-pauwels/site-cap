@@ -2,7 +2,8 @@
 import Layout from "../../layouts/Layout.astro";
 ---
 <Layout title="Mon QR carte fédé">
-  <h1>Mon QR – Carte fédé</h1>
+  <main class="flex-1 flex flex-col gap-4 items-center p-4 justify-center">
+  <h1 class="font-semibold text-2xl text-blue-800 bg-white mb-1">Mon QR – Carte fédé</h1>
 
   <p>Sélectionne la période :</p>
   <select id="sel"></select>
@@ -15,6 +16,7 @@ import Layout from "../../layouts/Layout.astro";
   <style>
     .muted{color:#666}
   </style>
+  </main>
 </Layout>
 
 <script>

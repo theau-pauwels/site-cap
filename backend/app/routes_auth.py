@@ -39,3 +39,15 @@ def login():
 def logout():
     logout_user()
     return jsonify({"ok": True})
+
+
+@bp_auth.route("/api/me", methods=["GET"])
+@login_required
+def me():
+    user = current_user
+    role_value = getattr(user.role, "value", user.role)
+    return jsonify({
+        "email": user.email or "",
+        "member_id": user.member_id or "",
+        "role": role_value
+    })

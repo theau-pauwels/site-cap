@@ -29,20 +29,14 @@ export default defineConfig({
     },
   },
   vite: {
-     server: {
-       host: true,
-       port: 3000,
-       allowedHosts: [
-         'frontend',
-         'localhost',
-         '127.0.0.1',
-         '::1',
-         'magellan.fpms.ac.be',
-       ],
-       hmr: {
-         protocol: 'ws',
-         host: process.env.HMR_HOST || 'localhost',
-         port: 80,
+    resolve: {
+      alias: {
+        "@components": "/src/components",
+        "@layouts": "/src/layouts",
+        "@images": "/src/assets/images",
+        "@assets": "/src/assets",
+        "@styles": "/src/styles",
+        "@icons": "/src/icons",
       },
     },
   },

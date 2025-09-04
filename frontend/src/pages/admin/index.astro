@@ -1,9 +1,9 @@
 ---
+import Layout from "../../layouts/Layout.astro";
 ---
-<html lang="fr">
-  <head>
+<Layout title="Admin">
+  <main class="flex-1 flex flex-col gap-4 items-center p-4 justify-center">
     <meta charset="utf-8" />
-    <title>Admin - Créer un utilisateur</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
       body { font-family: system-ui, sans-serif; margin: 2rem; }
@@ -16,67 +16,99 @@
       .muted { color:#666; font-size:.9rem; }
       a.btn { display:inline-block; padding:.4rem .6rem; border:1px solid #ddd; border-radius:.5rem; text-decoration:none; }
     </style>
-  </head>
-  <body>
     <div class="bar">
       <h1 style="margin:0;">Administration</h1>
       <a class="btn" href="/admin/users">Voir la liste</a>
       <span id="who" class="muted"></span>
-      <button id="logout" type="button">Se déconnecter</button>
+      <button 
+      id="logout" 
+      type="button"
+      class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      Se déconnecter
+      </button>
     </div>
 
-    <h2>Créer un utilisateur</h2>
+    <h1 class="font-semibold text-2xl text-blue-800 bg-white mb-1">Créer un utilisateur</h1>
     <p class="muted">Renseigner <strong>member_id (6 chiffres du matricule UMONS)</strong> OU <strong>email</strong>.</p>
     <form id="create">
       <div class="row">
-        <label>Prénom<br/><input name="prenom" required></label>
-        <label>Nom<br/><input name="nom" required></label>
+        <label>Prénom<br/>
+          <input 
+          name="prenom" 
+          class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required></label>
+        <label>Nom<br/>
+          <input 
+          name="nom" 
+          class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required></label>
       </div>
       <label>Identifiant (6 chiffres) — option 1<br/>
-        <input name="member_id" inputmode="numeric" pattern="\\d{6}" maxlength="6" placeholder="000123">
+        <input 
+        name="member_id" 
+        inputmode="numeric" 
+        pattern="\\d{6}" 
+        maxlength="6" 
+        placeholder="000123"
+        class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
       </label>
       <div class="muted">OU</div>
-      <label>Email — option 2<br/><input name="email" type="email" placeholder="user@example.com"></label>
-      <label>Mot de passe initial<br/><input name="password" type="password" minlength="8" required></label>
-      <button type="submit">Créer</button>
+      <label>Email — option 2<br/>
+        <input 
+        name="email" 
+        type="email" 
+        placeholder="user@example.com"
+        class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+      </label>
+      <label>Mot de passe initial<br/>
+        <input 
+        name="password" 
+        type="password" 
+        minlength="8" 
+        class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        required>
+      </label>
+      <button type="submit" class="rounded-lg border-2 border-blue-900 bg-blue-900 px-4 py-2 text-white transition duration-150 hover:bg-blue-50 hover:text-blue-900">Créer</button>
       <div id="msg"></div>
     </form>
+  </main>
+</Layout>
 
-    <script>
-      async function guard() {
-        const r = await fetch('/api/me', { credentials: 'include' });
-        if (!r.ok) return location.href = '/login?next=' + encodeURIComponent(location.pathname);
-        const me = await r.json();
-        if (me.role !== 'admin') return location.href = '/';
-        document.getElementById('who').textContent = `Connecté : ${me.email} (${me.role})`;
-      }
-      guard();
+<script>
+  async function guard() {
+    const r = await fetch('/api/me', { credentials: 'include' });
+    if (!r.ok) return location.href = '/login?next=' + encodeURIComponent(location.pathname);
+    const me = await r.json();
+    if (me.role !== 'admin') return location.href = '/';
+    document.getElementById('who').textContent = `Connecté : ${me.email} (${me.role})`;
+  }
+  guard();
 
-      document.getElementById('logout').onclick = async () => {
-        await fetch('/api/auth/logout', { method:'POST', credentials:'include' });
-        location.href = '/login';
-      };
+  document.getElementById('logout').onclick = async () => {
+    await fetch('/api/auth/logout', { method:'POST', credentials:'include' });
+    location.href = '/login';
+  };
 
-      document.getElementById('create').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const msg = document.getElementById('msg');
-        msg.className = ''; msg.textContent = '';
-        const data = Object.fromEntries(new FormData(e.target).entries());
+  document.getElementById('create').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById('msg');
+    msg.className = ''; msg.textContent = '';
+    const data = Object.fromEntries(new FormData(e.target).entries());
 
-        if (!((data.member_id && /^\d{6}$/.test(data.member_id)) || data.email)) {
-          msg.className='err'; msg.textContent='Fournir member_id (6 chiffres) OU email.'; return;
-        }
+    if (!((data.member_id && /^\d{6}$/.test(data.member_id)) || data.email)) {
+      msg.className='err'; msg.textContent='Fournir member_id (6 chiffres) OU email.'; return;
+    }
 
-        const res = await fetch('/api/admin/users', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify(data),
-          credentials: 'include'
-        });
+    const res = await fetch('/api/admin/users', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(data),
+      credentials: 'include'
+    });
 
-        if (res.ok) { msg.className='ok'; msg.textContent='Utilisateur créé ✅'; e.target.reset(); }
-        else { try { const j=await res.json(); msg.className='err'; msg.textContent=j.error||('Erreur '+res.status); } catch { msg.textContent='Erreur '+res.status; } }
-      });
-    </script>
-  </body>
-</html>
+    if (res.ok) { msg.className='ok'; msg.textContent='Utilisateur créé ✅'; e.target.reset(); }
+    else { try { const j=await res.json(); msg.className='err'; msg.textContent=j.error||('Erreur '+res.status); } catch { msg.textContent='Erreur '+res.status; } }
+  });
+</script>
