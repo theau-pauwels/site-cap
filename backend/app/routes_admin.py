@@ -6,15 +6,19 @@ from .models import db, User, Role, Membership
 
 bp_admin = Blueprint("admin", __name__)
 
+@bp_admin.before_request
+@login_required
+def _require_admin():
+    # Si pas admin -> 403. Si pas loggé -> 401 via unauthorized_handler ci-dessus
+    if not (current_user.is_authenticated and current_user.role == Role.ADMIN):
+        return jsonify({"error": "Forbidden"}), 403
+
 def is_admin():
     return current_user.is_authenticated and current_user.role == Role.ADMIN
 
 @bp_admin.route("/api/admin/users", methods=["GET", "POST"])
 @login_required
 def users_collection():
-    if not is_admin():
-        return jsonify({"error": "Forbidden"}), 403
-
     if request.method == "POST":
         data = request.json or {}
         nom = (data.get("nom") or "").strip()

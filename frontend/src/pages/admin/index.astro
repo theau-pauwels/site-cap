@@ -1,12 +1,12 @@
 ---
-import Layout from "../../layouts/Layout.astro";
+import Layout from "@layouts/Layout.astro";
 ---
 <Layout title="Admin">
   <main class="flex-1 flex flex-col gap-4 items-center p-4 justify-center">
+  <section class="w-full max-w-md">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
-      body { font-family: system-ui, sans-serif; margin: 2rem; }
+    <style> 
       form { max-width: 520px; display: grid; gap: .75rem; margin-top: 1rem; }
       input, button { padding: .6rem .8rem; font-size: 1rem; }
       .row { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
@@ -16,17 +16,6 @@ import Layout from "../../layouts/Layout.astro";
       .muted { color:#666; font-size:.9rem; }
       a.btn { display:inline-block; padding:.4rem .6rem; border:1px solid #ddd; border-radius:.5rem; text-decoration:none; }
     </style>
-    <div class="bar">
-      <h1 style="margin:0;">Administration</h1>
-      <a class="btn" href="/admin/users">Voir la liste</a>
-      <span id="who" class="muted"></span>
-      <button 
-      id="logout" 
-      type="button"
-      class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-      Se déconnecter
-      </button>
-    </div>
 
     <h1 class="font-semibold text-2xl text-blue-800 bg-white mb-1">Créer un utilisateur</h1>
     <p class="muted">Renseigner <strong>member_id (6 chiffres du matricule UMONS)</strong> OU <strong>email</strong>.</p>
@@ -70,9 +59,12 @@ import Layout from "../../layouts/Layout.astro";
         class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         required>
       </label>
-      <button type="submit" class="rounded-lg border-2 border-blue-900 bg-blue-900 px-4 py-2 text-white transition duration-150 hover:bg-blue-50 hover:text-blue-900">Créer</button>
+      <button type="submit" 
+      class="rounded-lg border-2 border-blue-900 bg-blue-900 px-4 py-2 text-white transition duration-150 hover:bg-blue-50 hover:text-blue-900"
+      >Créer</button>
       <div id="msg"></div>
     </form>
+  </section>
   </main>
 </Layout>
 

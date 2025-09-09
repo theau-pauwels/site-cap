@@ -17,7 +17,7 @@ interface Props {
 
 const { title: page } = Astro.props;
 
-const title = `${page === "Accueil" ? "" : `${page} | `}Fédé FPMs`;
+const title = `${page === "Accueil" ? "" : `${page} | `}Carte Fédé FPMs`;
 const description =
   "La Fédération des étudiants FPMs aussi appelée la Fédé, a comme rôle de représenter les étudiants de la Polytech de Mons dans le contexte académique et folklorique";
 const image = await getImage({ src: statueFPMs, quality: 50 });
@@ -68,7 +68,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site)
         ""
       )
     }
-    <meta name="og:site_name" content="Fédé FPMs" />
+    <meta name="og:site_name" content="Carte Fédé FPMs" />
     <!-- <ViewTransitions /> -->
     <ClientRouter />
     <!-- <style>

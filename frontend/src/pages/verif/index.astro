@@ -2,19 +2,32 @@
 import Layout from "../../layouts/Layout.astro";
 ---
 <Layout title="Vérification carte fédé">
-  <h1>Vérifier une carte</h1>
+  <main class="flex-1 flex flex-col gap-4 items-center p-4 justify-center">
+  <h1 class="font-semibold text-2xl text-blue-800 bg-white mb-1">Vérifier une carte</h1>
   <p class="muted">Autorise l'accès à la caméra. Si ça ne marche pas, colle le token ci-dessous.</p>
 
   <div id="scanZone" style="display:grid; gap:10px; grid-template-columns: 1fr; max-width:520px;">
     <video id="preview" playsinline style="width:100%; max-width:520px; border:1px solid #ddd; border-radius:8px;"></video>
-    <button id="btnStart">Démarrer la caméra</button>
+    <button id="btnStart"
+    class="rounded-lg border-2 border-blue-900 bg-blue-900 px-4 py-2 text-white transition duration-150 hover:bg-blue-50 hover:text-blue-900"
+    >Démarrer la caméra</button>
     <button id="btnStop" disabled>Stop</button>
   </div>
 
   <h3>Ou vérifier manuellement</h3>
   <form id="manual" class="row" onsubmit="return false;">
-    <input id="token" type="text" placeholder="token..." style="width:420px"/>
-    <button id="btnCheck">Vérifier</button>
+    <input 
+    id="token" 
+    type="text" 
+    placeholder="token..." 
+    style="width:420px"
+    class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+    
+    <button 
+    id="btnCheck"
+    class="rounded-lg border-2 border-blue-900 bg-blue-900 px-4 py-2 text-white transition duration-150 hover:bg-blue-50 hover:text-blue-900"
+    >Vérifier</button>
   </form>
 
   <div id="result" style="margin-top:1rem;"></div>
@@ -23,6 +36,7 @@ import Layout from "../../layouts/Layout.astro";
     .muted{color:#666} .ok{color: #0a7} .ko{color:#c00}
     .row{display:flex; gap:8px; align-items:center}
   </style>
+  </main>
 </Layout>
 
 <script type="module">

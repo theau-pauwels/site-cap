@@ -17,9 +17,15 @@ def create_app():
     app.config["SESSION_COOKIE_HTTPONLY"] = True
 
     db.init_app(app)
-    login_manager = LoginManager(); login_manager.init_app(app)
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+    login_manager = LoginManager()
+    login_manager.init_app(app)
 
+    @login_manager.unauthorized_handler
+    def unauthorized():
+        # Make APIs return 401 JSON instead of flashing a page then redirecting
+        return jsonify({"error": "unauthorized"}), 401
+
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -28,13 +34,6 @@ def create_app():
     @app.get("/api/health")
     def health():
         return {"ok": True}
-
-    @app.get("/api/me")
-    def me():
-        if current_user.is_authenticated:
-            role_val = getattr(current_user.role, "value", current_user.role)
-            return {"authenticated": True, "email": current_user.email, "role": role_val}
-        return {"authenticated": False}, 401
 
     app.register_blueprint(bp_auth)
     app.register_blueprint(bp_admin)

@@ -1,13 +1,19 @@
+---
+import Nav from "../components/Nav"; // ton fichier Nav.tsx
+---
+
 <header class="sticky top-0 z-20 bg-white font-semibold text-blue-900">
-  <div id="user-info" class="absolute right-4 top-4 text-sm font-medium text-blue-900"></div>
   <nav class="container mx-auto flex justify-between gap-4 p-4 lg:block">
-    <a href="/" class="inline-flex items-center gap-2 text-base duration-150 hover:opacity-80 xs:text-lg">
+  <a
+      href="/"
+      class="inline-flex items-center gap-2 text-base duration-150 hover:opacity-80 xs:text-lg"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 1653 1846"
         class="w-8 min-w-8 lg:w-10"
       >
-      <title>Blason Polytech</title>
+        <title>Blason Polytech</title>
         <path
           class="fill-blue-900"
           d="M168,80V1526a262,262,0,0,0,262,262H862a138,138,0,0,1,138,138,138,138,0,0,1,138-138h421a262,262,0,0,0,262-262V80Z"
@@ -40,71 +46,6 @@
       </svg>
       <div>Fédération des Étudiants FPMs</div>
     </a>
-
-    <!-- Desktop Menu -->
-    <ul id="nav-list" class="hidden flex-wrap justify-between gap-2 text-sm lg:flex xl:text-base"></ul>
-
-    <!-- Mobile Toggle -->
-    <button id="menu-toggle" class="lg:hidden px-2 py-1 border rounded">Menu</button>
-
-    <!-- Mobile Menu -->
-    <ul id="mobile-nav" class="hidden absolute top-full left-0 w-full bg-white shadow-lg flex-col gap-2 p-4 lg:hidden"></ul>
-
-  </nav>
+    </nav>
+  <Nav client:load />
 </header>
-
-<script>
-async function guard() {
-  try {
-    const r = await fetch('/api/me', { credentials: 'include' });
-    if (!r.ok) { 
-      location.href = '/login?next=' + encodeURIComponent(location.pathname);
-      return;
-    }
-    const me = await r.json();
-
-    // Affiche email et rôle
-    document.getElementById('user-info').textContent = `${me.email || me.identifiant || ''} (${me.role})`;
-
-    // Met à jour le menu
-    updateMenu(me);
-  } catch (err) {
-    console.error('Erreur guard:', err);
-  }
-}
-
-function updateMenu(user) {
-  const navItems = [
-    { title: "Se connecter", href: "/login" },
-    { title: "S'inscrire", href: "/register" },
-    { title: "Mes cartes", href: "/cartes" },
-    { title: "Changer de mot de passe", href:"/app/password" },
-    ...(user.role === 'admin' ? [
-      { title: "Liste d'utilisateurs", href:"/admin/users" },
-      { title: "Admin", href: "/admin" }
-    ] : [])
-  ];
-
-  const buildMenu = items => items.map(item => `
-    <li class="mx-auto flex items-center justify-center">
-      <a class="relative px-1 py-1 after:absolute after:bottom-0 after:left-0 after:z-50 after:h-[3px] after:w-0 after:rounded-full after:bg-blue-900 after:duration-500 hover:after:w-full"
-         href="${item.href}">${item.title}</a>
-    </li>
-  `).join('');
-
-  // Menu desktop et mobile
-  document.getElementById('nav-list').innerHTML = buildMenu(navItems);
-  document.getElementById('mobile-nav').innerHTML = buildMenu(navItems);
-}
-
-// Initialisation
-guard();
-
-// Gestion du menu mobile
-document.getElementById('menu-toggle').addEventListener('click', () => {
-  const mobileMenu = document.getElementById('mobile-nav');
-  const isHidden = mobileMenu.classList.contains('hidden');
-  mobileMenu.classList.toggle('hidden', !isHidden);
-});
-
-</script>
