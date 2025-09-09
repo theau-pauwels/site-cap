@@ -2,6 +2,7 @@ export type NavItem = {
   label: string;
   href: string;
   adminOnly?: boolean;
+  verifierOnly?: boolean;
 };
 
 export const navItems: NavItem[] = [
@@ -11,6 +12,6 @@ export const navItems: NavItem[] = [
     { label: "Changer de mot de passe", href:"/app/password" },
     { label: "Liste d'utilisateurs", href:"/admin/users", adminOnly: true },
     { label: "Admin", href: "/admin", adminOnly: true },
-    { label : "Vérification", href: "/verif", adminOnly: true},
+    { label : "Vérification", href: "/verif", adminOnly: true, verifierOnly: true },
     { label : "Site Fédé", href: "https://fede.fpms.ac.be" },
 ];

@@ -74,23 +74,20 @@ import Layout from "@layouts/Layout.astro";
     if (!r.ok) return location.href = '/login?next=' + encodeURIComponent(location.pathname);
     const me = await r.json();
     if (me.role !== 'admin') return location.href = '/';
-    document.getElementById('who').textContent = `Connecté : ${me.email} (${me.role})`;
   }
   guard();
 
-  document.getElementById('logout').onclick = async () => {
-    await fetch('/api/auth/logout', { method:'POST', credentials:'include' });
-    location.href = '/login';
-  };
-
   document.getElementById('create').addEventListener('submit', async (e) => {
     e.preventDefault();
+    console.log("➡️ Submit capturé"); // DEBUG
     const msg = document.getElementById('msg');
     msg.className = ''; msg.textContent = '';
     const data = Object.fromEntries(new FormData(e.target).entries());
 
     if (!((data.member_id && /^\d{6}$/.test(data.member_id)) || data.email)) {
-      msg.className='err'; msg.textContent='Fournir member_id (6 chiffres) OU email.'; return;
+      msg.className='err'; 
+      msg.textContent='Fournir member_id (6 chiffres) OU email.'; 
+      return;
     }
 
     const res = await fetch('/api/admin/users', {
@@ -100,7 +97,18 @@ import Layout from "@layouts/Layout.astro";
       credentials: 'include'
     });
 
-    if (res.ok) { msg.className='ok'; msg.textContent='Utilisateur créé ✅'; e.target.reset(); }
-    else { try { const j=await res.json(); msg.className='err'; msg.textContent=j.error||('Erreur '+res.status); } catch { msg.textContent='Erreur '+res.status; } }
+    if (res.ok) { 
+      msg.className='ok'; 
+      msg.textContent='Utilisateur créé ✅'; 
+      e.target.reset(); 
+    } else { 
+      try { 
+        const j=await res.json(); 
+        msg.className='err'; 
+        msg.textContent=j.error || ('Erreur '+res.status); 
+      } catch { 
+        msg.textContent='Erreur '+res.status; 
+      } 
+    }
   });
 </script>

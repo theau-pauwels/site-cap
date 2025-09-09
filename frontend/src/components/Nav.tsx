@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import { navItems as originalNavItems, type NavItem } from "./NavItems";
 
-type Me = { email?: string; role?: string };
+type Me = {
+  email?: string;
+  role?: string;
+  member_id?: string;
+  identifiant?: string;  // 🔹 ajouté
+};
+
 
 export default function Nav() {
   const [role, setRole] = useState<string>("guest");
@@ -35,7 +41,9 @@ export default function Nav() {
 
   // Filtrer les items selon la connexion
   const navItems = originalNavItems.filter((item) => {
-    if (item.adminOnly && role !== "admin") return false;
+    if (item.adminOnly && role !== "admin") {
+      if (!(item.verifierOnly && role === "verifier")) return false;
+    }
     if (me && (item.label === "Se connecter" || item.label === "S'inscrire")) return false;
     return true;
   });
@@ -70,11 +78,12 @@ export default function Nav() {
       <div className="text-sm text-gray-700 whitespace-nowrap">
         {me ? (
           <span>
-            Connecté : <strong>{me.email || me.role}</strong> ({me.role})
+            Connecté : <strong>{me.identifiant}</strong> ({me.role})
           </span>
         ) : (
           <span className="text-gray-500">Non connecté</span>
         )}
+
         <ul>
           {me && (
           <li className="flex flex-wrap gap-4 text-sm lg:text-base">

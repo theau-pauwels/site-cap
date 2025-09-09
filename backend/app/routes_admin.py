@@ -94,3 +94,50 @@ def set_user_role(user_id):
     target.role = allowed[role_str]
     db.session.commit()
     return jsonify({"ok": True, "id": target.id, "role": role_str})
+
+@bp_admin.route("/api/admin/users/<user_id>", methods=["PUT"])
+@login_required
+def update_user(user_id):
+    if not is_admin():
+        return jsonify({"error": "Forbidden"}), 403
+
+    target = User.query.get(user_id)
+    if not target:
+        return jsonify({"error": "Utilisateur introuvable"}), 404
+
+    data = request.get_json()
+    nom = data.get("nom")
+    prenom = data.get("prenom")
+    identifiant = data.get("identifiant")  # ⚡ ajout
+
+    if identifiant and not re.match(r"^\d{6}$", identifiant):
+        return jsonify({"error": "Le member_id doit faire 6 chiffres"}), 400
+
+    if nom:
+        target.nom = nom
+    if prenom:
+        target.prenom = prenom
+    if identifiant:
+        target.member_id = identifiant  # ⚡ mise à jour du member_id
+
+    db.session.commit()
+    return jsonify({"ok": True})
+
+@bp_admin.route("/api/admin/users/<user_id>", methods=["DELETE"])
+@login_required
+def delete_user(user_id):
+    if not is_admin():
+        return jsonify({"error": "Forbidden"}), 403
+
+    target = User.query.get(user_id)
+    if not target:
+        return jsonify({"error": "Utilisateur introuvable"}), 404
+
+    # ⚠️ Sécurité : éviter qu’un admin se supprime lui-même
+    if target.id == current_user.id:
+        return jsonify({"error": "Impossible de supprimer votre propre compte."}), 400
+
+    db.session.delete(target)
+    db.session.commit()
+    return jsonify({"ok": True})
+

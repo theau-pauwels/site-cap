@@ -49,11 +49,14 @@ def logout():
 def me():
     user = current_user
     role_value = getattr(user.role, "value", user.role)
+    identifiant = user.member_id or user.email  
     return jsonify({
+        "member_id": user.member_id or "",  
         "email": user.email or "",
-        "member_id": user.member_id or "",
-        "role": role_value
+        "role": role_value,
+        "identifiant": identifiant  
     })
+
 
 @bp_auth.route("/api/auth/register", methods=["POST"])
 def register():
@@ -107,3 +110,24 @@ def register():
     except Exception as e:
         current_app.logger.exception("Register error")
         return jsonify({"error": str(e)}), 500
+
+
+@bp_auth.route("/api/auth/change-password", methods=["POST"])
+@login_required
+def change_password():
+    data = request.json or {}
+    old_password = data.get("old_password", "").strip()
+    new_password = data.get("new_password", "").strip()
+
+    if not old_password or not new_password or len(new_password) < 8:
+        return jsonify({"error": "Champs invalides ou mot de passe trop court"}), 400
+
+    # Vérifier l'ancien mot de passe
+    if not check_password_hash(current_user.password_hash, old_password):
+        return jsonify({"error": "Ancien mot de passe incorrect"}), 403
+
+    # Mettre à jour le mot de passe
+    current_user.password_hash = generate_password_hash(new_password)
+    db.session.commit()
+
+    return jsonify({"ok": True})

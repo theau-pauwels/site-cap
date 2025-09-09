@@ -7,7 +7,7 @@ type User = {
   id: number;
   nom: string;
   prenom: string;
-  identifiant?: string;
+  identifiant?: string; // member_id ou email
   cartes?: Memberships;
   role: string;
 };
@@ -30,15 +30,11 @@ function makeYearRanges(countBefore = 2, countAfter = 6) {
   });
 }
 
-function startYearFromLabel(label: string) {
-  const left = label.split("-")[0];
-  const n = parseInt(left, 10);
-  return Number.isFinite(n) ? n : null;
-}
-
 export default function AdminUsersTable() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingUserId, setEditingUserId] = useState<number | null>(null);
+  const [editValues, setEditValues] = useState<{ nom: string; prenom: string; identifiant: string }>({ nom: "", prenom: "", identifiant: "" });
 
   // ---------- API ----------
   const fetchUsers = async () => {
@@ -56,7 +52,6 @@ export default function AdminUsersTable() {
     return true;
   };
 
-  // ---------- Effet initial ----------
   useEffect(() => {
     (async () => {
       if (!(await ensureAdmin())) return;
@@ -65,7 +60,7 @@ export default function AdminUsersTable() {
     })();
   }, []);
 
-  // ---------- Gestion des cartes ----------
+  // ---------- Cartes ----------
   const addCard = async (userId: number, annee: string, prefix: string, num: number) => {
     const annee_code = `${prefix}-${num}`;
     const res = await fetch(`/api/admin/users/${userId}/annees`, {
@@ -88,7 +83,7 @@ export default function AdminUsersTable() {
     await fetchUsers();
   };
 
-  // ---------- Changement de rôle ----------
+  // ---------- Rôle ----------
   const changeRole = async (userId: number, role: string) => {
     const res = await fetch(`/api/admin/users/${userId}/role`, {
       method: "PUT",
@@ -100,7 +95,30 @@ export default function AdminUsersTable() {
     await fetchUsers();
   };
 
-  // ---------- Rendu ----------
+  // ---------- Supprimer utilisateur ----------
+  const deleteUser = async (userId: number) => {
+    if (!confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) return;
+    const res = await fetch(`/api/admin/users/${userId}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    if (!res.ok) { alert("Erreur lors de la suppression de l'utilisateur"); return; }
+    await fetchUsers();
+  };
+
+  // ---------- Modifier utilisateur ----------
+  const saveUser = async (userId: number) => {
+    const res = await fetch(`/api/admin/users/${userId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(editValues),
+    });
+    if (!res.ok) { alert("Erreur lors de la modification"); return; }
+    setEditingUserId(null);
+    await fetchUsers();
+  };
+
   if (loading) return <p>Chargement...</p>;
 
   const yearRanges = makeYearRanges();
@@ -115,67 +133,82 @@ export default function AdminUsersTable() {
           <th className="border px-2 py-1">Cartes</th>
           <th className="border px-2 py-1">Ajouter une carte</th>
           <th className="border px-2 py-1">Rôle</th>
+          <th className="border px-2 py-1">Actions</th>
         </tr>
       </thead>
       <tbody>
-        {users.map((u) => (
+        {users.map(u => (
           <tr key={u.id}>
-            <td className="border px-2 py-1">{u.nom}</td>
-            <td className="border px-2 py-1">{u.prenom}</td>
-            <td className="border px-2 py-1">{u.identifiant ?? ""}</td>
+            <td className="border px-2 py-1">
+              {editingUserId === u.id ? (
+                <input
+                  value={editValues.nom}
+                  onChange={e => setEditValues(prev => ({ ...prev, nom: e.target.value }))}
+                  className="border p-1 rounded"
+                />
+              ) : u.nom}
+            </td>
+            <td className="border px-2 py-1">
+              {editingUserId === u.id ? (
+                <input
+                  value={editValues.prenom}
+                  onChange={e => setEditValues(prev => ({ ...prev, prenom: e.target.value }))}
+                  className="border p-1 rounded"
+                />
+              ) : u.prenom}
+            </td>
+            <td className="border px-2 py-1">
+              {editingUserId === u.id ? (
+                <input
+                  value={editValues.identifiant}
+                  onChange={e => setEditValues(prev => ({ ...prev, identifiant: e.target.value }))}
+                  className="border p-1 rounded"
+                />
+              ) : u.identifiant ?? ""}
+            </td>
             <td className="border px-2 py-1">
               {u.cartes && Object.entries(u.cartes).length > 0
-                ? Object.entries(u.cartes)
-                    .sort((a, b) => Number(b[0]) - Number(a[0]))
-                    .map(([annee, code]) => (
-                      <div key={annee}>
-                        {annee} → {code}{" "}
-                        <button
-                          className="text-red-600"
-                          onClick={() => removeCard(u.id, annee)}
-                        >
-                          🗑
-                        </button>
-                      </div>
-                    ))
+                ? Object.entries(u.cartes).sort((a,b)=>Number(b[0])-Number(a[0])).map(([annee, code])=>(
+                  <div key={annee}>
+                    {annee} → {code}{" "}
+                    <button className="text-red-600" onClick={()=>removeCard(u.id,annee)}>🗑</button>
+                  </div>
+                ))
                 : <span className="text-gray-400">—</span>
               }
             </td>
             <td className="border px-2 py-1">
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const f = e.currentTarget;
-                  const annee = (f.annee as HTMLSelectElement).value;
-                  const prefix = (f.prefix as HTMLSelectElement).value;
-                  const num = parseInt((f.num as HTMLInputElement).value, 10);
-                  addCard(u.id, annee, prefix, num);
-                }}
-                className="flex flex-col gap-1"
-              >
-                <select name="annee" required>
-                  {yearRanges.map((y) => (
-                    <option key={y} value={y}>{y}</option>
-                  ))}
-                </select>
-                <select name="prefix" required>
-                  {ALLOWED_PREFIXES.map((p) => (
-                    <option key={p} value={p}>{p}</option>
-                  ))}
-                </select>
+              <form onSubmit={e => {
+                e.preventDefault();
+                const f = e.currentTarget as any;
+                const annee = f.annee.value;
+                const prefix = f.prefix.value;
+                const num = parseInt(f.num.value,10);
+                addCard(u.id, annee, prefix, num);
+              }} className="flex flex-col gap-1">
+                <select name="annee" required>{yearRanges.map(y=><option key={y} value={y}>{y}</option>)}</select>
+                <select name="prefix" required>{ALLOWED_PREFIXES.map(p=><option key={p} value={p}>{p}</option>)}</select>
                 <input name="num" type="number" min={1} placeholder="Numéro" required />
                 <button type="submit" className="bg-blue-900 text-white px-2 py-1 rounded">➕</button>
               </form>
             </td>
             <td className="border px-2 py-1">
-              <select
-                value={u.role}
-                onChange={(e) => changeRole(u.id, e.target.value)}
-              >
-                {ROLE_OPTIONS.map((r) => (
-                  <option key={r} value={r}>{r}</option>
-                ))}
+              <select value={u.role} onChange={e=>changeRole(u.id,e.target.value)}>
+                {ROLE_OPTIONS.map(r=><option key={r} value={r}>{r}</option>)}
               </select>
+            </td>
+            <td className="border px-2 py-1 flex gap-1">
+              {editingUserId === u.id ? (
+                <>
+                  <button onClick={()=>saveUser(u.id)} className="bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700">💾</button>
+                  <button onClick={()=>setEditingUserId(null)} className="bg-gray-400 text-white px-2 py-1 rounded hover:bg-gray-500">✖</button>
+                </>
+              ) : (
+                <>
+                  <button onClick={()=>{setEditingUserId(u.id); setEditValues({nom:u.nom, prenom:u.prenom, identifiant:u.identifiant ?? ""})}} className="bg-yellow-500 px-2 py-1 rounded hover:bg-yellow-600">✏️</button>
+                  <button onClick={()=>deleteUser(u.id)} className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700">🗑</button>
+                </>
+              )}
             </td>
           </tr>
         ))}

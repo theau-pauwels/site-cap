@@ -43,6 +43,7 @@ export default defineConfig({
          protocol: 'ws',
          host: process.env.HMR_HOST || 'localhost',
          port: 80,
+         overlay: false,
       },
     },
   },
