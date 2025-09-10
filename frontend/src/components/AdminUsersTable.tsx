@@ -13,7 +13,7 @@ type User = {
 };
 
 const ALLOWED_PREFIXES = ["A","F","E","EA","MI","S"];
-const ROLE_OPTIONS = ["member","verifier","admin"];
+const ROLE_OPTIONS = ["member","verifier","admin","en attente"];
 
 function currentAcademicStartYear() {
   const d = new Date();

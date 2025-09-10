@@ -11,6 +11,7 @@ class Role(Enum):
     MEMBER = "member"
     ADMIN  = "admin"
     VERIFIER = "verifier"
+    ATTENTE = "en attente"
     
 
 class User(UserMixin, db.Model):

@@ -39,15 +39,32 @@ def users_collection():
         if email and User.query.filter_by(email=email).first():
             return jsonify({"error": "email déjà utilisé"}), 409
 
+        role_str = (data.get("role") or "member").lower()
+        allowed = {"member": Role.MEMBER, "admin": Role.ADMIN, "verifier": Role.VERIFIER, "en attente":Role.ATTENTE}
+        if role_str not in allowed:
+            return jsonify({"error": "Rôle invalide"}), 400
+        role = allowed[role_str]
+
+
         user = User(
             nom=nom,
             prenom=prenom,
             email=email,
             member_id=member_id,
             password_hash=generate_password_hash(password),
-            role=Role.MEMBER,
+            role=role,
         )
         db.session.add(user)
+        db.session.flush()
+
+        cartes = data.get("cartes", [])
+        for c in cartes:
+            annee = c.get("annee")
+            annee_code = c.get("annee_code")
+            if annee and annee_code:
+                m = Membership(user_id=user.id, annee=annee, annee_code=annee_code)
+                db.session.add(m)
+
         db.session.commit()
         return jsonify({"ok": True, "id": user.id})
 
@@ -66,7 +83,7 @@ def users_collection():
             "nom": u.nom,
             "prenom": u.prenom,
             "identifiant": (u.member_id or u.email),
-            "role": (u.role.value if hasattr(u.role, "value") else str(u.role)),  # "member" | "admin" | "verifier"
+            "role": (u.role.value if hasattr(u.role, "value") else str(u.role)), 
             "cartes": cartes,
         })
     return jsonify(result)
@@ -84,7 +101,7 @@ def set_user_role(user_id):
 
     data = request.get_json() or {}
     role_str = str(data.get("role", "")).lower().strip()
-    allowed = {"member": Role.MEMBER, "admin": Role.ADMIN, "verifier": Role.VERIFIER}
+    allowed = {"member": Role.MEMBER, "admin": Role.ADMIN, "verifier": Role.VERIFIER, "en attente": Role.ATTENTE}
     if role_str not in allowed:
         return jsonify({"error": "Rôle invalide"}), 400
 
@@ -142,3 +159,33 @@ def delete_user(user_id):
     db.session.commit()
     return jsonify({"ok": True})
 
+@bp_admin.route("/api/admin/next_num", methods=["GET"])
+@login_required
+def get_next_card_number():
+    """Retourne le prochain numéro disponible pour une année et un préfixe."""
+    if not is_admin():
+        return jsonify({"error": "Forbidden"}), 403
+
+    annee = request.args.get("annee")
+    prefix = request.args.get("prefix")
+
+    if not annee or not prefix:
+        return jsonify({"error": "annee et prefix requis"}), 400
+
+    # Trouver tous les annee_code existants pour cette année et ce préfixe
+    like_pattern = f"{prefix}-%"
+    existing = Membership.query.filter(
+        Membership.annee == int(annee.split("-")[0]),
+        Membership.annee_code.ilike(like_pattern)
+    ).all()
+
+    nums = []
+    for m in existing:
+        try:
+            n = int(m.annee_code.split("-")[1])
+            nums.append(n)
+        except:
+            pass
+
+    next_num = max(nums) + 1 if nums else 1
+    return jsonify({"next_num": next_num})
