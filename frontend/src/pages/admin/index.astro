@@ -1,156 +1,40 @@
 ---
 import Layout from "@layouts/Layout.astro";
+import Carte from "../../components/carte"; // adapte le chemin selon ton arborescence
 ---
+
 <Layout title="Admin">
   <main class="flex-1 flex flex-col gap-4 items-center p-4 justify-center">
     <section class="w-full max-w-md">
+      <!-- Tu peux déplacer ces meta dans le Layout si tu préfères -->
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <style> 
+
+      <style>
         form { max-width: 520px; display: grid; gap: .75rem; margin-top: 1rem; }
         input, select, button { padding: .6rem .8rem; font-size: 1rem; }
-        .row { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
         .bar { display:flex; gap:.75rem; align-items:center; }
         .ok { color: #0a7; }
         .err { color: #b00020; }
         .muted { color:#666; font-size:.9rem; }
-        a.btn { display:inline-block; padding:.4rem .6rem; border:1px solid #ddd; border-radius:.5rem; text-decoration:none; }
+        a.btn { display:inline-block; padding:.4rem .6rem; border:1px solid #ddd; border-radius:.5rem; }
+      </style>
+      <style global>
+      .muted { color:#666; font-size:.9rem; }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+      .ok { color:#0a7; }
+      .err { color:#b00020; }
       </style>
 
+
       <h1 class="font-semibold text-2xl text-blue-800 bg-white mb-1">Créer un utilisateur</h1>
-      <p class="muted">Renseigner <strong>member_id (6 chiffres du matricule UMONS)</strong> OU <strong>email</strong>.</p>
+      <p class="muted">
+        Renseigner <strong>member_id (6 chiffres du matricule UMONS)</strong> OU <strong>email</strong>.
+      </p>
 
-      <form id="create">
-        <div class="row">
-          <label>Prénom<br/>
-            <input name="prenom" required class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-          </label>
-          <label>Nom<br/>
-            <input name="nom" required class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-          </label>
-        </div>
-
-        <label>Identifiant (6 chiffres) — option 1<br/>
-          <input name="member_id" inputmode="numeric" pattern="\\d{6}" maxlength="6" placeholder="000123"
-            class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </label>
-        <div class="muted">OU</div>
-        <label>Email — option 2<br/>
-          <input name="email" type="email" placeholder="user@example.com"
-            class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </label>
-
-        <label>Mot de passe initial<br/>
-          <input name="password" type="password" minlength="8" required
-            class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </label>
-
-        <label>Rôle<br/>
-          <select name="role" required class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="en attente">En attente</option>
-            <option value="member">Member</option>
-            <option value="verifier">Verifier</option>
-            <option value="admin">Admin</option>
-          </select>
-        </label>
-
-        <fieldset>
-          <legend class="muted">Ajouter directement une carte (optionnel)</legend>
-          <div class="row">
-            <label>Année<br/>
-              <select name="annee" class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="2025-2026">2025-2026</option>
-                <option value="2026-2027">2026-2027</option>
-              </select>
-            </label>
-
-            <label>Préfixe<br/>
-              <select name="prefix" class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="A">A</option>
-                <option value="F">F</option>
-                <option value="E">E</option>
-                <option value="EA">EA</option>
-                <option value="MI">MI</option>
-                <option value="S">S</option>
-              </select>
-            </label>
-            <label>Numéro<br/>
-              <input name="num" type="number" min="1" placeholder="12" class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </label>
-          </div>
-        </fieldset>
-
-        <button type="submit"
-          class="rounded-lg border-2 border-blue-900 bg-blue-900 px-4 py-2 text-white transition duration-150 hover:bg-blue-50 hover:text-blue-900">
-          Créer
-        </button>
-        <div id="msg"></div>
-      </form>
+      <!-- Composant React hydraté côté client -->
+      <Carte client:load />
     </section>
   </main>
 </Layout>
-
-<script>
-  async function guard() {
-    const r = await fetch('/api/me', { credentials: 'include' });
-    if (!r.ok) return location.href = '/login?next=' + encodeURIComponent(location.pathname);
-    const me = await r.json();
-    if (me.role !== 'admin') return location.href = '/';
-  }
-  guard();
-
-  document.getElementById('create').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const msg = document.getElementById('msg');
-    msg.className=''; msg.textContent='';
-
-    const data = Object.fromEntries(new FormData(e.target).entries());
-
-    if (!((data.member_id && /^\d{6}$/.test(data.member_id)) || data.email)) {
-      msg.className='err'; 
-      msg.textContent='Fournir member_id (6 chiffres) OU email.'; 
-      return;
-    }
-
-    // Création de l'utilisateur
-    const res = await fetch('/api/admin/users', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        prenom: data.prenom,
-        nom: data.nom,
-        member_id: data.member_id,
-        email: data.email,
-        password: data.password,
-        role: data.role
-      }),
-      credentials: 'include'
-    });
-
-    if (!res.ok) {
-      try { const j = await res.json(); msg.className='err'; msg.textContent=j.error || ('Erreur '+res.status); } 
-      catch { msg.textContent='Erreur '+res.status; }
-      return;
-    }
-
-    const user = await res.json();
-
-    // Si carte renseignée, l'ajouter
-    if (data.annee && data.prefix && data.num) {
-      const cardRes = await fetch(`/api/admin/users/${user.id}/annees`, {
-        method: 'PUT',
-        headers: {'Content-Type':'application/json'},
-        credentials:'include',
-        body: JSON.stringify({
-          annee: data.annee,
-          annee_code: `${data.prefix}-${data.num}`
-        })
-      });
-      if (!cardRes.ok) { console.warn("Erreur lors de l'ajout de la carte"); }
-    }
-
-    msg.className='ok';
-    msg.textContent='Utilisateur créé ✅';
-    e.target.reset();
-  });
-</script>
