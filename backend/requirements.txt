@@ -6,3 +6,6 @@ gunicorn
 werkzeug
 itsdangerous>=2.1
 qrcode[pil]>=7.4
+Flask-Mail==0.9.1
+Flask-Migrate==4.1.0
+

@@ -9,10 +9,10 @@ export default defineConfig({
       'localhost',
       '127.0.0.1',
       'frontend',
-      'carte-fede-test.magellan.fpms.ac.be'
+      'cap.fede.fpms.ac.be'
     ],
     hmr: {
-      host: 'carte-fede-test.magellan.fpms.ac.be',
+      host: 'cap.fede.fpms.ac.be',
       protocol: 'ws', // ⚠️ HTTP => ws
       clientPort: 80  // ⚠️ puisque ton Nginx écoute sur 80
     }

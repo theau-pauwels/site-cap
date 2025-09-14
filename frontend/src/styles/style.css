@@ -1,0 +1,14 @@
+/* styles.css */
+
+.rouge {
+  background-color: #D13F27; /* ou rgb(209, 63, 39) */
+}
+
+.bleu {
+  background-color: #3A9AD9; /* ou rgb(58, 154, 217) */
+}
+
+.text-bleu {
+  color: #3A9AD9; /* ton bleu de barre */
+}
+

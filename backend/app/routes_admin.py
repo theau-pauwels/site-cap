@@ -2,10 +2,12 @@ from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
 from sqlalchemy.orm import joinedload
-from .models import db, User, Role, Membership
+from .models import db, User, Role, Membership, Order, OrderItem
 import re
 
 bp_admin = Blueprint("admin", __name__)
+bp_orders = Blueprint("orders",__name__)
+bp_admin_orders = Blueprint("admin_orders",__name__)
 
 @bp_admin.before_request
 @login_required
@@ -159,33 +161,77 @@ def delete_user(user_id):
     db.session.commit()
     return jsonify({"ok": True})
 
-@bp_admin.route("/api/admin/next_num", methods=["GET"])
+# @bp_admin.route("/api/admin/next_num", methods=["GET"])
+# @login_required
+# def get_next_card_number():
+#     """Retourne le prochain numéro disponible pour une année et un préfixe."""
+#     if not is_admin():
+#         return jsonify({"error": "Forbidden"}), 403
+
+#     annee = request.args.get("annee")
+#     prefix = request.args.get("prefix")
+
+#     if not annee or not prefix:
+#         return jsonify({"error": "annee et prefix requis"}), 400
+
+#     # Trouver tous les annee_code existants pour cette année et ce préfixe
+#     like_pattern = f"{prefix}-%"
+#     existing = Membership.query.filter(
+#         Membership.annee == int(annee.split("-")[0]),
+#         Membership.annee_code.ilike(like_pattern)
+#     ).all()
+
+#     nums = []
+#     for m in existing:
+#         try:
+#             n = int(m.annee_code.split("-")[1])
+#             nums.append(n)
+#         except:
+#             pass
+
+#     next_num = max(nums) + 1 if nums else 1
+#     return jsonify({"next_num": next_num})
+
+@bp_admin_orders.route("/api/admin/orders", methods=["GET"])
 @login_required
-def get_next_card_number():
-    """Retourne le prochain numéro disponible pour une année et un préfixe."""
-    if not is_admin():
-        return jsonify({"error": "Forbidden"}), 403
+def list_orders():
+    # Vérifie que l'utilisateur est admin
+    # if getattr(current_user.role, "value", current_user.role) != "admin":
+    #     return jsonify({"error": "Unauthorized"}), 403
 
-    annee = request.args.get("annee")
-    prefix = request.args.get("prefix")
+    orders = Order.query.order_by(Order.created_at.desc()).all()
+    data = []
+    for o in orders:
+        data.append({
+            "id": o.id,
+            "user_id": o.user_id,
+            "status": o.status,
+            "created_at": o.created_at.isoformat(),
+            "items": [{"title": i.title, "price": i.price, "quantity": i.quantity} for i in o.items]
+        })
+    return jsonify(data)
 
-    if not annee or not prefix:
-        return jsonify({"error": "annee et prefix requis"}), 400
+@bp_orders.route("/api/orders", methods=["POST"])
+@login_required
+def create_order():
+    data = request.get_json()
+    items = data.get("items", [])
+    if not items:
+        return jsonify({"error": "Le panier est vide"}), 400
 
-    # Trouver tous les annee_code existants pour cette année et ce préfixe
-    like_pattern = f"{prefix}-%"
-    existing = Membership.query.filter(
-        Membership.annee == int(annee.split("-")[0]),
-        Membership.annee_code.ilike(like_pattern)
-    ).all()
+    order = Order(user_id=current_user.id)
+    db.session.add(order)
+    db.session.flush()  # pour avoir l'ID avant commit
 
-    nums = []
-    for m in existing:
-        try:
-            n = int(m.annee_code.split("-")[1])
-            nums.append(n)
-        except:
-            pass
+    for it in items:
+        order_item = OrderItem(
+            order_id=order.id,
+            pin_id=it["id"],
+            title=it["title"],
+            price=float(it["price"]),
+            quantity=int(it.get("quantity", 1))
+        )
+        db.session.add(order_item)
 
-    next_num = max(nums) + 1 if nums else 1
-    return jsonify({"next_num": next_num})
+    db.session.commit()
+    return jsonify({"ok": True, "order_id": order.id})

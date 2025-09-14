@@ -15,12 +15,16 @@ export default {
         "2xl": "1400px",
       },
     },
-    extend: {
+    extend:{
       fontFamily: {
         sans: ["Poppins", ...defaultTheme.fontFamily.sans],
       },
       screens: {
         xs: "420px",
+      },
+      colors: {
+        'rouge': '#D13F27',
+        'bleu': '#3A9AD9',
       },
       boxShadow: {
         // Box shadow generated with https://shadows.brumm.af/

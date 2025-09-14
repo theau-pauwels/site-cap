@@ -2,10 +2,11 @@
 import Layout from "@layouts/Layout.astro";
 const next = Astro.url.searchParams.get("next") || "/"; // redir après inscription
 ---
+
 <Layout title="Inscription">
   <main class="flex-1 flex flex-col gap-4 items-center p-4 justify-center">
     <section class="w-full max-w-md">
-      <h1 class="font-semibold text-2xl text-blue-800 bg-white mb-1">Créer un compte</h1>
+      <h1 class="font-semibold text-2xl text-bleu bg-white mb-1">Créer un compte</h1>
 
       <form id="signupForm" class="stack" novalidate>
         <label>
@@ -33,7 +34,7 @@ const next = Astro.url.searchParams.get("next") || "/"; // redir après inscript
         </label>
 
         <label>
-          Email UMONS
+          Email
           <input
             id="email"
             name="email"
@@ -73,11 +74,12 @@ const next = Astro.url.searchParams.get("next") || "/"; // redir après inscript
 
         <button
           type="submit"
-          class="rounded-lg border-2 border-blue-900 bg-blue-900 px-4 py-2 text-white transition duration-150 hover:bg-blue-50 hover:text-blue-900"
+          class="rounded-lg border-2 border-bleu bg-bleu px-4 py-2 text-white transition duration-150 hover:bg-blue-50 hover:text-bleu"
         >
           S'inscrire
         </button>
         <p id="err" style="color:#b00;"></p>
+        <p id="success" style="color:green;"></p>
       </form>
 
       <style>
@@ -98,23 +100,14 @@ const next = Astro.url.searchParams.get("next") || "/"; // redir après inscript
 </Layout>
 
 <script>
-  async function guard() {
-    const r = await fetch('/api/me', { credentials: 'include' });
-    if (!r.ok) return location.href = '/login?next=' + encodeURIComponent(location.pathname);
-    const me = await r.json();
-    if (me.role !== 'admin') return location.href = '/';
-    document.getElementById('who').textContent = `Connecté : ${me.email} (${me.role})`;
-  }
-  guard();
-
-
-
   const form = document.getElementById('signupForm');
   const $err = document.getElementById('err');
+  const $success = document.getElementById('success');
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     $err.textContent = '';
+    $success.textContent = '';
 
     const nom = document.getElementById('nom').value.trim();
     const prenom = document.getElementById('prenom').value.trim();
@@ -132,25 +125,26 @@ const next = Astro.url.searchParams.get("next") || "/"; // redir après inscript
       return;
     }
 
-    const res = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      credentials: 'include',
-      body: JSON.stringify({ nom, prenom, email: email.toLowerCase(), password })
-    });
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ nom, prenom, email: email.toLowerCase(), password })
+      });
 
-    if (!res.ok) {
-      try {
-        const j = await res.json();
-        $err.textContent = j.error || ('Erreur ' + res.status);
-      } catch {
-        $err.textContent = 'Erreur ' + res.status;
+      const data = await res.json();
+
+      if (!res.ok) {
+        $err.textContent = data.error || ('Erreur ' + res.status);
+        return;
       }
-      return;
-    }
 
-    // OK → redirige
-    const next = new URLSearchParams(window.location.search).get('next') || '/';
-    location.href = next;
+      // Succès → affiche message et ne redirige pas
+      $success.textContent = data.message || "Un email de confirmation a été envoyé.";
+      form.reset();
+    } catch (err) {
+      console.error(err);
+      $err.textContent = "Erreur serveur, réessaie plus tard.";
+    }
   });
 </script>

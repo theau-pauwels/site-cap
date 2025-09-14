@@ -57,15 +57,17 @@ export default function Nav() {
             {item.label === "Site Fédé" ? (
               <a
                 href={item.href}
-                className="rounded-lg border-2 border-blue-900 bg-blue-900 px-4 py-2 text-white transition duration-150 hover:bg-blue-50 hover:text-blue-900"
+                className="rounded-lg border-2 bleu bleu px-4 py-2 text-white transition duration-150 hover:bg-blue-50 hover:text-bleu"
               >
                 {item.label}
               </a>
             ) : (
               <a
                 href={item.href}
-                className="relative px-1 py-1 after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-0 after:rounded-full after:bg-blue-900 after:duration-500 hover:after:w-full"
-              >
+                className="relative px-1 py-1 
+                  after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-0 after:rounded-full after:bg-bleu-barre after:duration-500 
+                  hover:after:w-full"
+                >
                 {item.label}
               </a>
             )}

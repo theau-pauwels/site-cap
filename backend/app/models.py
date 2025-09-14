@@ -1,48 +1,61 @@
-from flask_sqlalchemy import SQLAlchemy
+# app/models.py
+
+from . import db  # l'instance de __init__.py
 from flask_login import UserMixin
 from datetime import datetime
 from enum import Enum
 from sqlalchemy.orm import relationship
 import uuid
 
-db = SQLAlchemy()
-
 class Role(Enum):
     MEMBER = "member"
     ADMIN  = "admin"
     VERIFIER = "verifier"
     ATTENTE = "en attente"
-    
 
 class User(UserMixin, db.Model):
-    __tablename__ = "user"
+    __tablename__ = "users"
+
     id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
     nom = db.Column(db.String, nullable=False)
     prenom = db.Column(db.String, nullable=False)
-
-    # Identifiant au choix : id 6 chiffres OU email (au moins l'un des deux)
-    member_id = db.Column(db.String(6), unique=True, nullable=True)  # 6 chiffres
+    member_id = db.Column(db.String(6), unique=True, nullable=True)
     email = db.Column(db.String, unique=True, nullable=True)
-
     password_hash = db.Column(db.String, nullable=False)
     role = db.Column(db.Enum(Role, name="role_enum"), default=Role.MEMBER, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     memberships = relationship("Membership", backref="user", cascade="all, delete-orphan")
 
-    __table_args__ = (
-        db.CheckConstraint("(member_id IS NOT NULL) OR (email IS NOT NULL)", name="user_id_or_email_required"),
-        db.CheckConstraint("(member_id ~ '^[0-9]{6}$') OR (member_id IS NULL)", name="member_id_six_digits"),
-    )
-
 class Membership(db.Model):
     __tablename__ = "membership"
+
     id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id = db.Column(db.String, db.ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
-    annee = db.Column(db.Integer, nullable=False)       # année de début (2025 => 2025-2026)
-    annee_code = db.Column(db.String, nullable=False)   # ex: EA-23
+    user_id = db.Column(db.String, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    annee = db.Column(db.Integer, nullable=False)
+    annee_code = db.Column(db.String, nullable=False)
 
     __table_args__ = (
-        db.UniqueConstraint("user_id", "annee", name="uq_user_annee"),        # 1 carte max par user et par année
-        db.UniqueConstraint("annee", "annee_code", name="uq_annee_code_year") # code unique dans une même année
+        db.UniqueConstraint("user_id", "annee", name="uq_user_annee"),
+        db.UniqueConstraint("annee", "annee_code", name="uq_annee_code_year")
     )
+
+class Order(db.Model):
+    __tablename__ = "order"
+
+    id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = db.Column(db.String, db.ForeignKey("users.id"), nullable=False)
+    status = db.Column(db.String, default="en attente")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    items = relationship("OrderItem", backref="order", cascade="all, delete-orphan")
+
+class OrderItem(db.Model):
+    __tablename__ = "order_item"
+
+    id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    order_id = db.Column(db.String, db.ForeignKey("order.id", ondelete="CASCADE"), nullable=False)
+    pin_id = db.Column(db.String, nullable=False)
+    title = db.Column(db.String, nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    quantity = db.Column(db.Integer, default=1)
