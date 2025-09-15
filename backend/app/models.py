@@ -1,11 +1,11 @@
 # app/models.py
-
-from . import db  # l'instance de __init__.py
 from flask_login import UserMixin
 from datetime import datetime
 from enum import Enum
 from sqlalchemy.orm import relationship
 import uuid
+
+from .extensions import db  # ✅ import from extensions instead of __init__.py
 
 class Role(Enum):
     MEMBER = "member"
@@ -49,6 +49,8 @@ class Order(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     items = relationship("OrderItem", backref="order", cascade="all, delete-orphan")
+    user = relationship("User", backref="orders")  # <-- ajoute ça
+
 
 class OrderItem(db.Model):
     __tablename__ = "order_item"

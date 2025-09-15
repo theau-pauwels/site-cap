@@ -1,10 +1,10 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import Orders from "../../components/commandes";
+import MyOrders from "../components/myorders";
 ---
 
 <Layout title="Admin - Pins">
   <main class="bg-gray-100 min-h-screen p-8 flex justify-center">
-    <Orders client:load />
+    <MyOrders client:load />
   </main>
 </Layout>

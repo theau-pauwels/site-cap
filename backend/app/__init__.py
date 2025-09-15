@@ -1,15 +1,12 @@
 from flask import Flask, jsonify
-from flask_login import LoginManager, current_user
+from flask_login import LoginManager
+from werkzeug.middleware.proxy_fix import ProxyFix
+
+from .extensions import db, migrate
 from .routes_auth import bp_auth
-from .routes_admin import bp_admin,bp_admin_orders,bp_orders
+from .routes_admin import bp_admin, bp_admin_orders, bp_orders
 from .routes_memberships import bp_mem
 from .routes_pins import bp_pins
-from werkzeug.middleware.proxy_fix import ProxyFix
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-
-db = SQLAlchemy()
-migrate = Migrate()
 
 def create_app():
     app = Flask(__name__)
@@ -21,7 +18,6 @@ def create_app():
     app.config["SESSION_COOKIE_SECURE"] = True
     app.config["SESSION_COOKIE_HTTPONLY"] = True
 
-
     db.init_app(app)
     migrate.init_app(app, db)
 
@@ -30,10 +26,12 @@ def create_app():
 
     @login_manager.unauthorized_handler
     def unauthorized():
-        # Make APIs return 401 JSON instead of flashing a page then redirecting
         return jsonify({"error": "unauthorized"}), 401
 
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
+    # ✅ import User here (lazy import, after db is initialized)
+    from .models import User
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -49,4 +47,5 @@ def create_app():
     app.register_blueprint(bp_pins)
     app.register_blueprint(bp_admin_orders)
     app.register_blueprint(bp_orders)
+
     return app

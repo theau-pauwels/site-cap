@@ -14,5 +14,6 @@ export const navItems: NavItem[] = [
     { label: "Ajouter pins", href: "/adminpins", adminOnly: true },
     { label : "Commandes", href: "/admin/commandes", adminOnly: true},
     {label : "Mon panier", href: "/cart"},
-    { label : "Site Fédé", href: "https://fede.fpms.ac.be" },
+    {label : "Mes commandes", href: "/myorders"},
+    // { label : "Site Fédé", href: "https://fede.fpms.ac.be" },
 ];

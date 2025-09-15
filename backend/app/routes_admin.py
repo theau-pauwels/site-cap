@@ -192,12 +192,35 @@ def delete_user(user_id):
 #     next_num = max(nums) + 1 if nums else 1
 #     return jsonify({"next_num": next_num})
 
+# @bp_admin_orders.route("/api/admin/orders", methods=["GET"])
+# @login_required
+# def list_orders():
+#     # Vérifie que l'utilisateur est admin
+#     if getattr(current_user.role, "value", current_user.role) != "admin":
+#         return jsonify({"error": "Unauthorized"}), 403
+
+
+#     orders = Order.query.order_by(Order.created_at.desc()).all()
+#     data = []
+#     for o in orders:
+#         data.append({
+#             "id": o.id,
+#             "user_id": o.user_id,
+#             "status": o.status,
+#             "created_at": o.created_at.isoformat(),
+#             "items": [
+#                 {"title": i.title, "price": i.price, "quantity": i.quantity} 
+#                 for i in o.items
+#             ]
+#         })
+#     return jsonify(data)
+
+# GET orders admin avec nom/prenom
 @bp_admin_orders.route("/api/admin/orders", methods=["GET"])
 @login_required
 def list_orders():
-    # Vérifie que l'utilisateur est admin
-    # if getattr(current_user.role, "value", current_user.role) != "admin":
-    #     return jsonify({"error": "Unauthorized"}), 403
+    if getattr(current_user.role, "value", current_user.role) != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
 
     orders = Order.query.order_by(Order.created_at.desc()).all()
     data = []
@@ -205,11 +228,51 @@ def list_orders():
         data.append({
             "id": o.id,
             "user_id": o.user_id,
+            "user_nom": o.user.nom,
+            "user_prenom": o.user.prenom,
             "status": o.status,
             "created_at": o.created_at.isoformat(),
-            "items": [{"title": i.title, "price": i.price, "quantity": i.quantity} for i in o.items]
+            "items": [
+                {"title": i.title, "price": i.price, "quantity": i.quantity}
+                for i in o.items
+            ]
         })
     return jsonify(data)
+
+# PATCH pour changer le status
+@bp_admin_orders.route("/api/admin/orders/<order_id>", methods=["PATCH"])
+@login_required
+def update_order_status(order_id):
+    if getattr(current_user.role, "value", current_user.role) != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    order = Order.query.get(order_id)
+    if not order:
+        return jsonify({"error": "Commande introuvable"}), 404
+
+    data = request.get_json()
+    status = data.get("status")
+    if status:
+        order.status = status
+        db.session.commit()
+    return jsonify({"ok": True, "status": order.status})
+
+# DELETE pour supprimer une commande
+@bp_admin_orders.route("/api/admin/orders/<order_id>", methods=["DELETE"])
+@login_required
+def delete_order(order_id):
+    if getattr(current_user.role, "value", current_user.role) != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    order = Order.query.get(order_id)
+    if not order:
+        return jsonify({"error": "Commande introuvable"}), 404
+
+    db.session.delete(order)
+    db.session.commit()
+    return jsonify({"ok": True})
+
+
 
 @bp_orders.route("/api/orders", methods=["POST"])
 @login_required
@@ -235,3 +298,30 @@ def create_order():
 
     db.session.commit()
     return jsonify({"ok": True, "order_id": order.id})
+
+@bp_orders.route("/api/orders", methods=["GET"])
+@login_required
+def list_user_orders():
+    """
+    Renvoie toutes les commandes du user connecté
+    """
+    orders = (
+        Order.query
+        .filter_by(user_id=current_user.id)
+        .order_by(Order.created_at.desc())
+        .all()
+    )
+
+    data = []
+    for o in orders:
+        data.append({
+            "id": o.id,
+            "status": o.status,
+            "created_at": o.created_at.isoformat(),
+            "items": [
+                {"title": i.title, "price": i.price, "quantity": i.quantity}
+                for i in o.items
+            ]
+        })
+
+    return jsonify(data)
