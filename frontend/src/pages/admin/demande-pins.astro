@@ -1,10 +1,10 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import MyOrders from "../components/myorders";
+import AdminCustomPinRequests from "../../components/AdminCustomPinRequest";
 ---
 
 <Layout title="Admin - Pins">
   <main class="bg-white min-h-screen p-8 flex justify-center">
-    <MyOrders client:load />
+    <AdminCustomPinRequests client:load />
   </main>
 </Layout>

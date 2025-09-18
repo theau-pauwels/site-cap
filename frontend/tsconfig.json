@@ -13,5 +13,5 @@
       "@icons/*": ["src/icons/*"]
     }
   },
-  "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.astro"]
+  "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.astro", "src/components/RequestPasswordReset.tsx"]
 }

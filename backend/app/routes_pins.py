@@ -4,9 +4,9 @@ import os, json, time
 bp_pins = Blueprint("pins", __name__, url_prefix="/api/pins")
 
 DATA_FILE = "pins.json"
-
 UPLOAD_FOLDER = "/app/frontend/public/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 
 def read_pins():
     if not os.path.exists(DATA_FILE):
@@ -14,20 +14,24 @@ def read_pins():
     with open(DATA_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
 
+
 def save_pins(pins):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(pins, f, indent=2, ensure_ascii=False)
+
 
 # --- Routes Blueprint ---
 @bp_pins.get("/")
 def get_pins():
     return jsonify(read_pins())
 
+
 @bp_pins.post("/")
 def add_pin():
     title = request.form.get("title")
     price = request.form.get("price")
     description = request.form.get("description")
+    stock = request.form.get("stock", 0)  # ✅ stock
     image = request.files.get("image")
 
     if not title or not price or not description or not image:
@@ -43,12 +47,14 @@ def add_pin():
         "title": title,
         "price": price,
         "description": description,
-        "imageUrl": f"/uploads/{filename}"
+        "imageUrl": f"/uploads/{filename}",
+        "stock": int(stock),  # ✅ ajouté
     }
     pins.append(new_pin)
     save_pins(pins)
 
     return jsonify(new_pin), 201
+
 
 @bp_pins.put("/<int:pin_id>")
 def update_pin(pin_id):
@@ -60,6 +66,7 @@ def update_pin(pin_id):
     title = request.form.get("title", pin["title"])
     price = request.form.get("price", pin["price"])
     description = request.form.get("description", pin["description"])
+    stock = request.form.get("stock", pin.get("stock", 0))  # ✅ mis à jour
     image = request.files.get("image")
 
     if image:
@@ -71,9 +78,29 @@ def update_pin(pin_id):
     pin["title"] = title
     pin["price"] = price
     pin["description"] = description
+    pin["stock"] = int(stock)  # ✅ mis à jour
 
     save_pins(pins)
     return jsonify(pin)
+
+
+@bp_pins.patch("/<int:pin_id>/stock")
+def update_stock(pin_id):
+    """Route rapide pour mettre à jour uniquement le stock"""
+    pins = read_pins()
+    pin = next((p for p in pins if p["id"] == pin_id), None)
+    if not pin:
+        return jsonify({"error": "Pin not found"}), 404
+
+    data = request.get_json(silent=True) or {}
+    stock = data.get("stock")
+    if stock is None:
+        return jsonify({"error": "Missing stock"}), 400
+
+    pin["stock"] = int(stock)
+    save_pins(pins)
+    return jsonify({"success": True, "id": pin_id, "stock": pin["stock"]})
+
 
 @bp_pins.delete("/<int:pin_id>")
 def delete_pin(pin_id):
@@ -87,7 +114,6 @@ def delete_pin(pin_id):
         filepath = os.path.join(UPLOAD_FOLDER, filename)
         if os.path.exists(filepath):
             os.remove(filepath)
-
 
     pins = [p for p in pins if p["id"] != pin_id]
     save_pins(pins)

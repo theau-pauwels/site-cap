@@ -6,19 +6,20 @@ from .models import db, User, Role, Membership, Order, OrderItem
 import re
 
 bp_admin = Blueprint("admin", __name__)
-bp_orders = Blueprint("orders",__name__)
-bp_admin_orders = Blueprint("admin_orders",__name__)
+bp_orders = Blueprint("orders", __name__)
+bp_admin_orders = Blueprint("admin_orders", __name__)
 
-@bp_admin.before_request
-@login_required
-def _require_admin():
-    # Si pas admin -> 403. Si pas loggé -> 401 via unauthorized_handler ci-dessus
-    if not (current_user.is_authenticated and current_user.role == Role.ADMIN):
-        return jsonify({"error": "Forbidden"}), 403
-
+# -------------------- Helpers --------------------
 def is_admin():
     return current_user.is_authenticated and current_user.role == Role.ADMIN
 
+@bp_admin.before_request
+@login_required
+def require_admin():
+    if not is_admin():
+        return jsonify({"error": "Forbidden"}), 403
+
+# -------------------- Users --------------------
 @bp_admin.route("/api/admin/users", methods=["GET", "POST"])
 @login_required
 def users_collection():
@@ -42,11 +43,10 @@ def users_collection():
             return jsonify({"error": "email déjà utilisé"}), 409
 
         role_str = (data.get("role") or "member").lower()
-        allowed = {"member": Role.MEMBER, "admin": Role.ADMIN, "verifier": Role.VERIFIER, "en attente":Role.ATTENTE}
+        allowed = {"member": Role.MEMBER, "admin": Role.ADMIN, "verifier": Role.VERIFIER, "en attente": Role.ATTENTE}
         if role_str not in allowed:
             return jsonify({"error": "Rôle invalide"}), 400
         role = allowed[role_str]
-
 
         user = User(
             nom=nom,
@@ -54,7 +54,7 @@ def users_collection():
             email=email,
             member_id=member_id,
             password_hash=generate_password_hash(password),
-            role=role,
+            role=role
         )
         db.session.add(user)
         db.session.flush()
@@ -70,13 +70,8 @@ def users_collection():
         db.session.commit()
         return jsonify({"ok": True, "id": user.id})
 
-    # GET: lister avec dictionnaire {annee: code} + rôle
-    users = (
-        User.query
-        .options(joinedload(User.memberships))
-        .order_by(User.nom.asc(), User.prenom.asc())
-        .all()
-    )
+    # GET: liste tous les users
+    users = User.query.options(joinedload(User.memberships)).order_by(User.nom.asc(), User.prenom.asc()).all()
     result = []
     for u in users:
         cartes = {str(m.annee): m.annee_code for m in (u.memberships or [])}
@@ -84,8 +79,8 @@ def users_collection():
             "id": u.id,
             "nom": u.nom,
             "prenom": u.prenom,
-            "identifiant": (u.member_id or u.email),
-            "role": (u.role.value if hasattr(u.role, "value") else str(u.role)), 
+            "identifiant": u.member_id or u.email,
+            "role": u.role.value if u.role else None,
             "cartes": cartes,
         })
     return jsonify(result)
@@ -93,13 +88,9 @@ def users_collection():
 @bp_admin.route("/api/admin/users/<user_id>/role", methods=["PUT"])
 @login_required
 def set_user_role(user_id):
-    """Changer le rôle d'un utilisateur (admin only)."""
-    if not is_admin():
-        return jsonify({"error": "Forbidden"}), 403
-
     target = User.query.get(user_id)
     if not target:
-        return jsonify({"error": "User introuvable"}), 404
+        return jsonify({"error": "Utilisateur introuvable"}), 404
 
     data = request.get_json() or {}
     role_str = str(data.get("role", "")).lower().strip()
@@ -107,7 +98,6 @@ def set_user_role(user_id):
     if role_str not in allowed:
         return jsonify({"error": "Rôle invalide"}), 400
 
-    # (optionnel) éviter que l'admin courant se rétrograde par accident
     if target.id == current_user.id and role_str != "admin":
         return jsonify({"error": "Impossible de rétrograder votre propre compte."}), 400
 
@@ -118,9 +108,6 @@ def set_user_role(user_id):
 @bp_admin.route("/api/admin/users/<user_id>", methods=["PUT"])
 @login_required
 def update_user(user_id):
-    if not is_admin():
-        return jsonify({"error": "Forbidden"}), 403
-
     target = User.query.get(user_id)
     if not target:
         return jsonify({"error": "Utilisateur introuvable"}), 404
@@ -128,17 +115,14 @@ def update_user(user_id):
     data = request.get_json()
     nom = data.get("nom")
     prenom = data.get("prenom")
-    identifiant = data.get("identifiant")  # ⚡ ajout
+    identifiant = data.get("identifiant")
 
     if identifiant and not re.match(r"^\d{6}$", identifiant):
         return jsonify({"error": "Le member_id doit faire 6 chiffres"}), 400
 
-    if nom:
-        target.nom = nom
-    if prenom:
-        target.prenom = prenom
-    if identifiant:
-        target.member_id = identifiant  # ⚡ mise à jour du member_id
+    if nom: target.nom = nom
+    if prenom: target.prenom = prenom
+    if identifiant: target.member_id = identifiant
 
     db.session.commit()
     return jsonify({"ok": True})
@@ -153,73 +137,33 @@ def delete_user(user_id):
     if not target:
         return jsonify({"error": "Utilisateur introuvable"}), 404
 
-    # ⚠️ Sécurité : éviter qu’un admin se supprime lui-même
     if target.id == current_user.id:
         return jsonify({"error": "Impossible de supprimer votre propre compte."}), 400
 
-    db.session.delete(target)
-    db.session.commit()
-    return jsonify({"ok": True})
+    try:
+        # Supprimer toutes les commandes et leurs items
+        for order in target.orders:
+            for item in order.items:
+                db.session.delete(item)
+            db.session.delete(order)
 
-# @bp_admin.route("/api/admin/next_num", methods=["GET"])
-# @login_required
-# def get_next_card_number():
-#     """Retourne le prochain numéro disponible pour une année et un préfixe."""
-#     if not is_admin():
-#         return jsonify({"error": "Forbidden"}), 403
+        # Supprimer toutes les memberships
+        for membership in target.memberships:
+            db.session.delete(membership)
 
-#     annee = request.args.get("annee")
-#     prefix = request.args.get("prefix")
+        # Supprimer l'utilisateur
+        db.session.delete(target)
+        db.session.commit()
+        return jsonify({"ok": True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Erreur lors de la suppression"}), 500
 
-#     if not annee or not prefix:
-#         return jsonify({"error": "annee et prefix requis"}), 400
-
-#     # Trouver tous les annee_code existants pour cette année et ce préfixe
-#     like_pattern = f"{prefix}-%"
-#     existing = Membership.query.filter(
-#         Membership.annee == int(annee.split("-")[0]),
-#         Membership.annee_code.ilike(like_pattern)
-#     ).all()
-
-#     nums = []
-#     for m in existing:
-#         try:
-#             n = int(m.annee_code.split("-")[1])
-#             nums.append(n)
-#         except:
-#             pass
-
-#     next_num = max(nums) + 1 if nums else 1
-#     return jsonify({"next_num": next_num})
-
-# @bp_admin_orders.route("/api/admin/orders", methods=["GET"])
-# @login_required
-# def list_orders():
-#     # Vérifie que l'utilisateur est admin
-#     if getattr(current_user.role, "value", current_user.role) != "admin":
-#         return jsonify({"error": "Unauthorized"}), 403
-
-
-#     orders = Order.query.order_by(Order.created_at.desc()).all()
-#     data = []
-#     for o in orders:
-#         data.append({
-#             "id": o.id,
-#             "user_id": o.user_id,
-#             "status": o.status,
-#             "created_at": o.created_at.isoformat(),
-#             "items": [
-#                 {"title": i.title, "price": i.price, "quantity": i.quantity} 
-#                 for i in o.items
-#             ]
-#         })
-#     return jsonify(data)
-
-# GET orders admin avec nom/prenom
+# -------------------- Orders (admin) --------------------
 @bp_admin_orders.route("/api/admin/orders", methods=["GET"])
 @login_required
 def list_orders():
-    if getattr(current_user.role, "value", current_user.role) != "admin":
+    if not is_admin():
         return jsonify({"error": "Unauthorized"}), 403
 
     orders = Order.query.order_by(Order.created_at.desc()).all()
@@ -232,18 +176,14 @@ def list_orders():
             "user_prenom": o.user.prenom,
             "status": o.status,
             "created_at": o.created_at.isoformat(),
-            "items": [
-                {"title": i.title, "price": i.price, "quantity": i.quantity}
-                for i in o.items
-            ]
+            "items": [{"title": i.title, "price": i.price, "quantity": i.quantity} for i in o.items]
         })
     return jsonify(data)
 
-# PATCH pour changer le status
 @bp_admin_orders.route("/api/admin/orders/<order_id>", methods=["PATCH"])
 @login_required
 def update_order_status(order_id):
-    if getattr(current_user.role, "value", current_user.role) != "admin":
+    if not is_admin():
         return jsonify({"error": "Unauthorized"}), 403
 
     order = Order.query.get(order_id)
@@ -257,11 +197,10 @@ def update_order_status(order_id):
         db.session.commit()
     return jsonify({"ok": True, "status": order.status})
 
-# DELETE pour supprimer une commande
 @bp_admin_orders.route("/api/admin/orders/<order_id>", methods=["DELETE"])
 @login_required
 def delete_order(order_id):
-    if getattr(current_user.role, "value", current_user.role) != "admin":
+    if not is_admin():
         return jsonify({"error": "Unauthorized"}), 403
 
     order = Order.query.get(order_id)
@@ -272,8 +211,7 @@ def delete_order(order_id):
     db.session.commit()
     return jsonify({"ok": True})
 
-
-
+# -------------------- Orders (user) --------------------
 @bp_orders.route("/api/orders", methods=["POST"])
 @login_required
 def create_order():
@@ -284,7 +222,7 @@ def create_order():
 
     order = Order(user_id=current_user.id)
     db.session.add(order)
-    db.session.flush()  # pour avoir l'ID avant commit
+    db.session.flush()
 
     for it in items:
         order_item = OrderItem(
@@ -302,26 +240,13 @@ def create_order():
 @bp_orders.route("/api/orders", methods=["GET"])
 @login_required
 def list_user_orders():
-    """
-    Renvoie toutes les commandes du user connecté
-    """
-    orders = (
-        Order.query
-        .filter_by(user_id=current_user.id)
-        .order_by(Order.created_at.desc())
-        .all()
-    )
-
+    orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.created_at.desc()).all()
     data = []
     for o in orders:
         data.append({
             "id": o.id,
             "status": o.status,
             "created_at": o.created_at.isoformat(),
-            "items": [
-                {"title": i.title, "price": i.price, "quantity": i.quantity}
-                for i in o.items
-            ]
+            "items": [{"title": i.title, "price": i.price, "quantity": i.quantity} for i in o.items]
         })
-
     return jsonify(data)

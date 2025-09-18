@@ -1,81 +1,73 @@
 ---
 import Layout from "@layouts/Layout.astro";
-const next = Astro.url.searchParams.get("next") || "/"; // redir après inscription
+const next = Astro.url.searchParams.get("next") || "/"; // redir après register
 ---
 
 <Layout title="Inscription">
   <main class="flex-1 flex flex-col gap-4 items-center p-4 justify-center">
     <section class="w-full max-w-md">
-      <h1 class="font-semibold text-2xl text-bleu bg-white mb-1">Créer un compte</h1>
+      <h1 class="font-semibold text-2xl text-bleu bg-white mb-1">Inscription</h1>
 
-      <form id="signupForm" class="stack" novalidate>
+      <form id="registerForm" class="stack" novalidate>
         <label>
           Nom
-          <input
-            id="nom"
-            name="nom"
-            type="text"
-            placeholder="Votre nom"
-            required
+          <input 
+            id="nom" 
+            name="nom" 
+            type="text" 
+            required 
             class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </label>
 
         <label>
           Prénom
-          <input
-            id="prenom"
-            name="prenom"
-            type="text"
-            placeholder="Votre prénom"
-            required
+          <input 
+            id="prenom" 
+            name="prenom" 
+            type="text" 
+            required 
             class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </label>
 
         <label>
           Email
-          <input
-            id="email"
-            name="email"
-            type="email"
-            placeholder=""
-            autocomplete="username"
-            required
+          <input 
+            id="email" 
+            name="email" 
+            type="email" 
+            placeholder="exemple@domaine.com"
+            required 
             class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </label>
 
         <label>
           Mot de passe
-          <input
-            id="password"
-            name="password"
-            type="password"
+          <input 
+            id="password" 
+            name="password" 
+            type="password" 
             placeholder="••••••••"
-            autocomplete="new-password"
-            required
-            class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          /> 
-        </label>
-
-        <label>
-          Confirmer le mot de passe
-          <input
-            id="password2"
-            name="password2"
-            type="password"
-            placeholder="••••••••"
-            autocomplete="new-password"
-            required
+            required 
             class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </label>
 
-        <button
-          type="submit"
-          class="rounded-lg border-2 border-bleu bg-bleu px-4 py-2 text-white transition duration-150 hover:bg-blue-50 hover:text-bleu"
-        >
+        <label>
+          Confirmer le mot de passe
+          <input 
+            id="password2" 
+            name="password2" 
+            type="password" 
+            placeholder="••••••••"
+            required 
+            class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </label>
+
+        <button type="submit" class="rounded-lg border-2 border-bleu bg-bleu px-4 py-2 text-white transition duration-150 hover:bg-blue-50 hover:text-bleu">
           S'inscrire
         </button>
         <p id="err" style="color:#b00;"></p>
@@ -83,24 +75,15 @@ const next = Astro.url.searchParams.get("next") || "/"; // redir après inscript
       </form>
 
       <style>
-        .stack {
-          display: flex;
-          flex-direction: column;
-          gap: 0.8rem;
-          max-width: 380px;
-        }
-        input,
-        button {
-          padding: 0.55rem 0.7rem;
-          font-size: 1rem;
-        }
+        .stack { display:flex; flex-direction:column; gap:.8rem; max-width:380px }
+        input, button { padding:.55rem .7rem; font-size:1rem }
       </style>
     </section>
   </main>
 </Layout>
 
 <script>
-  const form = document.getElementById('signupForm');
+  const form = document.getElementById('registerForm');
   const $err = document.getElementById('err');
   const $success = document.getElementById('success');
 
@@ -119,32 +102,30 @@ const next = Astro.url.searchParams.get("next") || "/"; // redir après inscript
       $err.textContent = "Tous les champs sont obligatoires.";
       return;
     }
-
     if (password !== password2) {
       $err.textContent = "Les mots de passe ne correspondent pas.";
       return;
     }
 
-    try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ nom, prenom, email: email.toLowerCase(), password })
-      });
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({ nom, prenom, email: email.toLowerCase(), password })
+    });
 
-      const data = await res.json();
+    let data = {};
+    try { data = await res.json(); } catch {}
 
-      if (!res.ok) {
-        $err.textContent = data.error || ('Erreur ' + res.status);
-        return;
-      }
-
-      // Succès → affiche message et ne redirige pas
-      $success.textContent = data.message || "Un email de confirmation a été envoyé.";
-      form.reset();
-    } catch (err) {
-      console.error(err);
-      $err.textContent = "Erreur serveur, réessaie plus tard.";
+    if (!res.ok) {
+      $err.textContent = data.error || ('Erreur ' + res.status);
+      return;
     }
+
+    $success.textContent = data.message || "Inscription réussie ! Vérifie ton email.";
+
+    // redirection si next est défini
+    const next = new URLSearchParams(window.location.search).get('next') || '/';
+    setTimeout(() => location.href = next, 1500);
   });
 </script>
