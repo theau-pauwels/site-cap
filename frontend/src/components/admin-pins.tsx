@@ -105,7 +105,7 @@ const Pins: React.FC = () => {
       onSubmit={handleSubmit}
       className="flex flex-col gap-4 p-4 border rounded-xl shadow-md w-full max-w-md bg-white"
     >
-      <h2 className="text-xl font-bold">
+      <h2 className="text-xl text-bleu font-bold">
         {editingId ? "Modifier un Pin" : "Ajouter un Pin"}
       </h2>
 
@@ -142,7 +142,7 @@ const Pins: React.FC = () => {
       <div className="flex gap-2">
         <button
           type="submit"
-          className="bg-blue-500 text-white rounded p-2 hover:bg-blue-600"
+          className="bg-bleu text-white rounded p-2 hover:bg-blue-600"
         >
           {editingId ? "Mettre à jour" : "Ajouter"}
         </button>

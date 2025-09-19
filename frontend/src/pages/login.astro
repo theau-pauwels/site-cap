@@ -5,6 +5,7 @@ const next = Astro.url.searchParams.get("next") || "/"; // redir après login
 <Layout title="Connexion">
   <main class="flex-1 flex flex-col gap-4 items-center p-4 justify-center">
   <section class="w-full max-w-md">
+    <div class="bg-white shadow-lg rounded-xl p-8 max-w-md w-full">
   <h1 class="font-semibold text-2xl text-bleu bg-white mb-1">Connexion</h1>
   
   <form id="loginForm" class="stack" novalidate>
@@ -37,12 +38,12 @@ const next = Astro.url.searchParams.get("next") || "/"; // redir après login
     <button type="submit" class="rounded-lg border-2 border-bleu bg-bleu px-4 py-2 text-white transition duration-150 hover:bg-blue-50 hover:text-bleu">Se connecter</button>
     <p id="err" style="color:#b00;"></p>
   </form>
-
+  <a href="/RequestPasswordReset" class="text-sm text-gray-600 hover:underline">Mot de passe oublié ?</a>
   <style>
     .stack { display:flex; flex-direction:column; gap:.8rem; max-width:380px }
     input, button { padding:.55rem .7rem; font-size:1rem }
   </style>
-  
+  </div>
   </section>
   </main>
 </Layout>

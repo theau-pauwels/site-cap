@@ -32,8 +32,9 @@ const RequestPasswordReset = () => {
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "50px auto", textAlign: "center" }}>
-      <h1>Réinitialiser votre mot de passe</h1>
+    <div className="p-6 flex flex-col items-center gap-4">
+      <div className="bg-white shadow-lg rounded-xl p-8 max-w-md w-full">
+      <h1 className="text-2xl font-bold mb-4 text-bleu" >Réinitialiser votre mot de passe</h1>
       {message && <p>{message}</p>}
       {!message && (
         <form onSubmit={handleSubmit}>
@@ -44,12 +45,16 @@ const RequestPasswordReset = () => {
             onChange={(e) => setEmail(e.target.value)}
             required
             style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+            className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <button type="submit" disabled={loading} style={{ padding: "10px 20px" }}>
+          <button type="submit" 
+          className="rounded-lg border-2 border-bleu bg-bleu px-4 py-2 text-white transition duration-150 hover:bg-blue-50 hover:text-bleu" 
+          disabled={loading} style={{ padding: "10px 20px" }}>
             {loading ? "Envoi..." : "Envoyer le lien de réinitialisation"}
           </button>
         </form>
       )}
+      </div>
     </div>
   );
 };

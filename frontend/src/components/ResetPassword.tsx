@@ -50,9 +50,9 @@ const ResetPassword: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+    <div className="p-6 flex flex-col items-center gap-4">
       <div className="bg-white shadow-lg rounded-xl p-8 max-w-md w-full">
-        <h1 className="text-2xl font-bold mb-6 text-center">Réinitialisation du mot de passe</h1>
+        <h1 className="text-2xl font-bold mb-4 text-bleu">Réinitialisation du mot de passe</h1>
         {message && (
           <div className="mb-4 p-3 text-sm rounded bg-gray-200 text-gray-800">
             {message}
@@ -83,7 +83,7 @@ const ResetPassword: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
+              className="rounded-lg border-2 border-bleu bg-bleu px-4 py-2 text-white transition duration-150 hover:bg-blue-50 hover:text-bleu" 
             >
               {loading ? "En cours..." : "Réinitialiser"}
             </button>
