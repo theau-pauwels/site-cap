@@ -1,19 +1,12 @@
 [
   {
-    "id": 1757849531,
-    "title": "test",
-    "price": "20",
-    "description": "test",
-    "imageUrl": "/uploads/1757849531-logo-cap.png",
-    "stock": 0
-  },
-  {
     "id": 1758307265,
     "title": "1",
     "price": "2",
     "description": "Chiffre",
     "imageUrl": "/uploads/1758307265-BPCM1.jpg",
-    "stock": 0
+    "stock": 0,
+    "category": "Autre"
   },
   {
     "id": 1758307387,
@@ -21,7 +14,8 @@
     "price": "2",
     "description": "Chiffre",
     "imageUrl": "/uploads/1758307387-BPCM2.jpg",
-    "stock": 0
+    "stock": 0,
+    "category": ""
   },
   {
     "id": 1758307403,
@@ -45,7 +39,8 @@
     "price": "2",
     "description": "Chiffre",
     "imageUrl": "/uploads/1758307428-BPCM5.jpg",
-    "stock": 0
+    "stock": 0,
+    "category": "Autre"
   },
   {
     "id": 1758307439,
@@ -53,7 +48,8 @@
     "price": "2",
     "description": "Chiffre",
     "imageUrl": "/uploads/1758307439-BPCM6.jpg",
-    "stock": 0
+    "stock": 0,
+    "category": ""
   },
   {
     "id": 1758307449,
@@ -61,7 +57,8 @@
     "price": "2",
     "description": "Chiffre",
     "imageUrl": "/uploads/1758307449-BPCM7.jpg",
-    "stock": 0
+    "stock": 0,
+    "category": "Autre"
   },
   {
     "id": 1758307474,
@@ -69,7 +66,8 @@
     "price": "2",
     "description": "Chiffre",
     "imageUrl": "/uploads/1758307474-BPCM8.jpg",
-    "stock": 0
+    "stock": 0,
+    "category": ""
   },
   {
     "id": 1758307495,
@@ -85,7 +83,8 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758307764-BPLA.JPG",
-    "stock": 0
+    "stock": 0,
+    "category": "Autre"
   },
   {
     "id": 1758307781,
@@ -165,7 +164,8 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758308011-BPLK.JPG",
-    "stock": 0
+    "stock": 0,
+    "category": "Autre"
   },
   {
     "id": 1758308031,
@@ -325,7 +325,8 @@
     "price": "3.50",
     "description": "Poste de trésorier dans un comité d'un cercle",
     "imageUrl": "/uploads/1758309176-fac04.jpg",
-    "stock": 0
+    "stock": 0,
+    "category": "Autre"
   },
   {
     "id": 1758309209,
@@ -413,7 +414,8 @@
     "price": "2.40",
     "description": "Rôle de flic en bleusaille",
     "imageUrl": "/uploads/1758309587-BPI77-big.png",
-    "stock": 0
+    "stock": 0,
+    "category": "Autre"
   },
   {
     "id": 1758309633,
@@ -429,7 +431,8 @@
     "price": "3",
     "description": "Comité du cercle des Sports\r\nEtudes sportives",
     "imageUrl": "/uploads/1758309957-bpi06-big.jpg",
-    "stock": 0
+    "stock": 0,
+    "category": "Autre"
   },
   {
     "id": 1758310010,
@@ -437,7 +440,8 @@
     "price": "3",
     "description": "Comité du cercle Photo-Vidéo",
     "imageUrl": "/uploads/1758310010-FIP03-APPAREIL-PHOTO-big.jpg",
-    "stock": 0
+    "stock": 0,
+    "category": "Autre"
   },
   {
     "id": 1758310064,

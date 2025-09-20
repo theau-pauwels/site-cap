@@ -250,3 +250,41 @@ def list_user_orders():
             "items": [{"title": i.title, "price": i.price, "quantity": i.quantity} for i in o.items]
         })
     return jsonify(data)
+
+# --- DELETE supprimer commande ---
+
+@bp_orders.route("/api/orders/<int:order_id>", methods=["DELETE"])
+@login_required
+def delete_user_order(order_id):
+    order = Order.query.get(order_id)
+    if not order or order.user_id != current_user.id:
+        return jsonify({"error": "Commande introuvable"}), 404
+
+    if order.status != "en attente":
+        return jsonify({"error": "Impossible de supprimer une commande validée"}), 400
+
+    db.session.delete(order)
+    db.session.commit()
+    return jsonify({"ok": True})
+
+# --- PATCH modifier commande ---
+
+@bp_orders.route("/api/orders/<int:order_id>", methods=["PATCH"])
+@login_required
+def update_user_order(order_id):
+    order = Order.query.get(order_id)
+    if not order or order.user_id != current_user.id:
+        return jsonify({"error": "Commande introuvable"}), 404
+
+    if order.status != "en attente":
+        return jsonify({"error": "Impossible de modifier une commande validée"}), 400
+
+    data = request.get_json()
+    items = data.get("items", [])
+    for it in items:
+        order_item = next((i for i in order.items if i.title == it["title"]), None)
+        if order_item:
+            order_item.quantity = int(it.get("quantity", order_item.quantity))
+
+    db.session.commit()
+    return jsonify({"ok": True})

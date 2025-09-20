@@ -1,0 +1,10 @@
+---
+import AdminCategories from './../../components/AdminCategories';
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Admin - Catégories">
+  <main class="bg-white p-8 flex justify-center">
+    <AdminCategories client:load />
+  </main>
+</Layout>

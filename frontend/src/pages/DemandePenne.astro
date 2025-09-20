@@ -1,0 +1,10 @@
+---
+import Layout from "@layouts/Layout.astro";
+import DemandePenne from "./../components/DemandePenne";
+---
+
+<Layout title="Admin - Demande de Penne">
+  <main class="bg-white p-8 flex justify-center">
+    <DemandePenne client:load />
+  </main>
+</Layout>
