@@ -6,27 +6,34 @@ type Pin = {
   price: string;
   description: string;
   imageUrl: string;
+  category: string;
 };
 
-// Base URL pour l'API, configurable en dev ou prod
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
-const API_URL = `${API_BASE}/api/pins/`; // <-- pas de slash final
+const API_URL = `${API_BASE}/api/pins/`;
 
 const Pins: React.FC = () => {
   const [pins, setPins] = useState<Pin[]>([]);
-  const [title, setTitle] = useState("");
-  const [price, setPrice] = useState("");
-  const [description, setDescription] = useState("");
-  const [image, setImage] = useState<File | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [form, setForm] = useState({
+    title: "",
+    price: "",
+    description: "",
+    category: "",
+    image: null as File | null,
+  });
 
-  // Récupérer les pins
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const pinsPerPage = 20; // ou 30
+  const totalPages = Math.ceil(pins.length / pinsPerPage);
+
   const fetchPins = async () => {
     try {
       const res = await fetch(API_URL, { credentials: "include" });
       if (!res.ok) throw new Error("Erreur lors du chargement des pins");
-      const data = await res.json();
-      setPins(data);
+      setPins(await res.json());
     } catch (err) {
       console.error(err);
     }
@@ -34,167 +41,191 @@ const Pins: React.FC = () => {
 
   useEffect(() => {
     fetchPins();
+    fetch("/api/categories/")
+      .then((res) => res.json())
+      .then(setCategories)
+      .catch(console.error);
   }, []);
 
-  // Ajouter / modifier un pin
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const startEdit = (pin: Pin) => {
+    setEditingId(pin.id);
+    setForm({
+      title: pin.title,
+      price: pin.price,
+      description: pin.description,
+      category: pin.category,
+      image: null,
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setForm({ title: "", price: "", description: "", category: "", image: null });
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, files } = e.target as HTMLInputElement;
+    if (name === "image") {
+      setForm((prev) => ({ ...prev, image: files?.[0] || null }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleSubmit = async (pinId: number) => {
     try {
       const formData = new FormData();
-      formData.append("title", title);
-      formData.append("price", price);
-      formData.append("description", description);
-      if (image) formData.append("image", image);
+      formData.append("title", form.title);
+      formData.append("price", form.price);
+      formData.append("description", form.description);
+      formData.append("category", form.category);
+      if (form.image) formData.append("image", form.image);
 
-      const method = editingId ? "PUT" : "POST";
-      const url = editingId ? `${API_URL}${editingId}` : API_URL;
-
-      const res = await fetch(url, {
-        method,
+      const res = await fetch(`${API_URL}${pinId}`, {
+        method: "PUT",
         body: formData,
         credentials: "include",
       });
 
       if (!res.ok) {
         const errData = await res.json();
-        throw new Error(errData.error || "Erreur lors de l'enregistrement");
+        throw new Error(errData.error || "Erreur lors de la mise à jour");
       }
 
-      setTitle("");
-      setPrice("");
-      setDescription("");
-      setImage(null);
-      setEditingId(null);
+      cancelEdit();
       fetchPins();
     } catch (err) {
-      console.error(err);
       alert(err instanceof Error ? err.message : "Erreur inconnue");
     }
   };
 
-  // Supprimer un pin
   const handleDelete = async (id: number) => {
     if (!confirm("Voulez-vous vraiment supprimer ce pin ?")) return;
     try {
-      const res = await fetch(`${API_URL}${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || "Erreur lors de la suppression");
-      }
+      const res = await fetch(`${API_URL}${id}`, { method: "DELETE", credentials: "include" });
+      if (!res.ok) throw new Error("Erreur lors de la suppression");
       fetchPins();
     } catch (err) {
-      console.error(err);
       alert(err instanceof Error ? err.message : "Erreur inconnue");
     }
   };
 
-  // Préparer la modification
-  const handleEdit = (pin: Pin) => {
-    setEditingId(pin.id);
-    setTitle(pin.title);
-    setPrice(pin.price);
-    setDescription(pin.description);
-  };
+  const handleAddPin = async () => {
+  try {
+    const formData = new FormData();
+    formData.append("title", form.title);
+    formData.append("price", form.price);
+    formData.append("description", form.description);
+    formData.append("category", form.category || "Autre");
+    if (form.image) formData.append("image", form.image);
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: formData,
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      const errData = await res.json();
+      throw new Error(errData.error || "Erreur lors de l'ajout");
+    }
+
+    // Réinitialiser le formulaire
+    setForm({ title: "", price: "", description: "", category: "", image: null });
+    fetchPins();
+  } catch (err) {
+    alert(err instanceof Error ? err.message : "Erreur inconnue");
+  }
+};
+
+
+  // Grouper par catégorie
+  const groupedPins = pins.reduce((acc, pin) => {
+    const cat = pin.category && pin.category.trim() !== "" ? pin.category : "Autre";
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(pin);
+    return acc;
+  }, {} as Record<string, Pin[]>);
+
+  // Pagination: slice des pins visibles
+  const paginatedPins: Record<string, Pin[]> = {};
+  Object.entries(groupedPins).forEach(([cat, catPins]) => {
+    const start = (currentPage - 1) * pinsPerPage;
+    const end = start + pinsPerPage;
+    paginatedPins[cat] = catPins.slice(start, end);
+  });
+
+  const sortedCategories = Object.keys(paginatedPins).sort((a, b) => (a === "Autre" ? 1 : b === "Autre" ? -1 : a.localeCompare(b)));
 
   return (
-    <div className="flex flex-col items-center gap-8 p-6">
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-4 p-4 border rounded-xl shadow-md w-full max-w-md bg-white"
-    >
-      <h2 className="text-xl text-bleu font-bold">
-        {editingId ? "Modifier un Pin" : "Ajouter un Pin"}
-      </h2>
-
-      <input
-        type="text"
-        placeholder="Titre"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="border p-2 rounded"
-        required
-      />
-      <input
-        type="number"
-        placeholder="Prix"
-        value={price}
-        onChange={(e) => setPrice(e.target.value)}
-        className="border p-2 rounded"
-        required
-      />
-      <textarea
-        placeholder="Description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        className="border p-2 rounded"
-        required
-      />
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => setImage(e.target.files?.[0] || null)}
-        className="border p-2 rounded"
-      />
-
-      <div className="flex gap-2">
-        <button
-          type="submit"
-          className="bg-bleu text-white rounded p-2 hover:bg-blue-600"
-        >
-          {editingId ? "Mettre à jour" : "Ajouter"}
-        </button>
-
-        {editingId && (
-          <button
-            type="button"
-            onClick={() => {
-              setEditingId(null);
-              setTitle("");
-              setPrice("");
-              setDescription("");
-              setImage(null);
-            }}
-            className="bg-gray-400 text-white rounded p-2 hover:bg-gray-500"
-          >
-            Annuler
-          </button>
-        )}
+    <div className="flex flex-col items-center gap-8 p-6 w-full max-w-4xl">
+      <div className="border rounded-lg shadow bg-white p-4 mb-8">
+        <h2 className="text-xl font-bold text-bleu mb-2">Ajouter un nouveau pin</h2>
+        <input type="text" name="title" placeholder="Titre" value={form.title} onChange={handleChange} className="border p-2 rounded mb-2 w-full" />
+        <input type="number" name="price" placeholder="Prix" value={form.price} onChange={handleChange} className="border p-2 rounded mb-2 w-full" />
+        <textarea name="description" placeholder="Description" value={form.description} onChange={handleChange} className="border p-2 rounded mb-2 w-full" />
+        <select name="category" value={form.category} onChange={handleChange} className="border p-2 rounded mb-2 w-full">
+          <option value="">Autre</option>
+          {categories.map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
+        <input type="file" name="image" onChange={handleChange} className="border p-2 rounded mb-2 w-full" />
+        <button onClick={handleAddPin} className="bg-bleu text-white p-2 rounded">Ajouter</button>
       </div>
-    </form>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
-        {pins.map((pin) => (
-          <div
-            key={pin.id}
-            className="border rounded-lg shadow bg-white p-4 flex flex-col gap-2"
-          >
-            <img
-              src={pin.imageUrl}
-              alt={pin.title}
-              className="rounded-lg w-full h-48 object-cover"
-            />
-            <h3 className="text-lg font-bold">{pin.title}</h3>
-            <p className="text-sm">{pin.description}</p>
-            <p className="font-semibold text-blue-600">{pin.price} €</p>
-            <div className="flex gap-2 mt-2">
-              <button
-                onClick={() => handleEdit(pin)}
-                className="bg-yellow-400 text-white px-3 py-1 rounded"
-              >
-                Modifier
-              </button>
-              <button
-                onClick={() => handleDelete(pin.id)}
-                className="bg-red-500 text-white px-3 py-1 rounded"
-              >
-                Supprimer
-              </button>
-            </div>
+      {sortedCategories.map((cat) => (
+        <div key={cat} className="w-full">
+          <h2 className="text-2xl font-bold text-bleu mb-4">{cat}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {paginatedPins[cat].map((pin) => (
+              <div key={pin.id} className="border rounded-lg shadow bg-white p-4 flex flex-col gap-2">
+                <img src={pin.imageUrl} alt={pin.title} className="rounded-lg w-full h-48 object-cover" />
+                {editingId === pin.id ? (
+                  <>
+                    <input type="text" name="title" value={form.title} onChange={handleChange} className="border p-2 rounded" />
+                    <input type="number" name="price" value={form.price} onChange={handleChange} className="border p-2 rounded" />
+                    <textarea name="description" value={form.description} onChange={handleChange} className="border p-2 rounded" />
+                    <select name="category" value={form.category || "Autre"} onChange={handleChange} className="border p-2 rounded">
+                      <option value=""></option>
+                      {categories.map(c => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+
+                    <input type="file" name="image" onChange={handleChange} className="border p-2 rounded" />
+                    <div className="flex gap-2">
+                      <button onClick={() => handleSubmit(pin.id)} className="bg-bleu text-white p-2 rounded">Mettre à jour</button>
+                      <button onClick={cancelEdit} className="bg-gray-400 text-white p-2 rounded">Annuler</button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="text-lg font-bold">{pin.title}</h3>
+                    <p className="text-sm">
+                      {pin.description.split("\n").map((line, index) => (
+                        <React.Fragment key={index}>
+                          {line}
+                          <br />
+                        </React.Fragment>
+                      ))}
+                    </p>
+                    <p className="font-semibold text-blue-600">{pin.price} €</p>
+                    <div className="flex gap-2 mt-2">
+                      <button onClick={() => startEdit(pin)} className="bg-yellow-400 text-white px-3 py-1 rounded">Modifier</button>
+                      <button onClick={() => handleDelete(pin.id)} className="bg-red-500 text-white px-3 py-1 rounded">Supprimer</button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+      ))}
+
+      {/* Pagination controls */}
+      <div className="flex gap-2 mt-4">
+        <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-1 border rounded">Précédent</button>
+        <span className="px-3 py-1">{currentPage} / {totalPages}</span>
+        <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 py-1 border rounded">Suivant</button>
       </div>
     </div>
   );

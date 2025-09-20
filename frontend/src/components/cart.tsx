@@ -6,6 +6,7 @@ type Pin = {
   price: string;
   description: string;
   imageUrl: string;
+  quantity?: number;
 };
 
 const Cart: React.FC = () => {
@@ -24,7 +25,7 @@ const Cart: React.FC = () => {
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
-  const total = cart.reduce((sum, item) => sum + parseFloat(item.price), 0);
+  const total = cart.reduce((sum, item) => sum + parseFloat(item.price) * (item.quantity || 1), 0);
 
   const checkout = async () => {
     if (!cart.length) return;
@@ -35,7 +36,7 @@ const Cart: React.FC = () => {
       id: item.id,
       title: item.title,
       price: parseFloat(item.price),
-      quantity: 1, // ou stocker la quantité si nécessaire
+      quantity: item.quantity || 1,
     }));
 
     try {
@@ -67,20 +68,53 @@ const Cart: React.FC = () => {
     <div className="p-6 flex flex-col items-center gap-4">
       <h2 className="text-2xl font-bold mb-4 text-bleu">Votre Panier</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
-        {cart.map((item) => (
-          <div key={item.id} className="border rounded-lg shadow bg-white p-4 flex flex-col gap-2">
-            <img src={item.imageUrl} alt={item.title} className="rounded-lg w-full h-48 object-cover" />
-            <h3 className="text-lg font-bold">{item.title}</h3>
-            <p className="text-sm">{item.description}</p>
-            <p className="font-semibold text-blue-600">{item.price} €</p>
-            <button
-              onClick={() => removeFromCart(item.id)}
-              className="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-            >
-              Retirer
-            </button>
+      {cart.map((item) => (
+        <div
+          key={item.id}
+          className="border rounded-lg shadow bg-white p-4 flex flex-col gap-2"
+        >
+          <img
+            src={item.imageUrl}
+            alt={item.title}
+            className="rounded-lg w-full h-48 object-cover"
+          />
+
+          <h3 className="text-lg font-bold">{item.title}</h3>
+          <p className="text-sm">{item.description}</p>
+          <p className="font-semibold text-blue-600">{item.price} €</p>
+
+          {/* Champ pour modifier la quantité */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm">Quantité :</label>
+            <input
+              type="number"
+              min={1}
+              value={item.quantity || 1}
+              onChange={(e) => {
+                const newQty = Math.max(1, parseInt(e.target.value) || 1);
+                const updatedCart = cart.map((c) =>
+                  c.id === item.id ? { ...c, quantity: newQty } : c
+                );
+                setCart(updatedCart);
+                localStorage.setItem("cart", JSON.stringify(updatedCart));
+              }}
+              className="border p-1 rounded w-16"
+            />
           </div>
-        ))}
+
+          <button
+            onClick={() => {
+              const updatedCart = cart.filter((c) => c.id !== item.id);
+              setCart(updatedCart);
+              localStorage.setItem("cart", JSON.stringify(updatedCart));
+            }}
+            className="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+          >
+            Retirer
+          </button>
+        </div>
+      ))}
+
       </div>
       <p className="text-xl font-bold mt-4">Total: {total.toFixed(2)} €</p>
       <button

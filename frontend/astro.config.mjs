@@ -15,7 +15,7 @@ export default defineConfig({
     sitemap(),
     robotsTxt(),
   ],
-  site: "http://carte-fede-test.magellan.fpms.ac.be",
+  site: "https://cap.fede.fpms.ac.be",
   output: "static",
   adapter: vercel({
     webAnalytics: {

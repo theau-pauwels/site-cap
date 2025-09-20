@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from flask_login import login_required, current_user
 import os, json, time
 
 bp_requests = Blueprint("pins_requests", __name__, url_prefix="/api/pins/requests")
@@ -20,16 +21,19 @@ def save_requests(requests):
         json.dump(requests, f, indent=2, ensure_ascii=False)
 
 
-# --- Routes ---
 @bp_requests.get("/")
+@login_required
 def get_requests():
-    """Lister toutes les demandes (admin)"""
-    return jsonify(read_requests())
+    """Lister les demandes de pins de l'utilisateur connecté"""
+    requests = read_requests()
+    user_requests = [r for r in requests if r.get("user_id") == current_user.id]
+    return jsonify(user_requests)
+
 
 
 @bp_requests.post("/")
+@login_required
 def add_request():
-    """Créer une nouvelle demande (user)"""
     title = request.form.get("title")
     quantity = request.form.get("quantity")
     notes = request.form.get("notes", "")
@@ -45,6 +49,9 @@ def add_request():
     requests = read_requests()
     new_request = {
         "id": int(time.time()),
+        "user_id": current_user.id,   # ✅ associer au user
+        "user_nom": current_user.nom,
+        "user_prenom": current_user.prenom,
         "title": title,
         "quantity": int(quantity),
         "notes": notes,

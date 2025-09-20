@@ -9,6 +9,8 @@ from .routes_admin import bp_admin, bp_admin_orders, bp_orders
 from .routes_memberships import bp_mem
 from .routes_pins import bp_pins
 from .routes_pins_request import bp_requests
+from .categories import bp_categories
+from .pennes import bp_admin_penne, bp_user_penne
 
 def create_app():
     app = Flask(__name__)
@@ -76,5 +78,8 @@ def create_app():
     app.register_blueprint(bp_admin_orders)
     app.register_blueprint(bp_orders)
     app.register_blueprint(bp_requests)
+    app.register_blueprint(bp_categories)
+    app.register_blueprint(bp_admin_penne)
+    app.register_blueprint(bp_user_penne)
 
     return app

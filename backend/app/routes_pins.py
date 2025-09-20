@@ -33,6 +33,7 @@ def add_pin():
     description = request.form.get("description")
     stock = request.form.get("stock", 0)  # ✅ stock
     image = request.files.get("image")
+    category = request.form.get("category", pin.get("category", "Autre"))
 
     if not title or not price or not description or not image:
         return jsonify({"error": "Missing fields"}), 400
@@ -49,6 +50,7 @@ def add_pin():
         "description": description,
         "imageUrl": f"/uploads/{filename}",
         "stock": int(stock),  # ✅ ajouté
+        "category" : category
     }
     pins.append(new_pin)
     save_pins(pins)
@@ -66,7 +68,8 @@ def update_pin(pin_id):
     title = request.form.get("title", pin["title"])
     price = request.form.get("price", pin["price"])
     description = request.form.get("description", pin["description"])
-    stock = request.form.get("stock", pin.get("stock", 0))  # ✅ mis à jour
+    stock = request.form.get("stock", pin.get("stock", 0))
+    category = request.form.get("category", pin.get("category", "Autre"))
     image = request.files.get("image")
 
     if image:
@@ -78,10 +81,12 @@ def update_pin(pin_id):
     pin["title"] = title
     pin["price"] = price
     pin["description"] = description
-    pin["stock"] = int(stock)  # ✅ mis à jour
+    pin["stock"] = int(stock)
+    pin["category"] = category   # ✅ ajouté
 
     save_pins(pins)
     return jsonify(pin)
+
 
 
 @bp_pins.patch("/<int:pin_id>/stock")
