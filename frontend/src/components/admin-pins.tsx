@@ -27,37 +27,72 @@ const Pins: React.FC = () => {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const pinsPerPage = 20;
-  const totalPages = Math.ceil(pins.length / pinsPerPage);
+  const [categorySearch, setCategorySearch] = useState("");
 
   /** Charger les pins et catégories */
   const fetchPins = async () => {
     try {
       const res = await fetch(API_URL, { credentials: "include" });
       if (!res.ok) throw new Error("Erreur lors du chargement des pins");
-      setPins(await res.json());
+      const data = await res.json();
+      setPins(data);
+
+      // Extraire toutes les catégories uniques
+      const uniqueCategories = Array.from(new Set(data.map((p: Pin) => normalizeCategory(p.category))));
+      setCategories(uniqueCategories);
     } catch (err) {
       console.error(err);
     }
   };
 
   useEffect(() => {
-    Promise.all([
-      fetch(API_URL, { credentials: "include" }).then((res) => res.json()),
-      fetch("/api/categories/").then((res) => res.json()),
-    ])
-      .then(([pinsData, categoriesData]) => {
-        setPins(pinsData);
-        setCategories(categoriesData);
-      })
-      .catch(console.error);
+    fetchPins();
   }, []);
 
-  /** Faire défiler en haut lors du changement de page */
+  /** Scroll top lors du changement de page */
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
 
-  /** Démarrer édition */
+  /** Normalisation catégorie */
+  const normalizeCategory = (cat: string | null | undefined) => {
+    if (!cat || cat.trim() === "") return "Autre";
+    return cat.trim();
+  };
+
+  /** Filtrage par catégorie */
+  const filteredPins = categorySearch
+    ? pins.filter((pin) => normalizeCategory(pin.category) === categorySearch)
+    : pins;
+
+  /** Tri par catégorie puis titre */
+  const sortedPins = [...filteredPins].sort((a, b) => {
+    const catA = normalizeCategory(a.category);
+    const catB = normalizeCategory(b.category);
+    if (catA !== catB) return catA.localeCompare(catB);
+    return a.title.localeCompare(b.title);
+  });
+
+  // Pagination calculée
+  const start = (currentPage - 1) * pinsPerPage;
+  const end = start + pinsPerPage;
+  const paginatedPins = sortedPins.slice(start, end);
+
+  // Groupement par catégorie
+  const groupedPins = paginatedPins.reduce((acc, pin) => {
+    const cat = normalizeCategory(pin.category);
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(pin);
+    return acc;
+  }, {} as Record<string, Pin[]>);
+
+  const sortedCategories = Object.keys(groupedPins).sort((a, b) =>
+    a === "Autre" ? 1 : b === "Autre" ? -1 : a.localeCompare(b)
+  );
+
+  const totalPages = Math.ceil(sortedPins.length / pinsPerPage);
+
+  /** Handlers CRUD et Form */
   const startEdit = (pin: Pin) => {
     setEditingId(pin.id);
     setForm({
@@ -69,14 +104,14 @@ const Pins: React.FC = () => {
     });
   };
 
-  /** Annuler édition */
   const cancelEdit = () => {
     setEditingId(null);
     setForm({ title: "", price: "", description: "", category: "Autre", image: null });
   };
 
-  /** Form change */
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value, files } = e.target as HTMLInputElement;
     if (name === "image") {
       setForm((prev) => ({ ...prev, image: files?.[0] || null }));
@@ -85,47 +120,6 @@ const Pins: React.FC = () => {
     }
   };
 
-  /** Mettre à jour un pin */
-  const handleSubmit = async (pinId: number) => {
-    try {
-      const formData = new FormData();
-      formData.append("title", form.title);
-      formData.append("price", form.price);
-      formData.append("description", form.description);
-      formData.append("category", form.category || "Autre");
-      if (form.image) formData.append("image", form.image);
-
-      const res = await fetch(`${API_URL}${pinId}`, {
-        method: "PUT",
-        body: formData,
-        credentials: "include",
-      });
-
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || "Erreur lors de la mise à jour");
-      }
-
-      cancelEdit();
-      fetchPins();
-    } catch (err) {
-      alert(err instanceof Error ? err.message : "Erreur inconnue");
-    }
-  };
-
-  /** Supprimer un pin */
-  const handleDelete = async (id: number) => {
-    if (!confirm("Voulez-vous vraiment supprimer ce pin ?")) return;
-    try {
-      const res = await fetch(`${API_URL}${id}`, { method: "DELETE", credentials: "include" });
-      if (!res.ok) throw new Error("Erreur lors de la suppression");
-      fetchPins();
-    } catch (err) {
-      alert(err instanceof Error ? err.message : "Erreur inconnue");
-    }
-  };
-
-  /** Ajouter un pin */
   const handleAddPin = async () => {
     try {
       const formData = new FormData();
@@ -141,11 +135,7 @@ const Pins: React.FC = () => {
         credentials: "include",
       });
 
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || "Erreur lors de l'ajout");
-      }
-
+      if (!res.ok) throw new Error("Erreur lors de l'ajout");
       setForm({ title: "", price: "", description: "", category: "Autre", image: null });
       fetchPins();
     } catch (err) {
@@ -153,56 +143,110 @@ const Pins: React.FC = () => {
     }
   };
 
-// Normalisation catégorie
-const normalizeCategory = (cat: string | null | undefined) => {
-  if (!cat || cat.trim() === "") return "Autre";
-  return cat.trim();
-};
+  const handleSubmit = async (pinId: number) => {
+    try {
+      const formData = new FormData();
+      formData.append("title", form.title);
+      formData.append("price", form.price);
+      formData.append("description", form.description);
+      formData.append("category", form.category || "Autre");
+      if (form.image) formData.append("image", form.image);
 
-// Pagination calculée
-const start = (currentPage - 1) * pinsPerPage;
-const end = start + pinsPerPage;
+      const res = await fetch(`${API_URL}${pinId}`, {
+        method: "PUT",
+        body: formData,
+        credentials: "include",
+      });
 
-// 👉 On trie avant pagination
-const sortedPins = [...pins].sort((a, b) => {
-  const catA = normalizeCategory(a.category);
-  const catB = normalizeCategory(b.category);
-  if (catA !== catB) return catA.localeCompare(catB); // ordre par catégorie
-  return a.title.localeCompare(b.title); // et ordre alphabétique par titre
-});
+      if (!res.ok) throw new Error("Erreur lors de la mise à jour");
+      cancelEdit();
+      fetchPins();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Erreur inconnue");
+    }
+  };
 
-const paginatedPins = sortedPins.slice(start, end);
-
-// Groupement par catégorie
-const groupedPins = paginatedPins.reduce((acc, pin) => {
-  const cat = normalizeCategory(pin.category);
-  if (!acc[cat]) acc[cat] = [];
-  acc[cat].push(pin);
-  return acc;
-}, {} as Record<string, Pin[]>);
-
-const sortedCategories = Object.keys(groupedPins).sort((a, b) =>
-  a === "Autre" ? 1 : b === "Autre" ? -1 : a.localeCompare(b)
-);
+  const handleDelete = async (id: number) => {
+    if (!confirm("Voulez-vous vraiment supprimer ce pin ?")) return;
+    try {
+      const res = await fetch(`${API_URL}${id}`, { method: "DELETE", credentials: "include" });
+      if (!res.ok) throw new Error("Erreur lors de la suppression");
+      fetchPins();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Erreur inconnue");
+    }
+  };
 
   return (
     <div className="flex flex-col items-center gap-8 p-6 w-full max-w-4xl">
+
       {/* Ajout d’un pin */}
       <div className="border rounded-lg shadow bg-white p-4 mb-8 w-full">
         <h2 className="text-xl font-bold text-bleu mb-2">Ajouter un nouveau pin</h2>
-        <input type="text" name="title" placeholder="Titre" value={form.title} onChange={handleChange} className="border p-2 rounded mb-2 w-full" />
-        <input type="number" name="price" placeholder="Prix" value={form.price} onChange={handleChange} className="border p-2 rounded mb-2 w-full" />
-        <textarea name="description" placeholder="Description" value={form.description} onChange={handleChange} className="border p-2 rounded mb-2 w-full" />
-        <select name="category" value={form.category} onChange={handleChange} className="border p-2 rounded mb-2 w-full">
+        <input
+          type="text"
+          name="title"
+          placeholder="Titre"
+          value={form.title}
+          onChange={handleChange}
+          className="border p-2 rounded mb-2 w-full"
+        />
+        <input
+          type="number"
+          name="price"
+          placeholder="Prix"
+          value={form.price}
+          onChange={handleChange}
+          className="border p-2 rounded mb-2 w-full"
+        />
+        <textarea
+          name="description"
+          placeholder="Description"
+          value={form.description}
+          onChange={handleChange}
+          className="border p-2 rounded mb-2 w-full"
+        />
+        <select
+          name="category"
+          value={form.category}
+          onChange={handleChange}
+          className="border p-2 rounded mb-2 w-full"
+        >
           {categories.map((c) => (
-            <option key={c} value={c}>{c}</option>
+            <option key={c} value={c}>
+              {c}
+            </option>
           ))}
           <option value="Autre">Autre</option>
         </select>
-        <input type="file" name="image" onChange={handleChange} className="border p-2 rounded mb-2 w-full" />
-        <button onClick={handleAddPin} className="bg-bleu text-white p-2 rounded w-full">Ajouter</button>
+        <input
+          type="file"
+          name="image"
+          onChange={handleChange}
+          className="border p-2 rounded mb-2 w-full"
+        />
+        <button onClick={handleAddPin} className="bg-bleu text-white p-2 rounded w-full">
+          Ajouter
+        </button>
       </div>
 
+      {/* Recherche par catégorie */}
+      <select
+        value={categorySearch}
+        onChange={(e) => {
+          setCategorySearch(e.target.value);
+          setCurrentPage(1); // reset pagination
+        }}
+        className="border p-2 rounded w-full max-w-md mb-4"
+      >
+        <option value="">Toutes les catégories</option>
+        {categories.map((cat) => (
+          <option key={cat} value={cat}>
+            {cat}
+          </option>
+        ))}
+        <option value="Autre">Autre</option>
+      </select>
       {/* Liste des pins groupés */}
       {sortedCategories.map((cat) => (
         <div key={cat} className="w-full">
@@ -211,7 +255,6 @@ const sortedCategories = Object.keys(groupedPins).sort((a, b) =>
             {groupedPins[cat].map((pin) => (
               <div key={pin.id} className="border rounded-lg shadow bg-white p-4 flex flex-col gap-2">
                 <img src={pin.imageUrl} alt={pin.title} className="rounded-lg w-full h-48 object-cover" />
-
                 {editingId === pin.id ? (
                   <>
                     <input type="text" name="title" value={form.title} onChange={handleChange} className="border p-2 rounded" />
@@ -219,7 +262,9 @@ const sortedCategories = Object.keys(groupedPins).sort((a, b) =>
                     <textarea name="description" value={form.description} onChange={handleChange} className="border p-2 rounded" />
                     <select name="category" value={form.category} onChange={handleChange} className="border p-2 rounded">
                       {categories.map((c) => (
-                        <option key={c} value={c}>{c}</option>
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
                       ))}
                       <option value="Autre">Autre</option>
                     </select>
