@@ -26,6 +26,7 @@ const Pins: React.FC = () => {
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageInput, setPageInput] = useState(String(currentPage));
   const pinsPerPage = 20;
   const [categorySearch, setCategorySearch] = useState("");
 
@@ -49,10 +50,9 @@ const Pins: React.FC = () => {
     fetchPins();
   }, []);
 
-  /** Scroll top lors du changement de page */
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [currentPage]);
+useEffect(() => {
+  setPageInput(String(currentPage));
+}, [currentPage]);
 
   /** Normalisation catégorie */
   const normalizeCategory = (cat: string | null | undefined) => {
@@ -176,6 +176,8 @@ const Pins: React.FC = () => {
       alert(err instanceof Error ? err.message : "Erreur inconnue");
     }
   };
+
+
 
   return (
     <div className="flex flex-col items-center gap-8 p-6 w-full max-w-4xl">
@@ -302,14 +304,54 @@ const Pins: React.FC = () => {
         </div>
       ))}
 
-      {/* Pagination */}
-      <div className="flex gap-2 mt-4">
-        <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-1 border rounded">Précédent</button>
-        <span className="px-3 py-1">{currentPage} / {totalPages}</span>
-        <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 py-1 border rounded">Suivant</button>
-      </div>
+     {/* Pagination */}
+<div className="flex gap-2 mt-4 items-center">
+  <button
+    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+    disabled={currentPage === 1}
+    className="px-3 py-1 border rounded"
+  >
+    Précédent
+  </button>
+
+  <span className="px-3 py-1">
+    {currentPage} / {totalPages}
+  </span>
+
+  <input
+    type="number"
+    min={1}
+    max={totalPages}
+    value={pageInput}
+    onChange={(e) => setPageInput(e.target.value)}
+    className="border rounded px-2 py-1 w-16"
+  />
+
+  <button
+    onClick={() => {
+      const page = Number(pageInput);
+      if (pageInput >= 1 && page <= totalPages) setCurrentPage(page);
+    }}
+    className="px-3 py-1 border rounded"
+    disabled={
+      pageInput === "" ||
+      Number(pageInput) === currentPage ||
+      Number(pageInput) < 1 ||
+      Number(pageInput) > totalPages
+    }
+  >
+    Valider
+  </button>
+
+  <button
+    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+    disabled={currentPage === totalPages}
+    className="px-3 py-1 border rounded"
+  >
+    Suivant
+  </button>
+</div>
     </div>
   );
 };
-
 export default Pins;

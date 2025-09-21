@@ -18,7 +18,7 @@ const MemberPins: React.FC = () => {
   const [pins, setPins] = useState<Pin[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageInput, setPageInput] = useState(1);
+  const [pageInput, setPageInput] = useState(String(currentPage));
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [categorySearch, setCategorySearch] = useState("");
   const pinsPerPage = 20;
@@ -40,11 +40,9 @@ const MemberPins: React.FC = () => {
     if (storedCart) setCart(JSON.parse(storedCart));
   }, []);
 
-  useEffect(() => {
-    setPageInput(currentPage);
-    // Scroll en haut à chaque changement de page
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [currentPage]);
+useEffect(() => {
+  setPageInput(String(currentPage));
+}, [currentPage]);
 
   const handleQuantityChange = (pinId: number, qty: number) => {
     setQuantities((prev) => ({ ...prev, [pinId]: qty }));
@@ -173,46 +171,52 @@ const MemberPins: React.FC = () => {
       </div>
 
       {/* Pagination */}
-      <div className="flex gap-2 mt-4 items-center">
-        <button
-          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-          disabled={currentPage === 1}
-          className="px-3 py-1 border rounded"
-        >
-          Précédent
-        </button>
+<div className="flex gap-2 mt-4 items-center">
+  <button
+    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+    disabled={currentPage === 1}
+    className="px-3 py-1 border rounded"
+  >
+    Précédent
+  </button>
 
-        <span className="px-3 py-1">
-          {currentPage} / {totalPages}
-        </span>
+  <span className="px-3 py-1">
+    {currentPage} / {totalPages}
+  </span>
 
-        <input
-          type="number"
-          min={1}
-          max={totalPages}
-          value={pageInput}
-          onChange={(e) => setPageInput(Number(e.target.value))}
-          className="border rounded px-2 py-1 w-16"
-        />
+  <input
+    type="number"
+    min={1}
+    max={totalPages}
+    value={pageInput}
+    onChange={(e) => setPageInput(e.target.value)}
+    className="border rounded px-2 py-1 w-16"
+  />
 
-        <button
-          onClick={() => {
-            if (pageInput >= 1 && pageInput <= totalPages) setCurrentPage(pageInput);
-          }}
-          className="px-3 py-1 border rounded"
-          disabled={pageInput === currentPage || pageInput < 1 || pageInput > totalPages}
-        >
-          Aller à la page
-        </button>
+  <button
+    onClick={() => {
+      const page = Number(pageInput);
+      if (pageInput >= 1 && page <= totalPages) setCurrentPage(page);
+    }}
+    className="px-3 py-1 border rounded"
+    disabled={
+      pageInput === "" ||
+      Number(pageInput) === currentPage ||
+      Number(pageInput) < 1 ||
+      Number(pageInput) > totalPages
+    }
+  >
+    Valider
+  </button>
 
-        <button
-          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-          disabled={currentPage === totalPages}
-          className="px-3 py-1 border rounded"
-        >
-          Suivant
-        </button>
-      </div>
+  <button
+    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+    disabled={currentPage === totalPages}
+    className="px-3 py-1 border rounded"
+  >
+    Suivant
+  </button>
+</div>
     </div>
   );
 };
