@@ -6,7 +6,7 @@ type Pin = {
   price: string;
   description: string;
   imageUrl: string;
-  stock: number; // ✅ nouvelle propriété
+  stock: number;
 };
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
@@ -15,6 +15,7 @@ const API_URL = `${API_BASE}/api/pins/`;
 const AdminPins: React.FC = () => {
   const [pins, setPins] = useState<Pin[]>([]);
   const [loading, setLoading] = useState(true);
+  const [stockInputs, setStockInputs] = useState<Record<number, number>>({});
 
   const fetchPins = async () => {
     try {
@@ -23,6 +24,13 @@ const AdminPins: React.FC = () => {
       if (!res.ok) throw new Error("Erreur lors du chargement des pins");
       const data = await res.json();
       setPins(data);
+
+      // Initialiser les inputs de stock
+      const initialStocks: Record<number, number> = {};
+      data.forEach((pin) => {
+        initialStocks[pin.id] = pin.stock;
+      });
+      setStockInputs(initialStocks);
     } catch (err) {
       console.error(err);
     } finally {
@@ -43,11 +51,17 @@ const AdminPins: React.FC = () => {
         body: JSON.stringify({ stock: newStock }),
       });
       if (!res.ok) throw new Error("Erreur lors de la mise à jour du stock");
-      await fetchPins(); // refresh
+
+      // Mettre à jour localement pour éviter un re-fetch complet
+      setPins((prev) =>
+        prev.map((pin) =>
+          pin.id === pinId ? { ...pin, stock: newStock } : pin
+        )
+      );
     } catch (err) {
       console.error(err);
       alert("Impossible de mettre à jour le stock");
-    }   
+    }
   };
 
   if (loading) return <p>Chargement...</p>;
@@ -69,18 +83,34 @@ const AdminPins: React.FC = () => {
             <h3 className="text-lg font-bold">{pin.title}</h3>
             <p className="text-sm">{pin.description}</p>
             <p className="font-semibold text-blue-600">{pin.price} €</p>
-
-            <label className="mt-2 text-sm">
-              Stock disponible :
+            <p className="text-sm">Stock disponible : {pin.stock}</p>
+            <label className="mt-2 text-sm flex items-center gap-2">
+              Stock :
               <input
                 type="number"
-                value={pin.stock}
+                value={stockInputs[pin.id] ?? ""}
                 min={0}
+                placeholder={String(pin.stock)}
                 onChange={(e) =>
-                  updateStock(pin.id, parseInt(e.target.value, 10))
+                  setStockInputs((inputs) => ({
+                    ...inputs,
+                    [pin.id]: e.target.value,
+                  }))
                 }
-                className="ml-2 border rounded px-2 py-1 w-20"
+                className="border rounded px-2 py-1 w-20"
               />
+              <button
+                onClick={() =>
+                  updateStock(
+                    pin.id,
+                    stockInputs[pin.id] === "" ? pin.stock : Number(stockInputs[pin.id])
+                  )
+                }
+                className="ml-2 bg-blue-500 text-white px-2 py-1 rounded"
+                disabled={stockInputs[pin.id] === "" || Number(stockInputs[pin.id]) === pin.stock}
+              >
+                Valider
+              </button>
             </label>
           </div>
         ))}

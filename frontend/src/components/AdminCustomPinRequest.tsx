@@ -19,7 +19,7 @@ const AdminCustomPinRequests: React.FC = () => {
 
   const fetchRequests = async () => {
     try {
-      const res = await fetch(API_URL, { credentials: "include" });
+      const res = await fetch(`${API_URL}/`, { credentials: "include" });
       if (!res.ok) throw new Error("Erreur lors du chargement des demandes");
       const data = await res.json();
       setRequests(data);

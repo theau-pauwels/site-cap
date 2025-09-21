@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
-const API_URL = `${API_BASE}/api/pins/requests`;
+const API_URL = `${API_BASE}/api/pins/requests/`;
 
 const CustomPinRequest: React.FC = () => {
   const [title, setTitle] = useState("");

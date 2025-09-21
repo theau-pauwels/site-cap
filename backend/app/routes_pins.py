@@ -33,7 +33,7 @@ def add_pin():
     description = request.form.get("description")
     stock = request.form.get("stock", 0)  # ✅ stock
     image = request.files.get("image")
-    category = request.form.get("category", pin.get("category", "Autre"))
+    category = request.form.get("category", "Autre")
 
     if not title or not price or not description or not image:
         return jsonify({"error": "Missing fields"}), 400

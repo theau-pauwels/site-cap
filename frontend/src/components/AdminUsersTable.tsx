@@ -9,7 +9,7 @@ type User = {
   role: string;
 };
 
-const ROLE_OPTIONS = ["member","verifier","admin","en attente"];
+const ROLE_OPTIONS = ["member","admin"];
 
 export default function AdminUsersTable() {
   const [users, setUsers] = useState<User[]>([]);

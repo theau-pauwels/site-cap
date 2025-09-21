@@ -1,5 +1,14 @@
 [
   {
+    "id": 1758397616,
+    "title": "0",
+    "price": "2.00",
+    "description": "Chiffre",
+    "imageUrl": "/uploads/1758397616-BPCM0.JPG",
+    "stock": 0,
+    "category": "Chiffres"
+  },
+  {
     "id": 1758307265,
     "title": "1",
     "price": "2.00",
@@ -1494,15 +1503,6 @@
     "category": "Signes sexuels"
   },
   {
-    "id": 1758397616,
-    "title": "0",
-    "price": "2.00",
-    "description": "Chiffre",
-    "imageUrl": "/uploads/1758397616-BPCM0.JPG",
-    "stock": 0,
-    "category": "Chiffres"
-  },
-  {
     "id": 1758399336,
     "title": "Téléphone",
     "price": "1.80",
@@ -1707,7 +1707,7 @@
     "description": "Né(e) entre le 23 décembre et le 20 janvier",
     "imageUrl": "/uploads/1758403630-fz04.jpg",
     "stock": 0,
-    "category": "Signes astrologiques "
+    "category": "Signes astrologiques"
   },
   {
     "id": 1758403691,
@@ -1716,7 +1716,7 @@
     "description": "Né(e) entre le 21 janvier et le 19 février",
     "imageUrl": "/uploads/1758403691-fz11.jpg",
     "stock": 0,
-    "category": "Signes astrologiques "
+    "category": "Signes astrologiques"
   },
   {
     "id": 1758403836,
@@ -1725,7 +1725,7 @@
     "description": "Né(e) entre le 21 mars et le 19 avril",
     "imageUrl": "/uploads/1758403836-fz02.jpg",
     "stock": 0,
-    "category": "Signes astrologiques "
+    "category": "Signes astrologiques"
   },
   {
     "id": 1758403895,
@@ -1734,7 +1734,7 @@
     "description": "Né(e) entre le 20 avril et le 20 mai",
     "imageUrl": "/uploads/1758403895-fz10.jpg",
     "stock": 0,
-    "category": "Signes astrologiques "
+    "category": "Signes astrologiques"
   },
   {
     "id": 1758403923,
@@ -1743,7 +1743,7 @@
     "description": "Né(e) entre le 21 mai et le 21 juin",
     "imageUrl": "/uploads/1758403923-fz05.jpg",
     "stock": 0,
-    "category": "Signes astrologiques "
+    "category": "Signes astrologiques"
   },
   {
     "id": 1758404024,
@@ -1752,7 +1752,7 @@
     "description": "Né(e) entre le 23 août et le 22 septembre",
     "imageUrl": "/uploads/1758404024-fz12.jpg",
     "stock": 0,
-    "category": "Signes astrologiques "
+    "category": "Signes astrologiques"
   },
   {
     "id": 1758404057,
@@ -1761,7 +1761,7 @@
     "description": "Né(e) entre le 24 octobre et le 22 novembre ",
     "imageUrl": "/uploads/1758404057-fz09.jpg",
     "stock": 0,
-    "category": "Signes astrologiques "
+    "category": "Signes astrologiques"
   },
   {
     "id": 1758404103,
@@ -1770,6 +1770,6 @@
     "description": "Né(e) entre le 23 novembre et le 22 décembre",
     "imageUrl": "/uploads/1758404103-fz08.jpg",
     "stock": 0,
-    "category": "Signes astrologiques "
+    "category": "Signes astrologiques"
   }
 ]

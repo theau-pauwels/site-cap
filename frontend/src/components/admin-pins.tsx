@@ -20,15 +20,16 @@ const Pins: React.FC = () => {
     title: "",
     price: "",
     description: "",
-    category: "",
+    category: "Autre",
     image: null as File | null,
   });
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const pinsPerPage = 20; // ou 30
+  const pinsPerPage = 20;
   const totalPages = Math.ceil(pins.length / pinsPerPage);
 
+  /** Charger les pins et catégories */
   const fetchPins = async () => {
     try {
       const res = await fetch(API_URL, { credentials: "include" });
@@ -40,29 +41,41 @@ const Pins: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchPins();
-    fetch("/api/categories/")
-      .then((res) => res.json())
-      .then(setCategories)
+    Promise.all([
+      fetch(API_URL, { credentials: "include" }).then((res) => res.json()),
+      fetch("/api/categories/").then((res) => res.json()),
+    ])
+      .then(([pinsData, categoriesData]) => {
+        setPins(pinsData);
+        setCategories(categoriesData);
+      })
       .catch(console.error);
   }, []);
 
+  /** Faire défiler en haut lors du changement de page */
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
+
+  /** Démarrer édition */
   const startEdit = (pin: Pin) => {
     setEditingId(pin.id);
     setForm({
       title: pin.title,
       price: pin.price,
       description: pin.description,
-      category: pin.category,
+      category: pin.category || "Autre",
       image: null,
     });
   };
 
+  /** Annuler édition */
   const cancelEdit = () => {
     setEditingId(null);
-    setForm({ title: "", price: "", description: "", category: "", image: null });
+    setForm({ title: "", price: "", description: "", category: "Autre", image: null });
   };
 
+  /** Form change */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, files } = e.target as HTMLInputElement;
     if (name === "image") {
@@ -72,13 +85,14 @@ const Pins: React.FC = () => {
     }
   };
 
+  /** Mettre à jour un pin */
   const handleSubmit = async (pinId: number) => {
     try {
       const formData = new FormData();
       formData.append("title", form.title);
       formData.append("price", form.price);
       formData.append("description", form.description);
-      formData.append("category", form.category);
+      formData.append("category", form.category || "Autre");
       if (form.image) formData.append("image", form.image);
 
       const res = await fetch(`${API_URL}${pinId}`, {
@@ -99,6 +113,7 @@ const Pins: React.FC = () => {
     }
   };
 
+  /** Supprimer un pin */
   const handleDelete = async (id: number) => {
     if (!confirm("Voulez-vous vraiment supprimer ce pin ?")) return;
     try {
@@ -110,88 +125,109 @@ const Pins: React.FC = () => {
     }
   };
 
+  /** Ajouter un pin */
   const handleAddPin = async () => {
-  try {
-    const formData = new FormData();
-    formData.append("title", form.title);
-    formData.append("price", form.price);
-    formData.append("description", form.description);
-    formData.append("category", form.category || "Autre");
-    if (form.image) formData.append("image", form.image);
+    try {
+      const formData = new FormData();
+      formData.append("title", form.title);
+      formData.append("price", form.price);
+      formData.append("description", form.description);
+      formData.append("category", form.category || "Autre");
+      if (form.image) formData.append("image", form.image);
 
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: formData,
-      credentials: "include",
-    });
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
 
-    if (!res.ok) {
-      const errData = await res.json();
-      throw new Error(errData.error || "Erreur lors de l'ajout");
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Erreur lors de l'ajout");
+      }
+
+      setForm({ title: "", price: "", description: "", category: "Autre", image: null });
+      fetchPins();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Erreur inconnue");
     }
+  };
 
-    // Réinitialiser le formulaire
-    setForm({ title: "", price: "", description: "", category: "", image: null });
-    fetchPins();
-  } catch (err) {
-    alert(err instanceof Error ? err.message : "Erreur inconnue");
-  }
+// Normalisation catégorie
+const normalizeCategory = (cat: string | null | undefined) => {
+  if (!cat || cat.trim() === "") return "Autre";
+  return cat.trim();
 };
 
+// Pagination calculée
+const start = (currentPage - 1) * pinsPerPage;
+const end = start + pinsPerPage;
 
-  // Grouper par catégorie
-  const groupedPins = pins.reduce((acc, pin) => {
-    const cat = pin.category && pin.category.trim() !== "" ? pin.category : "Autre";
-    if (!acc[cat]) acc[cat] = [];
-    acc[cat].push(pin);
-    return acc;
-  }, {} as Record<string, Pin[]>);
+// 👉 On trie avant pagination
+const sortedPins = [...pins].sort((a, b) => {
+  const catA = normalizeCategory(a.category);
+  const catB = normalizeCategory(b.category);
+  if (catA !== catB) return catA.localeCompare(catB); // ordre par catégorie
+  return a.title.localeCompare(b.title); // et ordre alphabétique par titre
+});
 
-  // Pagination: slice des pins visibles
-  const paginatedPins: Record<string, Pin[]> = {};
-  Object.entries(groupedPins).forEach(([cat, catPins]) => {
-    const start = (currentPage - 1) * pinsPerPage;
-    const end = start + pinsPerPage;
-    paginatedPins[cat] = catPins.slice(start, end);
-  });
+const paginatedPins = sortedPins.slice(start, end);
 
-  const sortedCategories = Object.keys(paginatedPins).sort((a, b) => (a === "Autre" ? 1 : b === "Autre" ? -1 : a.localeCompare(b)));
+// Groupement par catégorie
+const groupedPins = paginatedPins.reduce((acc, pin) => {
+  const cat = normalizeCategory(pin.category);
+  if (!acc[cat]) acc[cat] = [];
+  acc[cat].push(pin);
+  return acc;
+}, {} as Record<string, Pin[]>);
+
+const sortedCategories = Object.keys(groupedPins).sort((a, b) =>
+  a === "Autre" ? 1 : b === "Autre" ? -1 : a.localeCompare(b)
+);
 
   return (
     <div className="flex flex-col items-center gap-8 p-6 w-full max-w-4xl">
-      <div className="border rounded-lg shadow bg-white p-4 mb-8">
+      {/* Ajout d’un pin */}
+      <div className="border rounded-lg shadow bg-white p-4 mb-8 w-full">
         <h2 className="text-xl font-bold text-bleu mb-2">Ajouter un nouveau pin</h2>
         <input type="text" name="title" placeholder="Titre" value={form.title} onChange={handleChange} className="border p-2 rounded mb-2 w-full" />
         <input type="number" name="price" placeholder="Prix" value={form.price} onChange={handleChange} className="border p-2 rounded mb-2 w-full" />
         <textarea name="description" placeholder="Description" value={form.description} onChange={handleChange} className="border p-2 rounded mb-2 w-full" />
         <select name="category" value={form.category} onChange={handleChange} className="border p-2 rounded mb-2 w-full">
-          <option value="">Autre</option>
-          {categories.map(c => <option key={c} value={c}>{c}</option>)}
+          {categories.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+          <option value="Autre">Autre</option>
         </select>
         <input type="file" name="image" onChange={handleChange} className="border p-2 rounded mb-2 w-full" />
-        <button onClick={handleAddPin} className="bg-bleu text-white p-2 rounded">Ajouter</button>
+        <button onClick={handleAddPin} className="bg-bleu text-white p-2 rounded w-full">Ajouter</button>
       </div>
 
+      {/* Liste des pins groupés */}
       {sortedCategories.map((cat) => (
         <div key={cat} className="w-full">
           <h2 className="text-2xl font-bold text-bleu mb-4">{cat}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {paginatedPins[cat].map((pin) => (
+            {groupedPins[cat].map((pin) => (
               <div key={pin.id} className="border rounded-lg shadow bg-white p-4 flex flex-col gap-2">
                 <img src={pin.imageUrl} alt={pin.title} className="rounded-lg w-full h-48 object-cover" />
+
                 {editingId === pin.id ? (
                   <>
                     <input type="text" name="title" value={form.title} onChange={handleChange} className="border p-2 rounded" />
                     <input type="number" name="price" value={form.price} onChange={handleChange} className="border p-2 rounded" />
                     <textarea name="description" value={form.description} onChange={handleChange} className="border p-2 rounded" />
-                    <select name="category" value={form.category || "Autre"} onChange={handleChange} className="border p-2 rounded">
-                      <option value=""></option>
-                      {categories.map(c => (
+                    <select name="category" value={form.category} onChange={handleChange} className="border p-2 rounded">
+                      {categories.map((c) => (
                         <option key={c} value={c}>{c}</option>
                       ))}
+                      <option value="Autre">Autre</option>
                     </select>
-
-                    <input type="file" name="image" onChange={handleChange} className="border p-2 rounded" />
+                    <div>
+                      <p className="text-sm text-gray-500">Image actuelle :</p>
+                      <img src={pin.imageUrl} alt={pin.title} className="w-32 h-20 object-cover rounded mb-2" />
+                      <input type="file" name="image" onChange={handleChange} className="border p-2 rounded" />
+                    </div>
                     <div className="flex gap-2">
                       <button onClick={() => handleSubmit(pin.id)} className="bg-bleu text-white p-2 rounded">Mettre à jour</button>
                       <button onClick={cancelEdit} className="bg-gray-400 text-white p-2 rounded">Annuler</button>
@@ -221,7 +257,7 @@ const Pins: React.FC = () => {
         </div>
       ))}
 
-      {/* Pagination controls */}
+      {/* Pagination */}
       <div className="flex gap-2 mt-4">
         <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-1 border rounded">Précédent</button>
         <span className="px-3 py-1">{currentPage} / {totalPages}</span>

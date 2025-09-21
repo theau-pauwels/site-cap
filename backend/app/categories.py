@@ -15,6 +15,12 @@ def save_categories(categories):
     with open(CATEGORIES_FILE, "w", encoding="utf-8") as f:
         json.dump(categories, f, indent=2, ensure_ascii=False)
 
+def normalize_category(name: str) -> str:
+    if not name:
+        return "Autre"
+    return name.strip()  # tu peux ajouter .capitalize() ou .title() si tu veux homogénéiser la casse
+
+
 bp_categories = Blueprint("categories", __name__, url_prefix="/api/categories")
 
 @bp_categories.get("/")
@@ -27,6 +33,8 @@ def add_category():
     if not name:
         return jsonify({"error": "Missing name"}), 400
 
+    name = normalize_category(name)  # 🔑 normalisation
+
     categories = read_categories()
     if name in categories:
         return jsonify({"error": "Category already exists"}), 400
@@ -35,10 +43,11 @@ def add_category():
     save_categories(categories)
     return jsonify({"success": True, "category": name}), 201
 
+
 @bp_categories.delete("/<name>")
 def delete_category(name):
     from urllib.parse import unquote
-    name = unquote(name)
+    name = normalize_category(unquote(name))  # 🔑 normalisation
 
     if name == "Autre":
         return jsonify({"error": "Cannot delete default category"}), 400
@@ -50,7 +59,7 @@ def delete_category(name):
     # Réaffecter les pins existants à "Autre"
     pins = read_pins()
     for pin in pins:
-        if pin.get("category") == name:
+        if normalize_category(pin.get("category")) == name:
             pin["category"] = "Autre"
     save_pins(pins)
 
