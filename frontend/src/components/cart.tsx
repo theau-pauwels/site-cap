@@ -13,11 +13,32 @@ const Cart: React.FC = () => {
   const [cart, setCart] = useState<Pin[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [quantityInputs, setQuantityInputs] = useState<Record<number, string>>({});
+
 
   useEffect(() => {
     const storedCart = localStorage.getItem("cart");
-    if (storedCart) setCart(JSON.parse(storedCart));
+    if (storedCart) {
+      const parsed = JSON.parse(storedCart);
+      setCart(parsed);
+      // Initialise les inputs avec la quantité actuelle
+      const initialInputs: Record<number, string> = {};
+      parsed.forEach((item: Pin) => {
+        initialInputs[item.id] = item.quantity ? String(item.quantity) : "";
+      });
+      setQuantityInputs(initialInputs);
+    }
   }, []);
+
+  const applyQuantity = (id: number) => {
+    const qty = Number(quantityInputs[id]);
+    if (!qty || qty < 1) return;
+    const updatedCart = cart.map((c) =>
+      c.id === id ? { ...c, quantity: qty } : c
+    );
+    setCart(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  };
 
   const removeFromCart = (id: number) => {
     const updatedCart = cart.filter((item) => item.id !== id);
@@ -68,53 +89,68 @@ const Cart: React.FC = () => {
     <div className="p-6 flex flex-col items-center gap-4">
       <h2 className="text-2xl font-bold mb-4 text-bleu">Votre Panier</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
-      {cart.map((item) => (
-        <div
-          key={item.id}
-          className="border rounded-lg shadow bg-white p-4 flex flex-col gap-2"
-        >
-          <img
-            src={item.imageUrl}
-            alt={item.title}
-            className="rounded-lg w-full h-48 object-cover"
-          />
+        {cart.map((item) => (
+          <div
+            key={item.id}
+            className="border rounded-lg shadow bg-white p-4 flex flex-col gap-2"
+          >
+            <img
+              src={item.imageUrl}
+              alt={item.title}
+              className="rounded-lg w-full h-48 object-cover"
+            />
 
-          <h3 className="text-lg font-bold">{item.title}</h3>
-          <p className="text-sm">{item.description}</p>
-          <p className="font-semibold text-blue-600">{item.price} €</p>
-
-          {/* Champ pour modifier la quantité */}
-          <div className="flex items-center gap-2">
-            <label className="text-sm">Quantité :</label>
-            <input
-              type="number"
-              min={1}
-              value={item.quantity || 1}
-              onChange={(e) => {
-                const newQty = Math.max(1, parseInt(e.target.value) || 1);
-                const updatedCart = cart.map((c) =>
-                  c.id === item.id ? { ...c, quantity: newQty } : c
-                );
+            <h3 className="text-lg font-bold">{item.title}</h3>
+            <p className="text-sm">
+              {item.description.split("\n").map((line, index) => (
+                <React.Fragment key={index}>
+                  {line}
+                  <br />
+                </React.Fragment>
+              ))}
+            </p>
+            <p className="font-semibold text-bleu">{item.price} €</p>
+            <p className="text-sm">Quantité: {item.quantity}</p>
+            {/* Champ pour modifier la quantité */}
+            <div className="flex items-center gap-2">
+              <label className="text-sm">Quantité :</label>
+              <input
+                type="number"
+                min={1}
+                value={quantityInputs[item.id] ?? ""}
+                onChange={(e) =>
+                  setQuantityInputs((inputs) => ({
+                    ...inputs,
+                    [item.id]: e.target.value,
+                  }))
+                }
+                className="border p-1 rounded w-16"
+                placeholder={String(item.quantity ?? 1)}
+              />
+              <button
+                onClick={() => applyQuantity(item.id)}
+                className="bg-bleu text-white px-3 py-1 rounded hover:bg-blue-600"
+                disabled={
+                  quantityInputs[item.id] === "" ||
+                  Number(quantityInputs[item.id]) < 1 ||
+                  Number(quantityInputs[item.id]) === item.quantity
+                }
+              >
+                Appliquer
+              </button>
+            </div>
+            <button
+              onClick={() => {
+                const updatedCart = cart.filter((c) => c.id !== item.id);
                 setCart(updatedCart);
                 localStorage.setItem("cart", JSON.stringify(updatedCart));
               }}
-              className="border p-1 rounded w-16"
-            />
+              className="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+            >
+              Retirer
+            </button>
           </div>
-
-          <button
-            onClick={() => {
-              const updatedCart = cart.filter((c) => c.id !== item.id);
-              setCart(updatedCart);
-              localStorage.setItem("cart", JSON.stringify(updatedCart));
-            }}
-            className="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-          >
-            Retirer
-          </button>
-        </div>
-      ))}
-
+        ))}
       </div>
       <p className="text-xl font-bold mt-4">Total: {total.toFixed(2)} €</p>
       <button

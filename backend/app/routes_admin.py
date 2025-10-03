@@ -4,10 +4,38 @@ from werkzeug.security import generate_password_hash
 from sqlalchemy.orm import joinedload
 from .models import db, User, Role, Membership, Order, OrderItem
 import re
+import json
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PINS_FILE = os.path.join(BASE_DIR, "..", "pins.json")
 
 bp_admin = Blueprint("admin", __name__)
 bp_orders = Blueprint("orders", __name__)
 bp_admin_orders = Blueprint("admin_orders", __name__)
+
+
+
+def read_pins():
+    """Retourne la liste des pins avec leur stock"""
+    if not os.path.exists(PINS_FILE):
+        return []
+    with open(PINS_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+def update_pin_stock(pin_id, delta):
+    """Met à jour le stock d’un pin en ajoutant delta (peut être négatif)"""
+    pins = read_pins()
+    pin = next((p for p in pins if p["id"] == pin_id), None)
+    if not pin:
+        return False
+    pin["stock"] = max(0, pin.get("stock", 0) + int(delta))  # stock minimum 0
+    # Sauvegarde dans le fichier JSON
+    with open(PINS_FILE, "w", encoding="utf-8") as f:
+        json.dump(pins, f, indent=2, ensure_ascii=False)
+    return True
+
+
 
 # -------------------- Helpers --------------------
 def is_admin():
@@ -112,17 +140,21 @@ def update_user(user_id):
     if not target:
         return jsonify({"error": "Utilisateur introuvable"}), 404
 
-    data = request.get_json()
-    nom = data.get("nom")
-    prenom = data.get("prenom")
-    identifiant = data.get("identifiant")
+    data = request.get_json() or {}
+    nom = (data.get("nom") or "").strip()
+    prenom = (data.get("prenom") or "").strip()
+    identifiant = (data.get("identifiant") or "").strip()
 
-    if identifiant and not re.match(r"^\d{6}$", identifiant):
-        return jsonify({"error": "Le member_id doit faire 6 chiffres"}), 400
+    if nom:
+        target.nom = nom
+    if prenom:
+        target.prenom = prenom
 
-    if nom: target.nom = nom
-    if prenom: target.prenom = prenom
-    if identifiant: target.member_id = identifiant
+    if identifiant:
+        if identifiant.isdigit() and len(identifiant) == 6:
+            target.member_id = identifiant
+        else:
+            target.email = identifiant.lower()
 
     db.session.commit()
     return jsonify({"ok": True})
@@ -167,8 +199,21 @@ def list_orders():
         return jsonify({"error": "Unauthorized"}), 403
 
     orders = Order.query.order_by(Order.created_at.desc()).all()
+    pins = read_pins()  # récupère tous les pins avec leur stock
+    pin_map = {str(p.get("id")): p for p in pins}
+
     data = []
     for o in orders:
+        items = []
+        for i in o.items:
+            pin = pin_map.get(str(i.pin_id))
+            items.append({
+                "title": i.title,
+                "price": i.price,
+                "quantity": i.quantity,
+                "pin_id": i.pin_id,
+                "currentStock": int(pin.get("stock", 0)) if pin else 0
+            })
         data.append({
             "id": o.id,
             "user_id": o.user_id,
@@ -176,9 +221,11 @@ def list_orders():
             "user_prenom": o.user.prenom,
             "status": o.status,
             "created_at": o.created_at.isoformat(),
-            "items": [{"title": i.title, "price": i.price, "quantity": i.quantity} for i in o.items]
+            "items": items
         })
+
     return jsonify(data)
+
 
 @bp_admin_orders.route("/api/admin/orders/<order_id>", methods=["PATCH"])
 @login_required
@@ -190,12 +237,66 @@ def update_order_status(order_id):
     if not order:
         return jsonify({"error": "Commande introuvable"}), 404
 
-    data = request.get_json()
-    status = data.get("status")
-    if status:
-        order.status = status
-        db.session.commit()
-    return jsonify({"ok": True, "status": order.status})
+    data = request.get_json() or {}
+    new_status = data.get("status")
+    if not new_status:
+        return jsonify({"error": "Status manquant"}), 400
+
+    old_status = order.status
+
+    pins_snapshot = read_pins()
+    pin_map = {str(p.get("id")): p for p in pins_snapshot}
+
+    going_to_shipped = old_status != "expédiée" and new_status == "expédiée"
+    leaving_shipped = old_status == "expédiée" and new_status != "expédiée"
+
+    if going_to_shipped:
+        for item in order.items:
+            pin = pin_map.get(str(item.pin_id))
+            if not pin:
+                return jsonify({"error": f"Article introuvable pour l'id {item.pin_id}"}), 404
+            current_stock = int(pin.get("stock", 0))
+            if item.quantity > current_stock:
+                title = pin.get("title") or item.title or "cet article"
+                return jsonify({
+                    "error": f"Stock insuffisant pour {title}",
+                    "available": current_stock,
+                    "requested": item.quantity,
+                }), 400
+
+    order.status = new_status
+    db.session.commit()
+
+    # Mise à jour du stock côté backend
+    if going_to_shipped or leaving_shipped:
+
+        for item in order.items:
+            delta = -item.quantity if going_to_shipped else item.quantity
+            update_pin_stock(int(item.pin_id), delta)
+
+    # 🔥 On renvoie la commande avec les stocks actuels
+    pins = read_pins()
+    pin_map_response = {str(p.get("id")): p for p in pins}
+    items = []
+    for i in order.items:
+        pin = pin_map_response.get(str(i.pin_id))
+        items.append({
+            "title": i.title,
+            "price": i.price,
+            "quantity": i.quantity,
+            "pin_id": i.pin_id,
+            "currentStock": int(pin.get("stock", 0)) if pin else 0
+        })
+
+    return jsonify({
+        "ok": True,
+        "id": order.id,
+        "status": order.status,
+        "items": items
+    })
+
+
+
 
 @bp_admin_orders.route("/api/admin/orders/<order_id>", methods=["DELETE"])
 @login_required
@@ -220,17 +321,47 @@ def create_order():
     if not items:
         return jsonify({"error": "Le panier est vide"}), 400
 
+    pins_snapshot = read_pins()
+    pin_map = {p.get("id"): p for p in pins_snapshot}
+
+    sanitized_items = []
+    for it in items:
+        try:
+            pin_id = int(it.get("id"))
+            quantity = int(it.get("quantity", 1))
+            price = float(it.get("price"))
+        except (TypeError, ValueError):
+            return jsonify({"error": "Article invalide"}), 400
+
+        if quantity <= 0:
+            return jsonify({"error": "Quantité invalide"}), 400
+
+        pin = pin_map.get(pin_id)
+        if not pin:
+            return jsonify({"error": f"Article introuvable (id {pin_id})"}), 404
+
+        current_stock = int(pin.get("stock", 0))
+        if quantity > current_stock:
+            title = pin.get("title") or it.get("title") or "cet article"
+            return jsonify({
+                "error": f"Stock insuffisant pour {title}",
+                "available": current_stock,
+                "requested": quantity,
+            }), 400
+
+        sanitized_items.append((str(pin_id), it.get("title", pin.get("title", "")), price, quantity))
+
     order = Order(user_id=current_user.id)
     db.session.add(order)
     db.session.flush()
 
-    for it in items:
+    for pin_id, title, price, quantity in sanitized_items:
         order_item = OrderItem(
             order_id=order.id,
-            pin_id=it["id"],
-            title=it["title"],
-            price=float(it["price"]),
-            quantity=int(it.get("quantity", 1))
+            pin_id=pin_id,
+            title=title,
+            price=price,
+            quantity=quantity
         )
         db.session.add(order_item)
 

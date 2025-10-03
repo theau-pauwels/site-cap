@@ -1,13 +1,13 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import AdminPenneRequests from "../../components/AdminPenneRequests.tsx";
+import AdminPenneRequests from "@components/AdminPenneRequests";
+import RequireRole from "@components/RequireRole";
 ---
 
 <Layout title="Admin - Pennes">
   <main class="bg-white p-8 flex justify-center">
-    <AdminPenneRequests client:load />
-  </main>
-</Layout>
-
+    <RequireRole allowedRoles={['admin']} client:load>
+      <AdminPenneRequests client:load />
+    </RequireRole>
   </main>
 </Layout>

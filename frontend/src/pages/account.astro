@@ -1,11 +1,13 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import MemberPins from "../components/pins";
 import RequireAuth from "@components/RequireAuth";
+import AccountPage from "../components/account.tsx";
 ---
 
-<Layout title="Admin - Pins">
+<Layout title="Mon compte">
   <main class="bg-white min-h-screen p-8 flex justify-center">
-    <MemberPins client:load />
+    <RequireAuth client:load>
+      <AccountPage client:load />
+    </RequireAuth>
   </main>
 </Layout>

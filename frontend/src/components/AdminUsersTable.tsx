@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 
 type User = {
-  id: number;
+  id: string;
   nom: string;
   prenom: string;
   identifiant?: string; // member_id ou email
@@ -14,7 +14,7 @@ const ROLE_OPTIONS = ["member","admin"];
 export default function AdminUsersTable() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingUserId, setEditingUserId] = useState<number | null>(null);
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [editValues, setEditValues] = useState<{ nom: string; prenom: string; identifiant: string }>({ nom: "", prenom: "", identifiant: "" });
 
   const fetchUsers = async () => {
@@ -28,7 +28,7 @@ export default function AdminUsersTable() {
     fetchUsers().finally(() => setLoading(false));
   }, []);
 
-  const changeRole = async (userId: number, role: string) => {
+  const changeRole = async (userId: string, role: string) => {
     const res = await fetch(`/api/admin/users/${userId}/role`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -39,7 +39,7 @@ export default function AdminUsersTable() {
     await fetchUsers();
   };
 
-  const deleteUser = async (userId: number) => {
+  const deleteUser = async (userId: string) => {
     if (!confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) return;
     const res = await fetch(`/api/admin/users/${userId}`, {
       method: "DELETE",
@@ -49,7 +49,7 @@ export default function AdminUsersTable() {
     await fetchUsers();
   };
 
-  const saveUser = async (userId: number) => {
+  const saveUser = async (userId: string) => {
     const res = await fetch(`/api/admin/users/${userId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },

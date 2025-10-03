@@ -5,10 +5,13 @@ from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mail import Message
 
+
 from .extensions import db, mail
 from .models import User, Role
 
 bp_auth = Blueprint("auth", __name__)
+
+
 
 # -------------------- LOGIN --------------------
 @bp_auth.route("/api/auth/login", methods=["POST"])
@@ -60,6 +63,29 @@ def me():
         "role": current_user.role.value,
         "identifiant": identifiant
     })
+
+
+@bp_auth.route("/api/me/info", methods=["GET", "PATCH"])
+@login_required
+def me_info():
+    if request.method == "GET":
+        identifiant = current_user.member_id or current_user.email
+        return jsonify({
+            "nom": current_user.nom or "",
+            "prenom": current_user.prenom or "",
+            "email": current_user.email or "",
+            "member_id": current_user.member_id or "",
+            "identifiant": identifiant,
+        })
+    elif request.method == "PATCH":
+        data = request.get_json()
+        current_user.nom = data.get("nom", current_user.nom)
+        current_user.prenom = data.get("prenom", current_user.prenom)
+        current_user.email = data.get("email", current_user.email)
+        db.session.commit()
+        return jsonify({"success": True})
+
+
 
 # -------------------- REGISTER --------------------
 @bp_auth.route("/api/auth/register", methods=["POST"])

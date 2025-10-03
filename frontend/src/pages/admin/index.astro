@@ -1,51 +1,36 @@
 ---
-// src/pages/admin.astro
 import Layout from "@layouts/Layout.astro";
+import RequireRole from "@components/RequireRole";
 
 const links = [
-  { name: "Gestion utilisateurs", path: "/admin/users" },
-  { name: "Ajouter pins", path: "/admin/adminpins" },
-  { name: "Prix", path: "/admin/AdminPrix" },
-  { name: "Catégories", path: "/admin/AdminCategories" },
-  { name: "Commandes", path: "/admin/commandes" }, 
-  { name: "Demandes de pennes", path: "/admin/DemandePenne" },
-  { name: "Pins personnalisés", path: "/admin/demande-pins" },
-  { name: "Stocks", path: "/admin/stocks" },
-
+  { name: "Gestion utilisateurs", path: "/admin/users", color: "bg-blue-100"},
+  { name: "Ajouter des articles", path: "/admin/adminpins", color: "bg-blue-100"},
+  { name: "Prix", path: "/admin/AdminPrix", color: "bg-blue-100"},
+  { name: "Catégories", path: "/admin/AdminCategories", color: "bg-blue-100"},
+  { name: "Commandes", path: "/admin/commandes", color: "bg-blue-100"}, 
+  { name: "Demandes de pennes", path: "/admin/DemandePenne", color: "bg-blue-100"},
+  { name: "Pins personnalisés", path: "/admin/demande-pins", color: "bg-blue-100"},
+  { name: "Stocks", path: "/admin/stocks", color: "bg-blue-100"},
 ];
 ---
 
 <Layout title="Admin Dashboard">
-  <main class="flex-1 flex flex-col gap-4 items-center p-4 justify-center">
-    <section class="w-full max-w-md">
-      <h1 class="font-semibold text-2xl text-bleu bg-white mb-1">Admin dashboard</h1>
-  <div class="grid">
-    {links.map(link => (
-      <a class="card" href={link.path}>{link.name}</a>
-    ))}
-  </div>
-
-  <style>
-    .grid {
-      display: grid;
-      gap: 1rem;
-      max-width: 400px;
-    }
-    .card {
-      background-color: #fff;
-      padding: 1rem 1.5rem;
-      border-radius: 0.5rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      text-decoration: none;
-      color: #D13F27;
-      font-weight: bold;
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
-    }
-    .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-  </style>
-  </section>
+  <main class="flex-1 flex flex-col gap-6 items-center p-6">
+    <RequireRole allowedRoles={['admin']} client:load>
+      <section class="w-full max-w-5xl">
+        <h1 class="font-bold text-3xl text-bleu mb-6">Admin Dashboard</h1>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {links.map(link => (
+            <a 
+              href={link.path} 
+              class={`flex flex-col items-center justify-center p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-200 ${link.color}`}
+            >
+              <span class="text-4xl mb-3">{link.icon}</span>
+              <span class="text-lg font-semibold text-bleu text-center">{link.name}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    </RequireRole>
   </main>
 </Layout>

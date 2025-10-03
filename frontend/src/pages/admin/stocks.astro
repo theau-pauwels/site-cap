@@ -1,10 +1,13 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import Adminpins from "../../components/stocks";
+import Adminpins from "@components/stocks";
+import RequireRole from "@components/RequireRole";
 ---
 
 <Layout title="Admin - Pins">
   <main class="bg-white min-h-screen p-8 flex justify-center">
-    <Adminpins client:load />
+    <RequireRole allowedRoles={['admin']} client:load>
+      <Adminpins client:load />
+    </RequireRole>
   </main>
 </Layout>

@@ -19,7 +19,7 @@ const AdminCustomPinRequests: React.FC = () => {
 
   const fetchRequests = async () => {
     try {
-      const res = await fetch(`${API_URL}/`, { credentials: "include" });
+      const res = await fetch(`${API_URL}/admin`, { credentials: "include" });
       if (!res.ok) throw new Error("Erreur lors du chargement des demandes");
       const data = await res.json();
       setRequests(data);
@@ -61,7 +61,11 @@ const AdminCustomPinRequests: React.FC = () => {
 
   return (
     <main className="p-4">
-      <h1 className="text-2xl font-bold text-bleu mb-4">Demandes de Pins personnalisés</h1>
+      <h1 className="text-3xl font-bold text-bleu mb-4">Demandes de Pins personnalisés</h1>
+
+            {requests.length === 0 ? (
+        <p className="text-gray-500 text-center">Aucune demande de penne pour le moment.</p>
+      ) : (
       <ul className="space-y-4">
         {requests.map((req) => (
           <li key={req.id} className="border rounded p-4 bg-white shadow">
@@ -70,8 +74,22 @@ const AdminCustomPinRequests: React.FC = () => {
             <p><strong>Notes :</strong> {req.notes || "—"}</p>
             <p><strong>Date :</strong> {new Date(req.created_at).toLocaleString()}</p>
             {req.user_email && <p><strong>Utilisateur :</strong> {req.user_email}</p>}
-            <img src={req.logoUrl} alt="logo" className="w-32 h-32 object-contain mt-2 border" />
-
+              <img
+                src={req.logoUrl}
+                alt="logo"
+                className="w-32 h-32 object-contain border"
+              />
+              <br />
+              <a
+                href={req.logoUrl}
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-lg border-2 bleu bleu px-4 py-1 text-white transition duration-150 hover:bg-blue-50 hover:text-bleu"
+              >
+                Télécharger
+              </a>
+              <br />
             <div className="mt-2 flex items-center gap-2">
               <label>
                 <span className="mr-2">Statut :</span>
@@ -94,7 +112,7 @@ const AdminCustomPinRequests: React.FC = () => {
             </div>
           </li>
         ))}
-      </ul>
+      </ul>)}
     </main>
   );
 };

@@ -1,29 +1,42 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import CustomPinRequest from "./../components/CustomPinRequest";
+import RequireAuth from "@components/RequireAuth";
 ---
 
 <Layout title="Admin - Pins">
     <main class="container mx-auto space-y-6 px-2 pt-4">
-    <section
-      class="mx-auto max-w-5xl space-y-2 rounded-lg border-l-4 border-bleu bg-white px-6 py-3 font-medium shadow-box"
-
-    >
-      <h2 class="text-xl">Les demandes de pins personnalisés</h2>
-      <p>
-        explication
-      </p>
-      <ol>
-        <li>
-          - 
-        </li>
-        <li>- </li>
-        <li>- </li>
-        <li>- </li>
-      </ol>
-      
-    </section>
+      <RequireAuth client:load>
+<section
+  class="mx-auto max-w-5xl space-y-4 rounded-lg border-l-4 border-bleu bg-white px-6 py-6 font-medium shadow-box"
+>
+  <h2 class="text-2xl font-bold text-bleu mb-2">Demande de pins personnalisés</h2>
+  <p>
+    Vous souhaitez créer un pin personnalisé pour votre cercle ou vos amis ? La CAP vous propose désormais la réalisation de pins sur mesure !
+  </p>
+  <ul class="list-disc list-inside space-y-2 text-lg text-gray-800">
+    <li>
+      <strong>Qualité professionnelle</strong> : nous collaborons avec des spécialistes pour garantir un rendu optimal.
+    </li>
+    <li>
+      <strong>Devis rapide</strong> : remplissez le formulaire ci-dessous et joignez votre image (JPEG/PNG). Nous vous enverrons un prix et une prévisualisation du pin.
+    </li>
+    <li>
+      <strong>Prix variable</strong> : le tarif dépend du nombre de pins commandés.
+    </li>
+    <li>
+      <strong>Pins métal</strong> : commande minimale de <span class="font-bold text-bleu">50 pièces</span>.
+    </li>
+    <li>
+      <strong>Pins acrylique</strong> : commande minimale de <span class="font-bold text-bleu">10 pièces</span>.
+    </li>
+  </ul>
+  <p>
+    N’hésitez pas à nous contacter pour toute question ou demande spécifique !
+  </p>
+</section>
 
     <CustomPinRequest client:load />
+  </RequireAuth>
   </main>
 </Layout>

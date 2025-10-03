@@ -1,10 +1,13 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import MyOrders from "../components/myorders";
+import RequireAuth from "@components/RequireAuth";
 ---
 
 <Layout title="Admin - Pins">
   <main class="bg-white min-h-screen p-8 flex justify-center">
+    <RequireAuth client:load>
     <MyOrders client:load />
+  </RequireAuth>
   </main>
 </Layout>

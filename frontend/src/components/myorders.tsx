@@ -93,9 +93,9 @@ const MyOrders: React.FC = () => {
 
       {/* Commandes de pins classiques */}
       <section>
-        <h2 className="text-xl font-bold text-bleu mb-2">Mes commandes de pins</h2>
+        <h2 className="text-xl font-bold text-bleu mb-2">Mes commandes d'articles</h2>
         {orders.length === 0 ? (
-          <p>Aucune commande de pins.</p>
+          <p>Aucune commande d'articles.</p>
         ) : (
           <ul className="space-y-4">
             {orders.map((order) => (

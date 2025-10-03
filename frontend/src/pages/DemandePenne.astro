@@ -1,10 +1,38 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import DemandePenne from "./../components/DemandePenne";
+import DemandePenne from "@components/DemandePenne";
+import RequireAuth from "@components/RequireAuth";
 ---
 
 <Layout title="Admin - Demande de Penne">
-  <main class="bg-white p-8 flex justify-center">
+  <main class="bg-white p-8 flex flex-col items-center gap-8">
+    <RequireAuth client:load>
+      <section
+        class="mx-auto max-w-5xl space-y-4 rounded-lg border-l-4 border-bleu bg-white px-6 py-6 font-medium shadow-box"
+      >
+        <h2 class="text-2xl font-bold text-bleu mb-2">Demande de pennes</h2>
+        <p>
+          Vous avez perdu votre penne lors d’une soirée trop arrosée ? Ou la vôtre commence à montrer des signes de fatigue ? Pas de panique, la CAP est là pour vous !
+        </p>
+        <ul class="list-disc list-inside space-y-2 text-lg text-gray-800">
+          <li>
+            <strong>Commande facile</strong> : remplissez le formulaire ci-dessous pour demander une nouvelle penne.
+          </li>
+          <li>
+            <strong>Fabrication locale</strong> : nos pennes sont réalisées en Belgique par un artisan reconnu.
+          </li>
+          <li>
+            <strong>Qualité garantie</strong> : robustes et fidèles à la tradition polytechnicienne.
+          </li>
+          <li>
+            <strong>Personnalisation possible</strong> : indiquez vos préférences dans le formulaire.
+          </li>
+        </ul>
+        <p>
+          Pour toute question, n’hésitez pas à nous contacter. Nous sommes là pour vous aider !
+        </p>
+      </section>
     <DemandePenne client:load />
+    </RequireAuth>
   </main>
 </Layout>

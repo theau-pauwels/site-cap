@@ -1,10 +1,13 @@
 ---
 import AdminCategories from './../../components/AdminCategories';
 import Layout from '@layouts/Layout.astro';
+import RequireRole from "@components/RequireRole";
 ---
 
 <Layout title="Admin - Catégories">
   <main class="bg-white p-8 flex justify-center">
-    <AdminCategories client:load />
+    <RequireRole allowedRoles={['admin']} client:load>
+      <AdminCategories client:load />
+    </RequireRole>
   </main>
 </Layout>

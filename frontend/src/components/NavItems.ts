@@ -8,11 +8,9 @@ export type NavItem = {
 export const navItems: NavItem[] = [
     { label: "Se connecter", href: "/login" },
     { label: "S'inscrire", href: "/register" },
-    { label: "Pins", href: "/pins" },
+    { label: "Articles", href: "/pins" },
     { label : "Pins personnalisés", href: "/demande-pins"},
     { label : "Demande de Penne", href: "/DemandePenne"},
-    { label : "Mon panier", href: "/cart"},
-    { label : "Mes commandes", href: "/myorders"},
     { label : "Admin", href: "/admin", adminOnly: true},
-    { label : "Site Fédé", href: "https://fede.fpms.ac.be" },
+    { label : "Site Fédé", href: "https://www.fede.fpms.ac.be/cercles&commissions/cap" },
 ];

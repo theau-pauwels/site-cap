@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
 import os, json, time
+from .models import Role
+
 
 bp_requests = Blueprint("pins_requests", __name__, url_prefix="/api/pins/requests")
 
@@ -28,6 +30,15 @@ def get_requests():
     requests = read_requests()
     user_requests = [r for r in requests if r.get("user_id") == current_user.id]
     return jsonify(user_requests)
+
+
+@bp_requests.get("/admin")
+@login_required
+def get_all_requests_admin():
+    requests = read_requests()
+    if getattr(current_user, "role", None) != Role.ADMIN:
+        return jsonify({"error": "Non autorisé"}), 403
+    return jsonify(requests)
 
 
 
@@ -66,6 +77,7 @@ def add_request():
 
 
 @bp_requests.patch("/<int:req_id>")
+@login_required
 def update_request(req_id):
     """Modifier uniquement le statut d’une demande"""
     requests = read_requests()
@@ -84,6 +96,7 @@ def update_request(req_id):
 
 
 @bp_requests.delete("/<int:req_id>")
+@login_required
 def delete_request(req_id):
     """Supprimer une demande"""
     requests = read_requests()

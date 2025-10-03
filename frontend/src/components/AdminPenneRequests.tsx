@@ -17,6 +17,7 @@ const AdminPenneRequests: React.FC = () => {
 
   const fetchRequests = async () => {
     try {
+      setLoading(true);
       const res = await fetch("/api/admin/penne-requests/", { credentials: "include" });
       if (!res.ok) throw new Error("Erreur lors du chargement des demandes");
       const data: PenneRequest[] = await res.json();
@@ -59,29 +60,45 @@ const AdminPenneRequests: React.FC = () => {
     fetchRequests();
   }, []);
 
-  if (loading) return <p>Chargement des demandes...</p>;
-  if (!requests.length) return <p>Aucune demande de penne pour le moment.</p>;
+  if (loading) return <p className="text-center text-gray-500">Chargement des demandes...</p>;
 
   return (
-    <main className="p-6 max-w-4xl mx-auto flex flex-col gap-4">
-      <h2 className="text-2xl font-bold text-bleu mb-4">Demandes de Penne</h2>
+    <main className="p-4">
+      <h1 className="text-3xl font-bold text-bleu mb-6">Demandes de Penne</h1>
+      {requests.length === 0 ? (
+        <p className="text-gray-500 text-center">Aucune demande de penne pour le moment.</p>
+      ) : (
       <ul className="space-y-4">
         {requests.map((req) => (
-          <li key={req.id} className="border rounded shadow p-4 bg-white flex flex-col gap-2">
-            <p><span className="font-semibold text-bleu">Utilisateur:</span> {req.user_nom} {req.user_prenom}</p>
-            <p><span className="font-semibold text-bleu">Couleur:</span> {req.couleur}</p>
-            <p><span className="font-semibold text-bleu">Liseré:</span> {req["liseré"]}</p>
-            <p><span className="font-semibold text-bleu">Broderie:</span> {req.broderie}</p>
-            <p><span className="font-semibold text-bleu">Tour de tête:</span> {req.tourDeTete}</p>
+          <li key={req.id} className="border rounded-lg shadow bg-white p-4 flex flex-col gap-2">
+            <p>
+              <span className="font-semibold text-bleu">Utilisateur:</span> {req.user_nom}{" "}
+              {req.user_prenom}
+            </p>
+            <p>
+              <span className="font-semibold text-bleu">Couleur:</span> {req.couleur}
+            </p>
+            <p>
+              <span className="font-semibold text-bleu">Liseré:</span> {req["liseré"]}
+            </p>
+            <p>
+              <span className="font-semibold text-bleu">Broderie:</span> {req.broderie}
+            </p>
+            <p>
+              <span className="font-semibold text-bleu">Tour de tête:</span> {req.tourDeTete}
+            </p>
             <p>
               <span className="font-semibold text-bleu">Statut:</span>
               <select
                 value={req.status}
-                onChange={(e) => updateStatus(req.id, e.target.value as "en attente" | "traitée")}
+                onChange={(e) =>
+                  updateStatus(req.id, e.target.value as "en attente" | "traitée")
+                }
                 className="ml-2 border rounded p-1"
               >
                 <option value="en attente">En attente</option>
                 <option value="traitée">Traitée</option>
+                <option value="traitée">Refusée</option>
               </select>
             </p>
             <div className="flex gap-2 mt-2">
@@ -94,7 +111,7 @@ const AdminPenneRequests: React.FC = () => {
             </div>
           </li>
         ))}
-      </ul>
+      </ul>)}
     </main>
   );
 };

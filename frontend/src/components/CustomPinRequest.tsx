@@ -56,7 +56,7 @@ const CustomPinRequest: React.FC = () => {
         onSubmit={handleSubmit}
         className="flex flex-col gap-4 p-4 border rounded-xl shadow-md w-full max-w-md bg-white"
       >
-        <h2 className="text-xl font-bold text-bleu">Demande de Pin personnalisé</h2>
+        <h2 className="text-xl font-bold text-bleu">Demande de Pins personnalisé</h2>
 
         <input
           type="text"

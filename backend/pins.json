@@ -5,7 +5,7 @@
     "price": "2.00",
     "description": "Chiffre",
     "imageUrl": "/uploads/1758397616-BPCM0.JPG",
-    "stock": 0,
+    "stock": 17,
     "category": "Chiffres"
   },
   {
@@ -14,7 +14,7 @@
     "price": "2.00",
     "description": "Chiffre",
     "imageUrl": "/uploads/1758307265-BPCM1.jpg",
-    "stock": 6,
+    "stock": 138,
     "category": "Chiffres"
   },
   {
@@ -23,7 +23,7 @@
     "price": "2.00",
     "description": "Chiffre",
     "imageUrl": "/uploads/1758307387-BPCM2.jpg",
-    "stock": 3,
+    "stock": 117,
     "category": "Chiffres"
   },
   {
@@ -32,7 +32,7 @@
     "price": "2.00",
     "description": "Chiffre",
     "imageUrl": "/uploads/1758307403-BPCM3.jpg",
-    "stock": 0,
+    "stock": 60,
     "category": "Chiffres"
   },
   {
@@ -41,7 +41,7 @@
     "price": "2.00",
     "description": "Chiffre",
     "imageUrl": "/uploads/1758307416-BPCM4.jpg",
-    "stock": 0,
+    "stock": 114,
     "category": "Chiffres"
   },
   {
@@ -50,7 +50,7 @@
     "price": "2.00",
     "description": "Chiffre",
     "imageUrl": "/uploads/1758307428-BPCM5.jpg",
-    "stock": 0,
+    "stock": 68,
     "category": "Chiffres"
   },
   {
@@ -59,7 +59,7 @@
     "price": "2.00",
     "description": "Chiffre",
     "imageUrl": "/uploads/1758307439-BPCM6.jpg",
-    "stock": 0,
+    "stock": 45,
     "category": "Chiffres"
   },
   {
@@ -68,7 +68,7 @@
     "price": "2.00",
     "description": "Chiffre",
     "imageUrl": "/uploads/1758307449-BPCM7.jpg",
-    "stock": 0,
+    "stock": 177,
     "category": "Chiffres"
   },
   {
@@ -77,7 +77,7 @@
     "price": "2.00",
     "description": "Chiffre",
     "imageUrl": "/uploads/1758307474-BPCM8.jpg",
-    "stock": 0,
+    "stock": 126,
     "category": "Chiffres"
   },
   {
@@ -86,7 +86,7 @@
     "price": "2.00",
     "description": "Chiffre",
     "imageUrl": "/uploads/1758307495-BPCM9.jpg",
-    "stock": 0,
+    "stock": 45,
     "category": "Chiffres"
   },
   {
@@ -95,7 +95,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758307764-BPLA.JPG",
-    "stock": 0,
+    "stock": 205,
     "category": "Lettres"
   },
   {
@@ -104,7 +104,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758307781-BPLB.JPG",
-    "stock": 0,
+    "stock": 33,
     "category": "Lettres"
   },
   {
@@ -113,7 +113,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758307797-BPLC.JPG",
-    "stock": 0,
+    "stock": 47,
     "category": "Lettres"
   },
   {
@@ -122,7 +122,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758307815-BPLD.JPG",
-    "stock": 0,
+    "stock": 52,
     "category": "Lettres"
   },
   {
@@ -131,7 +131,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758307876-BPLE.JPG",
-    "stock": 0,
+    "stock": 45,
     "category": "Lettres"
   },
   {
@@ -140,7 +140,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758307904-BPLF.JPG",
-    "stock": 0,
+    "stock": 216,
     "category": "Lettres"
   },
   {
@@ -149,7 +149,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758307915-BPLG.JPG",
-    "stock": 0,
+    "stock": 15,
     "category": "Lettres"
   },
   {
@@ -158,7 +158,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758307934-BPLH.JPG",
-    "stock": 0,
+    "stock": 41,
     "category": "Lettres"
   },
   {
@@ -167,7 +167,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758307949-BPLI.JPG",
-    "stock": 0,
+    "stock": 48,
     "category": "Lettres"
   },
   {
@@ -176,7 +176,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758307959-BPLJ.JPG",
-    "stock": 0,
+    "stock": 26,
     "category": "Lettres"
   },
   {
@@ -185,7 +185,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758308011-BPLK.JPG",
-    "stock": 0,
+    "stock": 27,
     "category": "Lettres"
   },
   {
@@ -194,7 +194,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758308031-BPLL.JPG",
-    "stock": 0,
+    "stock": 34,
     "category": "Lettres"
   },
   {
@@ -203,7 +203,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758308077-BPLM.JPG",
-    "stock": 0,
+    "stock": 280,
     "category": "Lettres"
   },
   {
@@ -212,7 +212,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758308097-BPLN.JPG",
-    "stock": 0,
+    "stock": 42,
     "category": "Lettres"
   },
   {
@@ -221,7 +221,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758308107-BPLO.JPG",
-    "stock": 0,
+    "stock": 48,
     "category": "Lettres"
   },
   {
@@ -230,7 +230,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758308117-BPLP.JPG",
-    "stock": 0,
+    "stock": 182,
     "category": "Lettres"
   },
   {
@@ -239,7 +239,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758308132-BPLQ.JPG",
-    "stock": 0,
+    "stock": 29,
     "category": "Lettres"
   },
   {
@@ -248,7 +248,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758308145-BPLR.JPG",
-    "stock": 0,
+    "stock": 29,
     "category": "Lettres"
   },
   {
@@ -257,7 +257,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758308161-BPLS.JPG",
-    "stock": 0,
+    "stock": 150,
     "category": "Lettres"
   },
   {
@@ -266,7 +266,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758308179-BPLT.JPG",
-    "stock": 0,
+    "stock": 40,
     "category": "Lettres"
   },
   {
@@ -275,7 +275,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758308188-BPLU.JPG",
-    "stock": 0,
+    "stock": 33,
     "category": "Lettres"
   },
   {
@@ -284,7 +284,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758308198-BPLV.JPG",
-    "stock": 0,
+    "stock": 18,
     "category": "Lettres"
   },
   {
@@ -293,7 +293,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758308210-BPLW.JPG",
-    "stock": 0,
+    "stock": 114,
     "category": "Lettres"
   },
   {
@@ -302,7 +302,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758308242-BPLX.JPG",
-    "stock": 0,
+    "stock": 15,
     "category": "Lettres"
   },
   {
@@ -311,7 +311,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758308257-BPLY.JPG",
-    "stock": 0,
+    "stock": 15,
     "category": "Lettres"
   },
   {
@@ -320,7 +320,7 @@
     "price": "1.80",
     "description": "Lettre",
     "imageUrl": "/uploads/1758308268-BPLZ.JPG",
-    "stock": 0,
+    "stock": 10,
     "category": "Lettres"
   },
   {
@@ -329,7 +329,7 @@
     "price": "3.50",
     "description": "Poste de président dans un comité d'un cercle",
     "imageUrl": "/uploads/1758308630-fac01.jpg",
-    "stock": 0,
+    "stock": 8,
     "category": "Postes"
   },
   {
@@ -338,7 +338,7 @@
     "price": "3.50",
     "description": "Poste de présidente dans un comité d'un cercle",
     "imageUrl": "/uploads/1758308685-fac01f-2-big.jpg",
-    "stock": 0,
+    "stock": 9,
     "category": "Postes"
   },
   {
@@ -347,7 +347,7 @@
     "price": "3.50",
     "description": "Poste de vice-président dans un comité d'un cercle",
     "imageUrl": "/uploads/1758308729-fac02.jpg",
-    "stock": 0,
+    "stock": 8,
     "category": "Postes"
   },
   {
@@ -356,7 +356,7 @@
     "price": "3.50",
     "description": "Poste de vice-présidente dans un comité d'un cercle",
     "imageUrl": "/uploads/1758308771-fac02f.jpg",
-    "stock": 0,
+    "stock": 15,
     "category": "Postes"
   },
   {
@@ -365,7 +365,7 @@
     "price": "3.50",
     "description": "Poste de trésorier dans un comité d'un cercle",
     "imageUrl": "/uploads/1758309176-fac04.jpg",
-    "stock": 0,
+    "stock": 10,
     "category": "Postes"
   },
   {
@@ -374,7 +374,7 @@
     "price": "3.50",
     "description": "Poste de trésorière dans un comité d'un cercle",
     "imageUrl": "/uploads/1758309209-fac04f.jpg",
-    "stock": 0,
+    "stock": 8,
     "category": "Postes"
   },
   {
@@ -383,7 +383,7 @@
     "price": "3.50",
     "description": "Poste de secrétaire dans un comité d'un cercle",
     "imageUrl": "/uploads/1758309235-fac03.jpg",
-    "stock": 0,
+    "stock": 16,
     "category": "Postes"
   },
   {
@@ -392,7 +392,7 @@
     "price": "1.90",
     "description": "Poste de président(e) dans un comité d'un cercle",
     "imageUrl": "/uploads/1758309298-BPI36.JPG",
-    "stock": 0,
+    "stock": 3,
     "category": "Postes"
   },
   {
@@ -410,7 +410,7 @@
     "price": "1.80",
     "description": "Poste de trésorier(e) dans un comité d'un cercle",
     "imageUrl": "/uploads/1758309370-BPI12.JPG",
-    "stock": 0,
+    "stock": 15,
     "category": "Postes"
   },
   {
@@ -419,7 +419,7 @@
     "price": "1.80",
     "description": "Poste de trésorier(e) dans un comité d'un cercle",
     "imageUrl": "/uploads/1758309384-BPI29.JPG",
-    "stock": 0,
+    "stock": 26,
     "category": "Postes"
   },
   {
@@ -428,7 +428,7 @@
     "price": "2.10",
     "description": "Poste de trésorier(e) dans un comité d'un cercle",
     "imageUrl": "/uploads/1758309402-BPI39.jpg",
-    "stock": 0,
+    "stock": 6,
     "category": "Postes"
   },
   {
@@ -437,7 +437,7 @@
     "price": "2.20",
     "description": "Poste de secrétaire dans un comité d'un cercle",
     "imageUrl": "/uploads/1758309426-BPI89.JPG",
-    "stock": 0,
+    "stock": 23,
     "category": "Postes"
   },
   {
@@ -446,7 +446,7 @@
     "price": "2.00",
     "description": "Poste de DRI / DRI-R dans un comité de régionale",
     "imageUrl": "/uploads/1758309506-fae08-big.jpg",
-    "stock": 0,
+    "stock": 12,
     "category": "Postes"
   },
   {
@@ -455,7 +455,7 @@
     "price": "3.00",
     "description": "Comité du Bar\r\nPoste de barman ",
     "imageUrl": "/uploads/1758309551-BPI26.JPG",
-    "stock": 0,
+    "stock": 14,
     "category": "Cercles"
   },
   {
@@ -464,7 +464,7 @@
     "price": "2.40",
     "description": "Rôle de flic en bleusaille",
     "imageUrl": "/uploads/1758309587-BPI77-big.png",
-    "stock": 0,
+    "stock": 7,
     "category": "Postes"
   },
   {
@@ -473,7 +473,7 @@
     "price": "1.80",
     "description": "Rôle de baptiseur en bleusaille",
     "imageUrl": "/uploads/1758309633-BPI30.jpg",
-    "stock": 0,
+    "stock": 13,
     "category": "Postes"
   },
   {
@@ -482,7 +482,7 @@
     "price": "3.00",
     "description": "Comité du cercle des Sports\r\nEtudes sportives",
     "imageUrl": "/uploads/1758309957-bpi06-big.jpg",
-    "stock": 0,
+    "stock": 1,
     "category": "Cercles"
   },
   {
@@ -491,7 +491,7 @@
     "price": "3.00",
     "description": "Comité du cercle Photo-Vidéo",
     "imageUrl": "/uploads/1758310010-FIP03-APPAREIL-PHOTO-big.jpg",
-    "stock": 0,
+    "stock": 14,
     "category": "Cercles"
   },
   {
@@ -500,7 +500,7 @@
     "price": "3.00",
     "description": "Comité du cercle Magellan",
     "imageUrl": "/uploads/1758310064-arobase-bpi130-big.jpg",
-    "stock": 0,
+    "stock": 11,
     "category": "Cercles"
   },
   {
@@ -509,7 +509,7 @@
     "price": "3.00",
     "description": "Comité du cercle Sono-Danse-Musique\r\nEtudes musicales",
     "imageUrl": "/uploads/1758310102-FF07.jpg",
-    "stock": 0,
+    "stock": 7,
     "category": "Cercles"
   },
   {
@@ -518,7 +518,7 @@
     "price": "3.00",
     "description": "Comité du cercle Radio-Extra",
     "imageUrl": "/uploads/1758310121-BPI60.jpg",
-    "stock": 0,
+    "stock": 11,
     "category": "Cercles"
   },
   {
@@ -527,7 +527,7 @@
     "price": "3.00",
     "description": "Comité de la Mutuelle d'Edition",
     "imageUrl": "/uploads/1758310173-BPI68.jpg",
-    "stock": 0,
+    "stock": 23,
     "category": "Cercles"
   },
   {
@@ -536,7 +536,7 @@
     "price": "3.00",
     "description": "Comité de cercle Culturel",
     "imageUrl": "/uploads/1758310209-BPI95.JPG",
-    "stock": 0,
+    "stock": 12,
     "category": "Cercles"
   },
   {
@@ -545,7 +545,7 @@
     "price": "3.00",
     "description": "Comité du cercle Scientifique",
     "imageUrl": "/uploads/1758310230-FIP71-SCIE-big.jpg",
-    "stock": 0,
+    "stock": 26,
     "category": "Cercles"
   },
   {
@@ -554,7 +554,7 @@
     "price": "3.00",
     "description": "Comité du cercle Peyresq",
     "imageUrl": "/uploads/1758310251-BPI99.jpg",
-    "stock": 0,
+    "stock": 10,
     "category": "Cercles"
   },
   {
@@ -563,7 +563,7 @@
     "price": "3.00",
     "description": "Comité du Mons-Mine",
     "imageUrl": "/uploads/1758310273-fip85-big.png",
-    "stock": 0,
+    "stock": 14,
     "category": "Cercles"
   },
   {
@@ -572,7 +572,7 @@
     "price": "1.80",
     "description": "Etudes en chimie",
     "imageUrl": "/uploads/1758311093-BPI03.JPG",
-    "stock": 0,
+    "stock": 5,
     "category": "Etudes"
   },
   {
@@ -581,7 +581,7 @@
     "price": "1.80",
     "description": "Etudes en droit\r\nNé(e) entre le 23 septembre et le 23 octobre",
     "imageUrl": "/uploads/1758311118-fz01.jpg",
-    "stock": 0,
+    "stock": 20,
     "category": "Etudes"
   },
   {
@@ -590,7 +590,7 @@
     "price": "1.80",
     "description": "Etudes en physique",
     "imageUrl": "/uploads/1758311154-BPI10.JPG",
-    "stock": 0,
+    "stock": 8,
     "category": "Etudes"
   },
   {
@@ -599,7 +599,7 @@
     "price": "2.20",
     "description": "Etudes en ingénieur commercial",
     "imageUrl": "/uploads/1758311415-ff03.jpg",
-    "stock": 0,
+    "stock": 9,
     "category": "Etudes"
   },
   {
@@ -608,7 +608,7 @@
     "price": "1.90",
     "description": "Etudes en médecine",
     "imageUrl": "/uploads/1758311453-FF02.jpg",
-    "stock": 0,
+    "stock": 10,
     "category": "Etudes"
   },
   {
@@ -617,7 +617,7 @@
     "price": "1.80",
     "description": "Etudes en pharmacologie",
     "imageUrl": "/uploads/1758311486-FF04.jpg",
-    "stock": 0,
+    "stock": 12,
     "category": "Etudes"
   },
   {
@@ -626,7 +626,7 @@
     "price": "1.80",
     "description": "Etudes en infirmier(e)",
     "imageUrl": "/uploads/1758311534-ff29-2-.jpg",
-    "stock": 0,
+    "stock": 9,
     "category": "Etudes"
   },
   {
@@ -635,7 +635,7 @@
     "price": "1.80",
     "description": "Etudes en psychologie",
     "imageUrl": "/uploads/1758403067-BPI16.JPG",
-    "stock": 0,
+    "stock": 14,
     "category": "Etudes"
   },
   {
@@ -644,7 +644,7 @@
     "price": "1.90",
     "description": "Etudes en vétérinaire",
     "imageUrl": "/uploads/1758311642-bpi118.jpg",
-    "stock": 0,
+    "stock": 5,
     "category": "Etudes"
   },
   {
@@ -662,7 +662,7 @@
     "price": "1.80",
     "description": "Séminariste",
     "imageUrl": "/uploads/1758312220-BPI19.JPG",
-    "stock": 0,
+    "stock": 15,
     "category": "Etudes"
   },
   {
@@ -671,7 +671,7 @@
     "price": "2.00",
     "description": "Etudes en philosophie classique",
     "imageUrl": "/uploads/1758312265-FIP11-CASQUE-DE-PERICLES-big.jpg",
-    "stock": 0,
+    "stock": 8,
     "category": "Etudes"
   },
   {
@@ -680,7 +680,7 @@
     "price": "1.80",
     "description": "Humanités latines",
     "imageUrl": "/uploads/1758312288-BPI22.jpg",
-    "stock": 0,
+    "stock": 6,
     "category": "Etudes"
   },
   {
@@ -689,7 +689,7 @@
     "price": "1.80",
     "description": "Etudes en agronomie",
     "imageUrl": "/uploads/1758312312-charrue-BPI-123-big.jpg",
-    "stock": 0,
+    "stock": 3,
     "category": "Etudes"
   },
   {
@@ -698,7 +698,7 @@
     "price": "3.00",
     "description": "Etudes en architecture et urbanisme",
     "imageUrl": "/uploads/1758312366-FF10.jpg",
-    "stock": 0,
+    "stock": 26,
     "category": "Etudes"
   },
   {
@@ -707,7 +707,7 @@
     "price": "2.10",
     "description": "Humanités en sciences fortes",
     "imageUrl": "/uploads/1758312418-BPI44.jpg",
-    "stock": 0,
+    "stock": 4,
     "category": "Etudes"
   },
   {
@@ -716,7 +716,7 @@
     "price": "2.20",
     "description": "Etudes en géographie",
     "imageUrl": "/uploads/1758312465-BPI57.jpg",
-    "stock": 0,
+    "stock": 5,
     "category": "Etudes"
   },
   {
@@ -725,7 +725,7 @@
     "price": "1.80",
     "description": "Etudes en ingénieur civil",
     "imageUrl": "/uploads/1758312519-bpi121.jpg",
-    "stock": 0,
+    "stock": 146,
     "category": "Etudes"
   },
   {
@@ -734,7 +734,7 @@
     "price": "2.50",
     "description": "Etudes en arts",
     "imageUrl": "/uploads/1758312549-BPI78.jpg",
-    "stock": 0,
+    "stock": 9,
     "category": "Etudes"
   },
   {
@@ -743,7 +743,7 @@
     "price": "2.20",
     "description": "Etudes en sciences politiques",
     "imageUrl": "/uploads/1758312576-FF20.jpg",
-    "stock": 0,
+    "stock": 14,
     "category": "Etudes"
   },
   {
@@ -752,7 +752,7 @@
     "price": "2.10",
     "description": "Humanités en mathématiques fortes",
     "imageUrl": "/uploads/1758312604-BPI86.jpg",
-    "stock": 0,
+    "stock": 9,
     "category": "Etudes"
   },
   {
@@ -761,7 +761,7 @@
     "price": "1.80",
     "description": "Etudes de traduction / interprète",
     "imageUrl": "/uploads/1758312640-FIP76-SPHINX-big.jpg",
-    "stock": 0,
+    "stock": 26,
     "category": "Etudes"
   },
   {
@@ -770,7 +770,7 @@
     "price": "1.80",
     "description": "Etudes en géologie",
     "imageUrl": "/uploads/1758312680-BPI88.JPG",
-    "stock": 0,
+    "stock": 1,
     "category": "Etudes"
   },
   {
@@ -788,7 +788,7 @@
     "price": "1.80",
     "description": "Lent dans les études\r\nNé(e) entre le 22 juin et le 22 juillet ",
     "imageUrl": "/uploads/1758313395-BPI37.JPG",
-    "stock": 0,
+    "stock": 15,
     "category": "Lien avec les études"
   },
   {
@@ -797,25 +797,25 @@
     "price": "2.00",
     "description": "Chanceux aux examens",
     "imageUrl": "/uploads/1758313420-BPI42.jpg",
-    "stock": 0,
+    "stock": 9,
     "category": "Lien avec les études"
   },
   {
     "id": 1758313469,
-    "title": "Etoile Dorée (FPMs/ISIMS)",
+    "title": "Etoile Dorée (FPMs/ISIMs)",
     "price": "1.90",
     "description": "Année réussie",
     "imageUrl": "/uploads/1758313469-bpi47p.jpg",
-    "stock": 0,
+    "stock": 99,
     "category": "Lien avec les études"
   },
   {
     "id": 1758313505,
-    "title": "Etoile Argentée (FPMs/ISIMS)",
+    "title": "Etoile Argentée (FPMs/ISIMs)",
     "price": "1.90",
     "description": "Année bissée",
     "imageUrl": "/uploads/1758313505-BPI46P-big.jpg",
-    "stock": 0,
+    "stock": 82,
     "category": "Lien avec les études"
   },
   {
@@ -833,7 +833,7 @@
     "price": "1.90",
     "description": "Année bissée",
     "imageUrl": "/uploads/1758385096-etoile-argent-bpi134-big.jpg",
-    "stock": 0,
+    "stock": 21,
     "category": "Lien avec les études"
   },
   {
@@ -842,7 +842,7 @@
     "price": "1.80",
     "description": "Lent aux études",
     "imageUrl": "/uploads/1758385183-BPI45.JPG",
-    "stock": 0,
+    "stock": 9,
     "category": "Lien avec les études"
   },
   {
@@ -851,7 +851,7 @@
     "price": "1.80",
     "description": "Touriste dans les études",
     "imageUrl": "/uploads/1758385208-BPI80.JPG",
-    "stock": 0,
+    "stock": 11,
     "category": "Lien avec les études"
   },
   {
@@ -860,7 +860,7 @@
     "price": "2.10",
     "description": "Hâtif dans les études",
     "imageUrl": "/uploads/1758385468-BPI81-big.png",
-    "stock": 0,
+    "stock": 11,
     "category": "Lien avec les études"
   },
   {
@@ -869,7 +869,7 @@
     "price": "2.20",
     "description": "Lent aux études",
     "imageUrl": "/uploads/1758385306-fac08.jpg",
-    "stock": 0,
+    "stock": 14,
     "category": "Lien avec les études"
   },
   {
@@ -878,7 +878,7 @@
     "price": "1.80",
     "description": "Voyage de fac en fac",
     "imageUrl": "/uploads/1758385331-BPI116.JPG",
-    "stock": 0,
+    "stock": 10,
     "category": "Lien avec les études"
   },
   {
@@ -887,7 +887,7 @@
     "price": "2.60",
     "description": "Roi des bleus\r\nReine des bleuses",
     "imageUrl": "/uploads/1758385379-bacchus-dore.jpg",
-    "stock": 0,
+    "stock": 7,
     "category": "Insignes bibitifs"
   },
   {
@@ -896,7 +896,7 @@
     "price": "2.60",
     "description": "Vice-roi des bleus\r\nVice-reine des bleuses",
     "imageUrl": "/uploads/1758385409-bacchus-arg.jpg",
-    "stock": 0,
+    "stock": 5,
     "category": "Insignes bibitifs"
   },
   {
@@ -905,7 +905,7 @@
     "price": "2.10",
     "description": "Coma éthylique approuvé",
     "imageUrl": "/uploads/1758385449-fi06-n-big.png",
-    "stock": 0,
+    "stock": 10,
     "category": "Insignes bibitifs"
   },
   {
@@ -914,7 +914,7 @@
     "price": "1.90",
     "description": "Droitier",
     "imageUrl": "/uploads/1758385591-tete-de-buffle-bpi129-big.jpg",
-    "stock": 0,
+    "stock": 31,
     "category": "Insignes bibitifs"
   },
   {
@@ -923,7 +923,7 @@
     "price": "1.90",
     "description": "Gaucher",
     "imageUrl": "/uploads/1758385615-BPI106.JPG",
-    "stock": 0,
+    "stock": 18,
     "category": "Insignes bibitifs"
   },
   {
@@ -932,7 +932,7 @@
     "price": "1.80",
     "description": "Rapide en affond",
     "imageUrl": "/uploads/1758385644-BPI55.JPG",
-    "stock": 0,
+    "stock": 13,
     "category": "Insignes bibitifs"
   },
   {
@@ -941,7 +941,7 @@
     "price": "1.80",
     "description": "Amour de l'aviation ",
     "imageUrl": "/uploads/1758387031-BPI02.JPG",
-    "stock": 0,
+    "stock": 9,
     "category": "Passions"
   },
   {
@@ -950,7 +950,7 @@
     "price": "1.80",
     "description": "Amour de la navigation",
     "imageUrl": "/uploads/1758387071-BPI04.JPG",
-    "stock": 0,
+    "stock": 8,
     "category": "Passions"
   },
   {
@@ -959,7 +959,7 @@
     "price": "2.10",
     "description": "Amour du vin",
     "imageUrl": "/uploads/1758387095-BPI14.jpg",
-    "stock": 0,
+    "stock": 12,
     "category": "Passions"
   },
   {
@@ -968,7 +968,7 @@
     "price": "1.80",
     "description": "Amour du jeu",
     "imageUrl": "/uploads/1758387135-BPI21.JPG",
-    "stock": 0,
+    "stock": 9,
     "category": "Passions"
   },
   {
@@ -977,7 +977,7 @@
     "price": "2.20",
     "description": "Amour de la chasse",
     "imageUrl": "/uploads/1758387185-BPI34.jpg",
-    "stock": 0,
+    "stock": 13,
     "category": "Passions"
   },
   {
@@ -986,7 +986,7 @@
     "price": "2.00",
     "description": "Scout\r\nRoyaliste",
     "imageUrl": "/uploads/1758387276-BPI52.JPG",
-    "stock": 0,
+    "stock": 4,
     "category": "Passions"
   },
   {
@@ -1004,7 +1004,7 @@
     "price": "1.80",
     "description": "Amour du ski",
     "imageUrl": "/uploads/1758387454-bpi125.jpg",
-    "stock": 0,
+    "stock": 14,
     "category": "Passions"
   },
   {
@@ -1013,7 +1013,7 @@
     "price": "1.80",
     "description": "Membre d'une fanfare",
     "imageUrl": "/uploads/1758387540-BPI104.JPG",
-    "stock": 0,
+    "stock": 9,
     "category": "Passions"
   },
   {
@@ -1022,7 +1022,7 @@
     "price": "1.80",
     "description": "Blessé en guindaille",
     "imageUrl": "/uploads/1758387596-BPI05.JPG",
-    "stock": 0,
+    "stock": 10,
     "category": "Comportement"
   },
   {
@@ -1031,7 +1031,7 @@
     "price": "1.80",
     "description": "Célibataire (à l’endroit) \r\nEn couple (à l’envers) ",
     "imageUrl": "/uploads/1758387732-BPI24.JPG",
-    "stock": 0,
+    "stock": 18,
     "category": "Comportement"
   },
   {
@@ -1040,7 +1040,7 @@
     "price": "2.20",
     "description": "Nuit blanche pour motif associatif",
     "imageUrl": "/uploads/1758387815-BPI25.jpg",
-    "stock": 0,
+    "stock": 5,
     "category": "Comportement"
   },
   {
@@ -1049,7 +1049,7 @@
     "price": "2.20",
     "description": "Grande gueule\r\nFrançais",
     "imageUrl": "/uploads/1758387896-BPI32.jpg",
-    "stock": 0,
+    "stock": 14,
     "category": "Comportement"
   },
   {
@@ -1058,7 +1058,7 @@
     "price": "1.80",
     "description": "Humour très lourd",
     "imageUrl": "/uploads/1758387943-BPI40.jpg",
-    "stock": 0,
+    "stock": 16,
     "category": "Comportement"
   },
   {
@@ -1067,7 +1067,7 @@
     "price": "2.20",
     "description": "Superstitieux",
     "imageUrl": "/uploads/1758388044-FI19.jpg",
-    "stock": 0,
+    "stock": 13,
     "category": "Comportement"
   },
   {
@@ -1076,7 +1076,7 @@
     "price": "1.80",
     "description": "Fidèle (à l’endroit) \r\nInfidèle (à l’envers) ",
     "imageUrl": "/uploads/1758388139-BPI56.JPG",
-    "stock": 0,
+    "stock": 8,
     "category": "Comportement"
   },
   {
@@ -1085,7 +1085,7 @@
     "price": "2.00",
     "description": "Prise de guerre",
     "imageUrl": "/uploads/1758388278-FI25.jpg",
-    "stock": 0,
+    "stock": 4,
     "category": "Comportement"
   },
   {
@@ -1094,7 +1094,7 @@
     "price": "1.80",
     "description": "Bon vivant",
     "imageUrl": "/uploads/1758388365-BPI61.JPG",
-    "stock": 0,
+    "stock": 6,
     "category": "Comportement"
   },
   {
@@ -1103,7 +1103,7 @@
     "price": "1.80",
     "description": "Grand dragueur qui conclut à chaque soirée ",
     "imageUrl": "/uploads/1758388427-BPI63.JPG",
-    "stock": 0,
+    "stock": 6,
     "category": "Comportement"
   },
   {
@@ -1112,7 +1112,7 @@
     "price": "1.80",
     "description": "S'endort en guindaille",
     "imageUrl": "/uploads/1758388502-bpi64-big.jpg",
-    "stock": 0,
+    "stock": 17,
     "category": "Comportement"
   },
   {
@@ -1121,7 +1121,7 @@
     "price": "2.60",
     "description": "Patriote\r\nNé(e) entre le 23 juillet et le 22 août",
     "imageUrl": "/uploads/1758388562-fz06.jpg",
-    "stock": 0,
+    "stock": 22,
     "category": "Comportement"
   },
   {
@@ -1139,7 +1139,7 @@
     "price": "3.10",
     "description": "Change de comportement avec l'alcool",
     "imageUrl": "/uploads/1758388702-fi53.jpg",
-    "stock": 0,
+    "stock": 13,
     "category": "Comportement"
   },
   {
@@ -1148,7 +1148,7 @@
     "price": "2.60",
     "description": "Se tape des thons en guindaille\r\nNé(e) entre le 20 février et le 20 mars",
     "imageUrl": "/uploads/1758388791-fz07n-big.png",
-    "stock": 0,
+    "stock": 17,
     "category": "Comportement"
   },
   {
@@ -1157,7 +1157,7 @@
     "price": "2.60",
     "description": "Radin",
     "imageUrl": "/uploads/1758388819-bpi136.jpg",
-    "stock": 0,
+    "stock": 8,
     "category": "Comportement"
   },
   {
@@ -1166,7 +1166,7 @@
     "price": "2.20",
     "description": "Grand blagueur",
     "imageUrl": "/uploads/1758388916-BPI97.jpg",
-    "stock": 0,
+    "stock": 17,
     "category": "Comportement"
   },
   {
@@ -1175,7 +1175,7 @@
     "price": "2.60",
     "description": "Malchanceux",
     "imageUrl": "/uploads/1758388956-fi71.jpg",
-    "stock": 0,
+    "stock": 9,
     "category": "Comportement"
   },
   {
@@ -1193,7 +1193,7 @@
     "price": "2.20",
     "description": "Conducteur après guindaille",
     "imageUrl": "/uploads/1758389041-FI51.jpg",
-    "stock": 0,
+    "stock": 3,
     "category": "Comportement"
   },
   {
@@ -1202,7 +1202,7 @@
     "price": "4.00",
     "description": "Nationalité belge",
     "imageUrl": "/uploads/1758390607-bb05-big.jpg",
-    "stock": 0,
+    "stock": 21,
     "category": "Régions"
   },
   {
@@ -1211,7 +1211,7 @@
     "price": "4.00",
     "description": "Originaire du Borinage",
     "imageUrl": "/uploads/1758390647-bb08-big.jpg",
-    "stock": 0,
+    "stock": 36,
     "category": "Régions"
   },
   {
@@ -1220,7 +1220,7 @@
     "price": "4.00",
     "description": "Originaire de Charleroi et alentours",
     "imageUrl": "/uploads/1758390679-IMGP1759-copie.jpg",
-    "stock": 0,
+    "stock": 24,
     "category": "Régions"
   },
   {
@@ -1229,7 +1229,7 @@
     "price": "4.70",
     "description": "Originaire du Centre",
     "imageUrl": "/uploads/1758390717-IMGP1752-copie.jpg",
-    "stock": 0,
+    "stock": 22,
     "category": "Régions"
   },
   {
@@ -1238,7 +1238,7 @@
     "price": "4.00",
     "description": "Originaire de Chimay et alentours",
     "imageUrl": "/uploads/1758390794-IMGP1758-copie.jpg",
-    "stock": 0,
+    "stock": 6,
     "category": "Régions"
   },
   {
@@ -1247,7 +1247,7 @@
     "price": "4.70",
     "description": "Originaire du Hainaut",
     "imageUrl": "/uploads/1758390843-IMGP1754-copie.jpg",
-    "stock": 0,
+    "stock": 22,
     "category": "Régions"
   },
   {
@@ -1256,7 +1256,7 @@
     "price": "4.70",
     "description": "Originaire du Luxembourg",
     "imageUrl": "/uploads/1758390875-IMGP1757-copie.jpg",
-    "stock": 0,
+    "stock": 4,
     "category": "Régions"
   },
   {
@@ -1265,7 +1265,7 @@
     "price": "4.00",
     "description": "Originaire de Namur et alentours",
     "imageUrl": "/uploads/1758390906-IMGP1753-copie.jpg",
-    "stock": 0,
+    "stock": 11,
     "category": "Régions"
   },
   {
@@ -1274,7 +1274,7 @@
     "price": "4.00",
     "description": "Originaire de Tournai et alentours",
     "imageUrl": "/uploads/1758390933-bb06-big.jpg",
-    "stock": 0,
+    "stock": 56,
     "category": "Régions"
   },
   {
@@ -1283,7 +1283,7 @@
     "price": "2.70",
     "description": "Originaire de Binche et alentours",
     "imageUrl": "/uploads/1758390961-bpi141.jpg",
-    "stock": 0,
+    "stock": 15,
     "category": "Régions"
   },
   {
@@ -1292,7 +1292,7 @@
     "price": "1.80",
     "description": "Chimacien",
     "imageUrl": "/uploads/1758391018-BPI109.JPG",
-    "stock": 0,
+    "stock": 19,
     "category": "Régions"
   },
   {
@@ -1301,7 +1301,7 @@
     "price": "1.80",
     "description": "Originaire du Centre",
     "imageUrl": "/uploads/1758391041-BPI108.JPG",
-    "stock": 0,
+    "stock": 11,
     "category": "Régions"
   },
   {
@@ -1310,7 +1310,7 @@
     "price": "2.20",
     "description": "Ardennais",
     "imageUrl": "/uploads/1758391054-BPI96.jpg",
-    "stock": 0,
+    "stock": 2,
     "category": "Régions"
   },
   {
@@ -1319,7 +1319,7 @@
     "price": "2.00",
     "description": "Montois",
     "imageUrl": "/uploads/1758391074-BPI98.JPG",
-    "stock": 0,
+    "stock": 49,
     "category": "Régions"
   },
   {
@@ -1328,7 +1328,7 @@
     "price": "2.70",
     "description": "Originaire de Tournai et alentours",
     "imageUrl": "/uploads/1758391095-bpi58.jpg",
-    "stock": 0,
+    "stock": 35,
     "category": "Régions"
   },
   {
@@ -1337,7 +1337,7 @@
     "price": "2.20",
     "description": "Surpris en plein cunnilingus ",
     "imageUrl": "/uploads/1758392785-FP01-ORANGE-big.png",
-    "stock": 0,
+    "stock": 4,
     "category": "Signes sexuels"
   },
   {
@@ -1346,7 +1346,7 @@
     "price": "2.20",
     "description": "Surpris en pleine partie de jambes en l’air en guindaille ",
     "imageUrl": "/uploads/1758392809-fp02.jpg",
-    "stock": 0,
+    "stock": 16,
     "category": "Signes sexuels"
   },
   {
@@ -1355,7 +1355,7 @@
     "price": "1.80",
     "description": "Ardeur sexuelle",
     "imageUrl": "/uploads/1758392831-BPI23.JPG",
-    "stock": 0,
+    "stock": 22,
     "category": "Signes sexuels"
   },
   {
@@ -1364,7 +1364,7 @@
     "price": "2.20",
     "description": "Surpris en plein acte avec une fille enceinte en guindaille ",
     "imageUrl": "/uploads/1758393044-fp03.jpg",
-    "stock": 0,
+    "stock": 10,
     "category": "Signes sexuels"
   },
   {
@@ -1382,7 +1382,7 @@
     "price": "2.50",
     "description": "Fin baiseur (vers le haut)\r\nJardin secret (vers le bas) ",
     "imageUrl": "/uploads/1758393133-BPI41.jpg",
-    "stock": 0,
+    "stock": 9,
     "category": "Signes sexuels"
   },
   {
@@ -1391,7 +1391,7 @@
     "price": "1.90",
     "description": "Perte de virginité masculine en guindaille ",
     "imageUrl": "/uploads/1758393160-BPI49.jpg",
-    "stock": 0,
+    "stock": 8,
     "category": "Signes sexuels"
   },
   {
@@ -1400,7 +1400,7 @@
     "price": "2.40",
     "description": "Ouverte d’esprit sexuellement (féminin) ",
     "imageUrl": "/uploads/1758393255-fs02.jpg",
-    "stock": 0,
+    "stock": 14,
     "category": "Signes sexuels"
   },
   {
@@ -1409,7 +1409,7 @@
     "price": "2.40",
     "description": "Ouverture d’esprit sexuellement (masculin) ",
     "imageUrl": "/uploads/1758393283-fs01.jpg",
-    "stock": 0,
+    "stock": 13,
     "category": "Signes sexuels"
   },
   {
@@ -1418,7 +1418,7 @@
     "price": "2.20",
     "description": "Perte de virginité féminine en guindaille ",
     "imageUrl": "/uploads/1758393324-fi24-big.jpg",
-    "stock": 0,
+    "stock": 8,
     "category": "Signes sexuels"
   },
   {
@@ -1427,7 +1427,7 @@
     "price": "2.60",
     "description": "Pratique assidue de la levrette ",
     "imageUrl": "/uploads/1758393353-fs03.jpg",
-    "stock": 0,
+    "stock": 4,
     "category": "Signes sexuels"
   },
   {
@@ -1436,7 +1436,7 @@
     "price": "2.20",
     "description": "Surpris en pleine sodomie en guindaille ",
     "imageUrl": "/uploads/1758393399-fp03.jpg",
-    "stock": 0,
+    "stock": 14,
     "category": "Signes sexuels"
   },
   {
@@ -1445,7 +1445,7 @@
     "price": "2.20",
     "description": "Surpris en pleine fellation en guindaille ",
     "imageUrl": "/uploads/1758393423-fp04.jpg",
-    "stock": 0,
+    "stock": 15,
     "category": "Signes sexuels"
   },
   {
@@ -1454,7 +1454,7 @@
     "price": "2.20",
     "description": "Fille très chaude ",
     "imageUrl": "/uploads/1758393453-BPI93.jpg",
-    "stock": 0,
+    "stock": 7,
     "category": "Signes sexuels"
   },
   {
@@ -1463,7 +1463,7 @@
     "price": "2.40",
     "description": "Dépucelée en guindaille ",
     "imageUrl": "/uploads/1758393473-BPI94.jpg",
-    "stock": 0,
+    "stock": 12,
     "category": "Signes sexuels"
   },
   {
@@ -1472,7 +1472,7 @@
     "price": "2.50",
     "description": "Hétérosexuel (à l’endroit)\r\nHomosexuel (à l’envers)",
     "imageUrl": "/uploads/1758393509-BPI102.jpg",
-    "stock": 0,
+    "stock": 17,
     "category": "Signes sexuels"
   },
   {
@@ -1481,7 +1481,7 @@
     "price": "1.80",
     "description": "Bisexuel",
     "imageUrl": "/uploads/1758393531-BPI103.JPG",
-    "stock": 0,
+    "stock": 9,
     "category": "Signes sexuels"
   },
   {
@@ -1490,7 +1490,7 @@
     "price": "2.20",
     "description": "Surpris en train de faire une minette en guindaille ",
     "imageUrl": "/uploads/1758393559-fp06.jpg",
-    "stock": 0,
+    "stock": 9,
     "category": "Signes sexuels"
   },
   {
@@ -1499,7 +1499,7 @@
     "price": "2.70",
     "description": "Pratique assidue du 69 ",
     "imageUrl": "/uploads/1758393578-fs04.jpg",
-    "stock": 0,
+    "stock": 19,
     "category": "Signes sexuels"
   },
   {
@@ -1517,7 +1517,7 @@
     "price": "2.40",
     "description": "Ejaculateur précoce ",
     "imageUrl": "/uploads/1758401142-BPI51.jpg",
-    "stock": 0,
+    "stock": 14,
     "category": "Signes sexuels"
   },
   {
@@ -1526,7 +1526,7 @@
     "price": "1.80",
     "description": "Etudes en philosophie ",
     "imageUrl": "/uploads/1758402875-BPI50.JPG",
-    "stock": 0,
+    "stock": 10,
     "category": "Etudes"
   },
   {
@@ -1535,7 +1535,7 @@
     "price": "1.80",
     "description": "Vie nocturne",
     "imageUrl": "/uploads/1758402772-BPI27.jpg",
-    "stock": 0,
+    "stock": 7,
     "category": "Comportement"
   },
   {
@@ -1544,7 +1544,7 @@
     "price": "4.00",
     "description": "Originaire de Wallonie",
     "imageUrl": "/uploads/1758401258-a-2.jpg",
-    "stock": 0,
+    "stock": 13,
     "category": "Régions"
   },
   {
@@ -1562,7 +1562,7 @@
     "price": "3.10",
     "description": "Amour de l'astrologie",
     "imageUrl": "/uploads/1758401314-c.jpg",
-    "stock": 0,
+    "stock": 8,
     "category": "Passions"
   },
   {
@@ -1571,7 +1571,7 @@
     "price": "2.60",
     "description": "Soumis à son conjoint",
     "imageUrl": "/uploads/1758401353-canard.jpg",
-    "stock": 0,
+    "stock": 12,
     "category": "Comportement"
   },
   {
@@ -1580,7 +1580,7 @@
     "price": "3.10",
     "description": "Originaire de Mouscron et alentours",
     "imageUrl": "/uploads/1758401406-hurlu.jpg",
-    "stock": 0,
+    "stock": 9,
     "category": "Régions"
   },
   {
@@ -1589,7 +1589,7 @@
     "price": "1.80",
     "description": "Humanités en mathématiques",
     "imageUrl": "/uploads/1758403005-BPI87.JPG",
-    "stock": 0,
+    "stock": 11,
     "category": "Etudes"
   },
   {
@@ -1598,7 +1598,7 @@
     "price": "2.60",
     "description": "Etudes littéraires",
     "imageUrl": "/uploads/1758401478-v.jpg",
-    "stock": 0,
+    "stock": 15,
     "category": "Etudes"
   },
   {
@@ -1607,7 +1607,7 @@
     "price": "3.10",
     "description": "Etudes en histoire",
     "imageUrl": "/uploads/1758401504-h.jpg",
-    "stock": 0,
+    "stock": 12,
     "category": "Etudes"
   },
   {
@@ -1616,7 +1616,7 @@
     "price": "2.10",
     "description": "Deuxième session totalement réussie",
     "imageUrl": "/uploads/1758401580-t-2.jpg",
-    "stock": 0,
+    "stock": 12,
     "category": "Lien avec les études"
   },
   {
@@ -1625,7 +1625,7 @@
     "price": "2.60",
     "description": "Deuxième session totalement ratée",
     "imageUrl": "/uploads/1758401615-t.jpg",
-    "stock": 0,
+    "stock": 5,
     "category": "Lien avec les études"
   },
   {
@@ -1634,7 +1634,7 @@
     "price": "1.80",
     "description": "Joueur",
     "imageUrl": "/uploads/1758402824-BPI38.JPG",
-    "stock": 0,
+    "stock": 10,
     "category": "Comportement"
   },
   {
@@ -1652,7 +1652,7 @@
     "price": "1.90",
     "description": "Etudes en mécanique",
     "imageUrl": "/uploads/1758401998-BPI126.jpg",
-    "stock": 0,
+    "stock": 8,
     "category": "Etudes"
   },
   {
@@ -1661,7 +1661,7 @@
     "price": "1.80",
     "description": "Amour de la musique, de la poésie, de la danse",
     "imageUrl": "/uploads/1758402150-BPI70.jpg",
-    "stock": 0,
+    "stock": 2,
     "category": "Passions"
   },
   {
@@ -1670,7 +1670,7 @@
     "price": "1.80",
     "description": "Symbole de l'amitié",
     "imageUrl": "/uploads/1758402174-BPI71.JPG",
-    "stock": 0,
+    "stock": 68,
     "category": "Passions"
   },
   {
@@ -1679,7 +1679,7 @@
     "price": "2.60",
     "description": "Cœur à prendre (à l’endroit)\r\nCœur brisé (à l’envers) ",
     "imageUrl": "/uploads/1758402223-o.jpg",
-    "stock": 0,
+    "stock": 1,
     "category": "Comportement"
   },
   {
@@ -1706,7 +1706,7 @@
     "price": "2.60",
     "description": "Né(e) entre le 23 décembre et le 20 janvier",
     "imageUrl": "/uploads/1758403630-fz04.jpg",
-    "stock": 0,
+    "stock": 15,
     "category": "Signes astrologiques"
   },
   {
@@ -1715,7 +1715,7 @@
     "price": "2.60",
     "description": "Né(e) entre le 21 janvier et le 19 février",
     "imageUrl": "/uploads/1758403691-fz11.jpg",
-    "stock": 0,
+    "stock": 22,
     "category": "Signes astrologiques"
   },
   {
@@ -1724,7 +1724,7 @@
     "price": "2.60",
     "description": "Né(e) entre le 21 mars et le 19 avril",
     "imageUrl": "/uploads/1758403836-fz02.jpg",
-    "stock": 0,
+    "stock": 14,
     "category": "Signes astrologiques"
   },
   {
@@ -1733,7 +1733,7 @@
     "price": "2.60",
     "description": "Né(e) entre le 20 avril et le 20 mai",
     "imageUrl": "/uploads/1758403895-fz10.jpg",
-    "stock": 0,
+    "stock": 18,
     "category": "Signes astrologiques"
   },
   {
@@ -1742,7 +1742,7 @@
     "price": "2.60",
     "description": "Né(e) entre le 21 mai et le 21 juin",
     "imageUrl": "/uploads/1758403923-fz05.jpg",
-    "stock": 0,
+    "stock": 18,
     "category": "Signes astrologiques"
   },
   {
@@ -1751,7 +1751,7 @@
     "price": "2.60",
     "description": "Né(e) entre le 23 août et le 22 septembre",
     "imageUrl": "/uploads/1758404024-fz12.jpg",
-    "stock": 0,
+    "stock": 21,
     "category": "Signes astrologiques"
   },
   {
@@ -1760,7 +1760,7 @@
     "price": "2.60",
     "description": "Né(e) entre le 24 octobre et le 22 novembre ",
     "imageUrl": "/uploads/1758404057-fz09.jpg",
-    "stock": 0,
+    "stock": 14,
     "category": "Signes astrologiques"
   },
   {
@@ -1769,7 +1769,43 @@
     "price": "2.60",
     "description": "Né(e) entre le 23 novembre et le 22 décembre",
     "imageUrl": "/uploads/1758404103-fz08.jpg",
-    "stock": 0,
+    "stock": 18,
     "category": "Signes astrologiques"
+  },
+  {
+    "id": 1759475787,
+    "title": "Tablier de Chimie",
+    "price": "17",
+    "description": "Taille S",
+    "imageUrl": "/uploads/1759475787-julien-blouse-labo-pour-jeune-etudiant.jpg",
+    "stock": 0,
+    "category": "Autre"
+  },
+  {
+    "id": 1759475834,
+    "title": "Tablier de Chimie",
+    "price": "17",
+    "description": "Taille M",
+    "imageUrl": "/uploads/1759475834-julien-blouse-labo-pour-jeune-etudiant.jpg",
+    "stock": 0,
+    "category": "Autre"
+  },
+  {
+    "id": 1759475856,
+    "title": "Tablier de Chimie",
+    "price": "17",
+    "description": "Taille L",
+    "imageUrl": "/uploads/1759475856-julien-blouse-labo-pour-jeune-etudiant.jpg",
+    "stock": 0,
+    "category": "Autre"
+  },
+  {
+    "id": 1759475878,
+    "title": "Tablier de Chimie",
+    "price": "17",
+    "description": "Taille XL",
+    "imageUrl": "/uploads/1759475878-julien-blouse-labo-pour-jeune-etudiant.jpg",
+    "stock": 0,
+    "category": "Autre"
   }
 ]
